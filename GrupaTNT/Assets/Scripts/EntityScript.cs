@@ -10,7 +10,7 @@ public class EntityScript : MonoBehaviour
     // Start is called before the first frame update
     public void Start()
     {
-        rb2 = gameObject.GetComponent<Rigidbody>;
+        rb2d = gameObject.GetComponent<Rigidbody>();
         if (entityType.Equals("player")) { controller = new PlayerController(); }
     }
 
