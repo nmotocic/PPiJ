@@ -5,7 +5,7 @@ using UnityEngine;
 public class EntityScript : MonoBehaviour
 {
     EntityControllerInterface controller;
-    public string entityType= "player";
+    public string entityType= "player";int i = 0;
     // Start is called before the first frame update
     public void Start()
     {
@@ -22,6 +22,8 @@ public class EntityScript : MonoBehaviour
     void OnCollisionEnter2D(Collision2D col)
     {
         EntityScript ES = col.otherCollider.gameObject.GetComponent<EntityScript>();
+        foreach (ContactPoint2D e in col.contacts) { Debug.Log(i.ToString()+e.point.ToString()); }
+        i++;
         if (ES!=null)
         {
         }
