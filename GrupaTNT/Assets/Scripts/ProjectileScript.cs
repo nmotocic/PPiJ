@@ -16,7 +16,6 @@ public class ProjectileScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(direction);
         transform.Translate(direction * speed);
         TTL--;
         if (TTL == 0 && speed!=0.0f) { GameObject.Destroy(gameObject); }
