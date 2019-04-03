@@ -17,12 +17,15 @@ public class EntityScript : MonoBehaviour
     {
         controller.Update();
         Vector2 movement = controller.getMovement();
-        Debug.Log(movement);
         transform.Translate(movement);
     }
     void OnCollisionEnter2D(Collision2D col)
     {
-        Debug.Log("Ow");
-        Debug.Log(col.contacts);
+        EntityScript ES = col.otherCollider.gameObject.GetComponent<EntityScript>();
+        if (ES!=null)
+        {
+        }
+        if (entityType.Equals("player")) {
+        }
     }
 }

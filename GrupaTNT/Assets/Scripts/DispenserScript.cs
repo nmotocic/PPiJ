@@ -21,7 +21,7 @@ public class DispenserScript : MonoBehaviour
         if (counter == DispensingFrames) {
             GameObject x = Instantiate(dispensable);
             ProjectileScript y = x.GetComponent<ProjectileScript>();
-            v = new Vector2(Random.Range(-1.0f, 1 - 0f), Random.Range(-1.0f, 1 - 0f));
+            v = new Vector2(Random.Range(-1.0f, -1.0f), Random.Range(-1.0f, -1.0f));
             y.direction = v.normalized;
             y.speed = 0.2f;
             counter++;
