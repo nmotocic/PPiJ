@@ -5,12 +5,10 @@ using UnityEngine;
 public class EntityScript : MonoBehaviour
 {
     EntityControllerInterface controller;
-    private Rigidbody rb2d;
     public string entityType= "player";
     // Start is called before the first frame update
     public void Start()
     {
-        rb2d = gameObject.GetComponent<Rigidbody>();
         if (entityType.Equals("player")) { controller = new PlayerController(); }
     }
 
@@ -19,7 +17,8 @@ public class EntityScript : MonoBehaviour
     {
         controller.Update();
         Vector2 movement = controller.getMovement();
-        rb2d.AddForce(movement);
+        Debug.Log(movement);
+        transform.Translate(movement);
     }
     void OnCollisionEnter2D(Collision2D col)
     {
