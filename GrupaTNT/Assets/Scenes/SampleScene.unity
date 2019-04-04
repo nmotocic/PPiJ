@@ -142,6 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a93305eaa820bdc4c8ef091537761f7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DispensingFrames: 20
   dispensable: {fileID: 1117863274}
 --- !u!212 &192565061
 SpriteRenderer:
@@ -513,7 +514,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 7
+  m_Constraints: 4
 --- !u!61 &1350809394
 BoxCollider2D:
   m_ObjectHideFlags: 0

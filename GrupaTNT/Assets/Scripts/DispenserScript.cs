@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DispenserScript : MonoBehaviour
 {
-    int DispensingFrames = 5;
+    public int DispensingFrames = 20;
     int counter = 0;
     public GameObject dispensable;
     // Start is called before the first frame update
