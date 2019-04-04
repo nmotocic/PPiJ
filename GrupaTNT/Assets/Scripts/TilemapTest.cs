@@ -9,18 +9,18 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+/// <summary>
+/// Testing script for Tilemaps and Serialization
+/// </summary>
 public class TilemapTest : MonoBehaviour
 {
     private Tilemap map;
     private Grid grid;
     private Camera cam;
-
-    private Grid createdGrid;
     
     private Vector3Int mousePosition;
 
     private LinkedList<Vector3Int> allTileLocations;
-    private Vector3 tileAncor;
     private TileBase[] tileBases;
 
     private TileMapSerializer _serializer;
@@ -28,29 +28,20 @@ public class TilemapTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Creating of out serializer
         _serializer = new TileMapSerializer();
         
+        //We assume the script is on the Tilemap Object so we get the Tilemap Component
         map = gameObject.GetComponent<Tilemap>();
+        
+        //We find the grid and camera objects, grab the components we need.
         grid = GameObject.FindWithTag("Grid").GetComponent<Grid>();
         cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
 
-        GameObject gridObject = new GameObject("GridGenerated");
-        createdGrid = gridObject.AddComponent<Grid>();
         
-        GameObject tileObject = new GameObject("TilemapGenerated");
-        Tilemap createdTile = tileObject.AddComponent<Tilemap>();
-        tileObject.AddComponent<TilemapRenderer>();
-        
-        tileObject.transform.SetParent(gridObject.transform);
-        
-        allTileLocations = findAllPositions(map);
-        tileAncor = map.tileAnchor;
-        tileBases = map.GetTilesBlock(map.cellBounds);
+        //TEST ONE
+        TestingProgramaticallyCopyAndSerialize();
 
-        createdTile.SetTilesBlock(map.cellBounds, tileBases);
-        createdTile.GetTileFlags(new Vector3Int(0, 0, 0));
-        
-        _serializer.SerializeRoom(new Tilemap[] {createdTile}, "SerializeTilemapData_TEST.room");
     }
 
     // Update is called once per frame
@@ -78,19 +69,28 @@ public class TilemapTest : MonoBehaviour
         writer.Close();  
     }
 
-    LinkedList<Vector3Int> findAllPositions(Tilemap tilemap)
+    /// <summary>
+    /// TESTING PURPOSES
+    /// We can copy a handmade tilemap into a empty one with this script.
+    /// Then we save it via serialization.
+    /// TODO MOVE THIS TO A GAME MANAGER OBJECT WHERE IT GRABS ALL TILES FROM ONE ROOM
+    /// </summary>
+    public void TestingProgramaticallyCopyAndSerialize()
     {
-        LinkedList<Vector3Int> vector3List = new LinkedList<Vector3Int>();
-        
-        //get bounds
-        tilemap.CompressBounds();
-        
-        foreach(Vector3Int tileLocation in tilemap.cellBounds.allPositionsWithin)
-        {
-            vector3List.AddLast(tileLocation);
-        }
+        GameObject gridObject = new GameObject("GridGenerated");                                       
+        Grid createdGrid = gridObject.AddComponent<Grid>();                                                 
+                                                                                                 
+        GameObject tileObject = new GameObject("TilemapGenerated");                                    
+        Tilemap createdTile = tileObject.AddComponent<Tilemap>();                                      
+        tileObject.AddComponent<TilemapRenderer>();                                                    
+                                                                                                 
+        tileObject.transform.SetParent(gridObject.transform);
 
-        return vector3List;
+        tileBases = map.GetTilesBlock(map.cellBounds);                                                 
+                                                                                                 
+        createdTile.SetTilesBlock(map.cellBounds, tileBases);                                          
+                                                                                                 
+        _serializer.SerializeRoom(new Tilemap[] {createdTile}, "SerializeTilemapData_TEST.room");      
     }
 
 }
