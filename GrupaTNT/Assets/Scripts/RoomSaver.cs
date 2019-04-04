@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.Tilemaps;
 
 public class RoomSaver : MonoBehaviour
 {
@@ -9,27 +11,47 @@ public class RoomSaver : MonoBehaviour
     GameObject gridObject;
     private GameObject[] _roomObjects;
     private GameObject[][] _tileMapObjects;
+
+    private Tilemap[][] _tilemaps;
+                                               
+    private TileMapSerializer _serializer; 
     
     // Start is called before the first frame update
     void Start()
     {
-        gridObject = GameObject.FindWithTag("Grid");
-        _roomObjects = new GameObject[gridObject.transform.childCount];
+        //Creating of our serializer               
+        _serializer = new TileMapSerializer();
         
-        for(int i = 0; i < gridObject.transform.childCount; i++)
+        gridObject = GameObject.FindWithTag("Grid");
+        int NumOfRooms = gridObject.transform.childCount; 
+        _roomObjects = new GameObject[NumOfRooms];
+        
+        for(int i = 0; i < NumOfRooms; i++)
         {
             _roomObjects[i] = gridObject.transform.GetChild(i).gameObject;
-
-            _tileMapObjects = new GameObject[_roomObjects[i].transform.childCount][];
-            for (int j = 0; j < _roomObjects[i].transform.childCount; j++)
+            int NumLayersInRoom = _roomObjects[i].transform.childCount;
+            
+            _tileMapObjects = new GameObject[NumOfRooms][];
+            _tilemaps = new Tilemap[NumOfRooms][];
+            GameObject[] roomObjectChildren = new GameObject[NumLayersInRoom];
+            Tilemap[] SingleRoomTileMaps = new Tilemap[NumLayersInRoom];
+            
+            for (int j = 0; j < NumLayersInRoom; j++)
             {
-                _tileMapObjects[i] = new GameObject[_roomObjects[i].transform.childCount];
-                _tileMapObjects[i][j] = _roomObjects[i].transform.GetChild(j).gameObject;
+                roomObjectChildren[j] = _roomObjects[i].transform.GetChild(j).gameObject;
+                SingleRoomTileMaps[j] = _roomObjects[i].transform.GetChild(j).gameObject.GetComponent<Tilemap>();
             }
+
+            _tileMapObjects[i] = roomObjectChildren;
+            _tilemaps[i] = SingleRoomTileMaps;
+        }                           
+
+        for (int i = 0; i < NumOfRooms; i++)
+        {
+            Tilemap[] map = _tilemaps[i];
+            _serializer.SerializeRoom(map, "Tilemap- " + i.ToString() + " -" + 
+                                           _roomObjects[i].name + ".room");
         }
-        
-        
-        Debug.Log("bla");
         
     }
 

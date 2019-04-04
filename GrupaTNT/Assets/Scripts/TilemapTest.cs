@@ -28,7 +28,7 @@ public class TilemapTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //Creating of out serializer
+        //Creating of our serializer
         _serializer = new TileMapSerializer();
         
         //We assume the script is on the Tilemap Object so we get the Tilemap Component
@@ -85,5 +85,5 @@ public class TilemapTest : MonoBehaviour
                                                                                                  
         _serializer.SerializeRoom(new Tilemap[] {createdTile}, "SerializeTilemapData_TEST.room");      
     }
-
+    
 }
