@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerController : EntityControllerInterface
 {
     Vector2 direction;
-    float speed = 0.1f;
+    float speed = 1f;
     // Start is called before the first frame update
     public static void main() {
         return;
