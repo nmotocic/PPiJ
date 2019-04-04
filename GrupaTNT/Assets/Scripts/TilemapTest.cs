@@ -23,9 +23,13 @@ public class TilemapTest : MonoBehaviour
     private Vector3 tileAncor;
     private TileBase[] tileBases;
 
+    private TileMapSerializer _serializer;
+
     // Start is called before the first frame update
     void Start()
     {
+        _serializer = new TileMapSerializer();
+        
         map = gameObject.GetComponent<Tilemap>();
         grid = GameObject.FindWithTag("Grid").GetComponent<Grid>();
         cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
@@ -42,11 +46,11 @@ public class TilemapTest : MonoBehaviour
         allTileLocations = findAllPositions(map);
         tileAncor = map.tileAnchor;
         tileBases = map.GetTilesBlock(map.cellBounds);
-        
+
         createdTile.SetTilesBlock(map.cellBounds, tileBases);
+        createdTile.GetTileFlags(new Vector3Int(0, 0, 0));
         
-
-
+        _serializer.SerializeRoom(new Tilemap[] {createdTile}, "SerializeTilemapData_TEST.room");
     }
 
     // Update is called once per frame
