@@ -62,13 +62,6 @@ public class TilemapTest : MonoBehaviour
         return (int) (input + 0.5);
     }
     
-    public void SerializeTilemap() {;
-        Stream writer = File.Open(Path.Combine(Application.persistentDataPath, "tilemap.txt"), FileMode.Create);
-        BinaryFormatter b = new BinaryFormatter();  
-        b.Serialize(writer, map);
-        writer.Close();  
-    }
-
     /// <summary>
     /// TESTING PURPOSES
     /// We can copy a handmade tilemap into a empty one with this script.
