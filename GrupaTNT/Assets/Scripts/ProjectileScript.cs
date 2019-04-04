@@ -20,4 +20,20 @@ public class ProjectileScript : MonoBehaviour
         TTL--;
         if (TTL == 0 && speed!=0.0f) { GameObject.Destroy(gameObject); }
     }
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        EntityScript ES = col.otherCollider.gameObject.GetComponent<EntityScript>();
+        Vector2 ve;
+        foreach (ContactPoint2D e in col.contacts) {
+            ve = (Vector2)transform.position - e.point;
+            if (Mathf.Abs(ve.x) > Mathf.Abs(ve.y))
+            {
+                if (direction.x*ve.x < 0) { direction.x = 0 - direction.x; }
+            }
+            else
+            {
+                if (direction.y * ve.y < 0) { direction.y = 0 - direction.y; }
+            }
+        }
+    }
 }
