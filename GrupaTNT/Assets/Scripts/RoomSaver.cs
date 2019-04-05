@@ -22,6 +22,17 @@ public class RoomSaver : MonoBehaviour
         //Creating of our serializer               
         _serializer = new TileMapSerializer();
         
+        SaveRooms();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    void SaveRooms()
+    {
         gridObject = GameObject.FindWithTag("Grid");
         int NumOfRooms = gridObject.transform.childCount; 
         _roomObjects = new GameObject[NumOfRooms];
@@ -49,15 +60,15 @@ public class RoomSaver : MonoBehaviour
         for (int i = 0; i < NumOfRooms; i++)
         {
             Tilemap[] map = _tilemaps[i];
-            _serializer.SerializeRoom(map, "Tilemap- " + i.ToString() + " -" + 
+            _serializer.SerializeRoom(map, "PremadeRooms/Tilemap- " + i.ToString() + " -" + 
                                            _roomObjects[i].name + ".room");
         }
-        
     }
 
-    // Update is called once per frame
-    void Update()
+    void LoadRooms()
     {
+        _serializer.DeserializeRoom("Tilemap- 0 -Room.room");
         
+        //TODO Create empty room object, insert players inside of children of empty room object
     }
 }

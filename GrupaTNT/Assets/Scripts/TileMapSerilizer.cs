@@ -5,6 +5,7 @@ using System.IO;
 using System.Numerics;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 using Vector3 = UnityEngine.Vector3;
 
@@ -51,17 +52,39 @@ public class TileMapSerializer
         _stream.Close();
     }
 
+    public Tilemap[] DeserializeRoom(String filename)
+    {
+        _stream = File.Open(Path.Combine(Application.dataPath, filename), FileMode.OpenOrCreate);
+        RoomWrapper roomWrapper = (RoomWrapper) _formatter.Deserialize(_stream);
+        TilemapWrapper[] tilemapWrappers = roomWrapper._tilemapLayers;
+
+        List<Tilemap> roomTileMaps = new List<Tilemap>(tilemapWrappers.Length);
+        
+        foreach (var tilemapWrapper in tilemapWrappers)
+        {
+            BoundsInt tileBounds = new BoundsInt(tilemapWrapper.LayerPosition, tilemapWrapper.LayerSize);
+            TileBase[] tileBases = tilemapWrapper.LayerBases;
+            
+            Tilemap map = new Tilemap();
+            map.SetTilesBlock(tileBounds, tileBases);
+            
+            roomTileMaps.Add(map);
+        }
+
+        return roomTileMaps.ToArray();
+    }
+
     /// <summary>
     /// Stores relevant information about a tilemap to be serialized.
     /// </summary>
     [Serializable]
-    private struct TilemapWrapper
+    public struct TilemapWrapper
     {
         public TilemapWrapper(TileBase[] roomBases, Vector3Int layerPosition, Vector3Int layerSize)
         {
             LayerBases = roomBases;
-            LayerPositions = layerPosition;
-            LayerSizes = layerSize;
+            LayerPosition = layerPosition;
+            LayerSize = layerSize;
         }
 
         /// <summary>
@@ -72,12 +95,12 @@ public class TileMapSerializer
         /// <summary>
         /// Used in to create BoundsInt. BoundsInt will be used in SetTilesBlock.
         /// </summary>
-        public SerializableVector3Int LayerPositions;
+        public SerializableVector3Int LayerPosition;
 
         /// <summary>
         /// Used in to create BoundsInt. BoundsInt will be used in SetTilesBlock.
         /// </summary>
-        public SerializableVector3Int LayerSizes;
+        public SerializableVector3Int LayerSize;
 
     }
     
@@ -85,14 +108,14 @@ public class TileMapSerializer
     /// Room creation, room has list of tilemap wrappers.
     /// </summary>
     [Serializable]
-    private struct RoomWrapper
+    public struct RoomWrapper
     {
         public RoomWrapper(TilemapWrapper[] tilemapLayers)
         {
             _tilemapLayers = tilemapLayers;
         }
 
-        private TilemapWrapper[] _tilemapLayers;
+        public TilemapWrapper[] _tilemapLayers;
         
         // ADD MORE ITEMS HERE IF NEEDED
     }

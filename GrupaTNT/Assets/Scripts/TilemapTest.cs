@@ -40,7 +40,7 @@ public class TilemapTest : MonoBehaviour
 
         
         //TEST ONE
-        TestingProgramaticallyCopyAndSerialize();
+        //TestingProgramaticallyCopyAndSerialize();
 
     }
 

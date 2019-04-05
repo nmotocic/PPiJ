@@ -47,7 +47,7 @@ public struct SerializableVector3Int
     /// </summary>
     /// <param name="rValue"></param>
     /// <returns></returns>
-    public static implicit operator Vector3(SerializableVector3Int rValue)
+    public static implicit operator Vector3Int(SerializableVector3Int rValue)
     {
         return new Vector3Int(rValue.x, rValue.y, rValue.z);
     }
