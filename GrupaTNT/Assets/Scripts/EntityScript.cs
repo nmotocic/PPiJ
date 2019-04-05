@@ -19,7 +19,7 @@ public class EntityScript : MonoBehaviour
     {
         controller.Update();
         Vector2 movement = controller.getMovement();
-        rb2d.AddForce(movement);
+        rb2d.velocity = movement;
         print(movement);
     }
     void OnCollisionEnter2D(Collision2D col)
