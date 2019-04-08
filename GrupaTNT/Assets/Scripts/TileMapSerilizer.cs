@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
+using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 
 //TODO: - We need a way to mark places where doors/exits to be. So we know where to place rooms. Some kind of flag system is needed.
@@ -22,7 +23,6 @@ public class TileMapSerializer
     public TileMapSerializer()
     {
         _formatter = new BinaryFormatter();
-        
     }
 
     /// <summary>
@@ -32,19 +32,52 @@ public class TileMapSerializer
     /// <param name="FileName">Name of the serialized data file that will be saved.</param>
     public void SerializeRoom(Tilemap[] tilemaps, String FileName)
     {
+        FileName = "PremadeRooms/" + FileName;
         TilemapWrapper[] tilemapWrappers = new TilemapWrapper[tilemaps.Length];
         _stream = File.Open(Path.Combine(Application.dataPath, FileName), FileMode.OpenOrCreate);
         
-        
         Vector3Int[] positions = new Vector3Int[tilemaps.Length];
         
-        
+        ///HARDCODED TO 0.5, because unity treats it as half, it will always be half
+        Vector2 halfPivot = new Vector2(0.5f, 0.5f);
+
+        int iterator = 0;
         foreach (var tilemap in tilemaps)
         {
             var bounds = tilemap.cellBounds;
             var bases = tilemap.GetTilesBlock(bounds);
+            List<SerializableVector3Int> tilePositionsInTilemap = new List<SerializableVector3Int>();
+            List<string> namesInTilemap = new List<string>();
+            List<float> xmins = new List<float>();
+            List<float> ymins = new List<float>();
+            List<float> widths = new List<float>();
+            List<float> heights = new List<float>();
+            float pixelsPerUnit = 0;
             
-            TilemapWrapper tilemapWrapper = new TilemapWrapper(bases, bounds.position, bounds.size );
+
+            foreach (var tilePosition in tilemap.cellBounds.allPositionsWithin)
+            {
+                if (tilemap.GetTile(tilePosition) != null)
+                {
+                    tilePositionsInTilemap.Add(tilePosition);
+                    
+                    Sprite sprite = tilemap.GetSprite(tilePosition);
+                    namesInTilemap.Add(sprite.texture.name);
+
+                    var rect = sprite.rect;
+                    xmins.Add(rect.xMin);
+                    ymins.Add(rect.yMin);
+                    widths.Add(rect.width);
+                    heights.Add(rect.height);
+
+                    pixelsPerUnit = sprite.pixelsPerUnit;
+                }
+            }
+            
+            tilemapWrappers[iterator] = new TilemapWrapper(tilePositionsInTilemap.ToArray(),namesInTilemap.ToArray(),
+                xmins.ToArray(), ymins.ToArray(), widths.ToArray(),
+                heights.ToArray(), halfPivot, pixelsPerUnit, bounds.position, bounds.size);
+            iterator++;
         }
         
         RoomWrapper roomWrapper = new RoomWrapper(tilemapWrappers);
@@ -52,26 +85,48 @@ public class TileMapSerializer
         _stream.Close();
     }
 
-    public Tilemap[] DeserializeRoom(String filename)
-    {
-        _stream = File.Open(Path.Combine(Application.dataPath, filename), FileMode.OpenOrCreate);
+    public GameObject DeserializeAndCreateRoom(String FileName)
+    {   
+        GameObject gridObject = GameObject.FindWithTag("Grid");
+        
+        FileName = "PremadeRooms/" + FileName;
+        _stream = File.Open(Path.Combine(Application.dataPath, FileName), FileMode.Open);
         RoomWrapper roomWrapper = (RoomWrapper) _formatter.Deserialize(_stream);
         TilemapWrapper[] tilemapWrappers = roomWrapper._tilemapLayers;
 
-        List<Tilemap> roomTileMaps = new List<Tilemap>(tilemapWrappers.Length);
+        GameObject roomObject = new GameObject(FileName);
+        roomObject.transform.SetParent(gridObject.transform);
         
+        int layerIndexer = 0;
         foreach (var tilemapWrapper in tilemapWrappers)
         {
-            BoundsInt tileBounds = new BoundsInt(tilemapWrapper.LayerPosition, tilemapWrapper.LayerSize);
-            TileBase[] tileBases = tilemapWrapper.LayerBases;
+            GameObject layerObject = new GameObject(layerIndexer.ToString());
+            layerObject.transform.SetParent(roomObject.transform);
+            Tilemap objectTilemap = layerObject.AddComponent<Tilemap>();
+            layerObject.AddComponent<TilemapRenderer>().sortingOrder = layerIndexer;
             
-            Tilemap map = new Tilemap();
-            map.SetTilesBlock(tileBounds, tileBases);
-            
-            roomTileMaps.Add(map);
+            int tileIndexer = 0;
+            Tile[] singleLayerTiles = new Tile[tilemapWrapper.tilePositions.Length];
+            foreach (var tilePosition in tilemapWrapper.tilePositions)
+            {
+                Rect rect = new Rect(tilemapWrapper.m_XMins[tileIndexer], tilemapWrapper.m_YMins[tileIndexer],
+                    tilemapWrapper.m_Widths[tileIndexer], tilemapWrapper.m_Heights[tileIndexer]);
+                Tile createdTile = ScriptableObject.CreateInstance<Tile>();
+                
+                Texture2D texture2D = Resources.Load<Texture2D>(tilemapWrapper.textureNames[tileIndexer]);
+                Sprite recreatedSprite = Sprite.Create(texture2D, rect, 
+                    tilemapWrapper.pivot, tilemapWrapper.pixelPerUnit);
+
+                createdTile.sprite = recreatedSprite;
+                objectTilemap.SetTile(tilePosition, createdTile);
+                tileIndexer++;
+            }
+         
+            layerIndexer++;
         }
 
-        return roomTileMaps.ToArray();
+        _stream.Close();
+        return roomObject;
     }
 
     /// <summary>
@@ -80,25 +135,57 @@ public class TileMapSerializer
     [Serializable]
     public struct TilemapWrapper
     {
-        public TilemapWrapper(TileBase[] roomBases, Vector3Int layerPosition, Vector3Int layerSize)
+        public TilemapWrapper(SerializableVector3Int[] tilePositions, string[] textureNames, float[] mXMins, 
+            float[] mYMins, float[] mWidths, float[] mHeights, SerializableVector2 pivot, float pixelPerUnit, 
+            SerializableVector3Int layerPosition, SerializableVector3Int layerSize)
         {
-            LayerBases = roomBases;
+            this.tilePositions = tilePositions;
+            this.textureNames = textureNames;
+            m_XMins = mXMins;
+            m_YMins = mYMins;
+            m_Widths = mWidths;
+            m_Heights = mHeights;
+            this.pivot = pivot;
+            this.pixelPerUnit = pixelPerUnit;
             LayerPosition = layerPosition;
             LayerSize = layerSize;
         }
 
         /// <summary>
-        /// Used in SetTilesBlock.
+        /// Positions of the tiles
         /// </summary>
-        public TileBase[] LayerBases;
+        public SerializableVector3Int[] tilePositions;
+
+        /// <summary>
+        /// Texture name storage, used to recreate Sprite
+        /// </summary>
+        public string[] textureNames;
         
         /// <summary>
-        /// Used in to create BoundsInt. BoundsInt will be used in SetTilesBlock.
+        /// Recreation of Rect, Rect is used to recreate Sprite
+        /// </summary>
+        public float[] m_XMins;
+        public float[] m_YMins;
+        public float[] m_Widths;
+        public float[] m_Heights;
+
+        /// <summary>
+        /// Used to recreate sprite, HAS TO BE FROM [0,1]! Will be set manually to 0.5 probably because unity is weird.
+        /// </summary>
+        public SerializableVector2 pivot;
+
+        /// <summary>
+        /// Pixel per units, will probably be a constant number, maybe change in future to store in RoomWrapper.
+        /// </summary>
+        public float pixelPerUnit;
+        
+        /// <summary>
+        /// Used to create BoundsInt. BoundsInt will be used in SetTilesBlock.
         /// </summary>
         public SerializableVector3Int LayerPosition;
 
         /// <summary>
-        /// Used in to create BoundsInt. BoundsInt will be used in SetTilesBlock.
+        /// Used to create BoundsInt. BoundsInt will be used in SetTilesBlock.
         /// </summary>
         public SerializableVector3Int LayerSize;
 

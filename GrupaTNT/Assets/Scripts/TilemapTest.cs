@@ -40,7 +40,7 @@ public class TilemapTest : MonoBehaviour
 
         
         //TEST ONE
-        //TestingProgramaticallyCopyAndSerialize();
+        TestingProgramaticallyCopyAndSerialize();
 
     }
 
@@ -79,11 +79,27 @@ public class TilemapTest : MonoBehaviour
                                                                                                  
         tileObject.transform.SetParent(gridObject.transform);
 
-        tileBases = map.GetTilesBlock(map.cellBounds);                                                 
+        tileBases = map.GetTilesBlock(map.cellBounds);
                                                                                                  
-        createdTile.SetTilesBlock(map.cellBounds, tileBases);                                          
-                                                                                                 
-        _serializer.SerializeRoom(new Tilemap[] {createdTile}, "SerializeTilemapData_TEST.room");      
+        //createdTile.SetTilesBlock(map.cellBounds, tileBases);
+
+        Sprite sprite = map.GetSprite(new Vector3Int(0, 0, 0));
+        String savedSpriteName = sprite.name;
+        Debug.Log(sprite.name);
+        var rect = sprite.textureRect;
+        var pivot = sprite.pivot;
+        var pixPerUnit = sprite.pixelsPerUnit;
+        
+        Tile script_manufactiored_tile = ScriptableObject.CreateInstance<Tile>();
+        //tex, rect, pivot, pixperunit
+        Texture2D texture2D = Resources.Load<Texture2D>("Dungeon_Tileset");
+        Sprite recreatedSprite = Sprite.Create(texture2D, rect, new Vector2(0.5f, 0.5f), pixPerUnit);
+
+        script_manufactiored_tile.sprite = recreatedSprite;
+        createdTile.SetTile(new Vector3Int(0,0,0), script_manufactiored_tile);
+
+        //_serializer.SerializeRoom(new Tilemap[] {createdTile}, "SerializeTilemapData_TEST.room");    
+
     }
     
 }

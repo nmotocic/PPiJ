@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 public class RoomSaver : MonoBehaviour
 {
-    [FormerlySerializedAs("GridObject")] [SerializeField]
-    GameObject gridObject;
-    private GameObject[] _roomObjects;
-    private GameObject[][] _tileMapObjects;
+   
+    [SerializeField] GameObject gridObject;
 
-    private Tilemap[][] _tilemaps;
-                                               
-    private TileMapSerializer _serializer; 
+    private TileMapSerializer _serializer;
+
+    [SerializeField] public bool load;
+
+    [SerializeField] public bool save;
     
     // Start is called before the first frame update
     void Start()
@@ -22,7 +24,11 @@ public class RoomSaver : MonoBehaviour
         //Creating of our serializer               
         _serializer = new TileMapSerializer();
         
-        SaveRooms();
+        if(save)
+            SaveRooms();
+        
+        if(load)
+            LoadRooms();
     }
 
     // Update is called once per frame
@@ -35,15 +41,15 @@ public class RoomSaver : MonoBehaviour
     {
         gridObject = GameObject.FindWithTag("Grid");
         int NumOfRooms = gridObject.transform.childCount; 
-        _roomObjects = new GameObject[NumOfRooms];
+        GameObject[] _roomObjects = new GameObject[NumOfRooms];
         
+        Tilemap[][] _tilemaps = new Tilemap[NumOfRooms][];
         for(int i = 0; i < NumOfRooms; i++)
         {
             _roomObjects[i] = gridObject.transform.GetChild(i).gameObject;
             int NumLayersInRoom = _roomObjects[i].transform.childCount;
             
-            _tileMapObjects = new GameObject[NumOfRooms][];
-            _tilemaps = new Tilemap[NumOfRooms][];
+            GameObject[][] _tileMapObjects = new GameObject[NumOfRooms][];
             GameObject[] roomObjectChildren = new GameObject[NumLayersInRoom];
             Tilemap[] SingleRoomTileMaps = new Tilemap[NumLayersInRoom];
             
@@ -60,15 +66,34 @@ public class RoomSaver : MonoBehaviour
         for (int i = 0; i < NumOfRooms; i++)
         {
             Tilemap[] map = _tilemaps[i];
-            _serializer.SerializeRoom(map, "PremadeRooms/Tilemap- " + i.ToString() + " -" + 
+            _serializer.SerializeRoom(map, "Tilemap- " + i.ToString() + " -" + 
                                            _roomObjects[i].name + ".room");
         }
     }
 
     void LoadRooms()
     {
-        _serializer.DeserializeRoom("Tilemap- 0 -Room.room");
         
-        //TODO Create empty room object, insert players inside of children of empty room object
+        gridObject = GameObject.FindWithTag("Grid");
+        DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "PremadeRooms"));
+        FileInfo[] filenames = directoryInfo.GetFiles();
+
+        //There could be other metafiles in the directory so we check how many room files we have.
+        int trueRoomSize = 0;
+        foreach (FileInfo filename in filenames)
+        {
+            if(filename.Name.EndsWith(".room"))
+                trueRoomSize++;
+        }
+            
+        //GameObject[] _roomObjects = new GameObject[trueRoomSize];
+
+        for (int i = 0; i < trueRoomSize; i++)
+        {
+            string filename = filenames[i].Name;
+
+            GameObject createdRoom = _serializer.DeserializeAndCreateRoom(filename);
+            //_roomObjects[i] = createdRoom;
+        }
     }
 }

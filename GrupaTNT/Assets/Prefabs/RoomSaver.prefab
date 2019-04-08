@@ -43,3 +43,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a17d6355eb1347c1952ad5d7ec6eff8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridObject: {fileID: 4108307000704083221}

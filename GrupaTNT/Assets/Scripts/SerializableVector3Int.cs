@@ -61,4 +61,14 @@ public struct SerializableVector3Int
     {
         return new SerializableVector3Int(rValue.x, rValue.y, rValue.z);
     }
+    
+    /// <summary>
+    /// Automatic conversion from SerializableVector3 to SerializableVector3Int
+    /// </summary>
+    /// <param name="rValue"></param>
+    /// <returns></returns>
+    public static explicit operator SerializableVector3Int(SerializableVector3 rValue)
+    {
+        return new SerializableVector3Int((int)(rValue.x + 0.5), (int)(rValue.y + 0.5), (int)(rValue.z + 0.5));
+    }
 }
