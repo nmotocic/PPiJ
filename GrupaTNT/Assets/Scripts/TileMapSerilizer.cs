@@ -30,7 +30,7 @@ public class TileMapSerializer
     /// </summary>
     /// <param name="tilemaps">Tilemaps from a single room. They should be ordered from bottom to top in layers.</param>
     /// <param name="FileName">Name of the serialized data file that will be saved.</param>
-    public void SerializeRoom(Tilemap[] tilemaps, String FileName)
+    public void SerializeRoom(Tilemap[] tilemaps, int[] layerNumbers, String FileName)
     {
         FileName = "PremadeRooms/" + FileName;
         TilemapWrapper[] tilemapWrappers = new TilemapWrapper[tilemaps.Length];
@@ -42,10 +42,10 @@ public class TileMapSerializer
         Vector2 halfPivot = new Vector2(0.5f, 0.5f);
 
         int iterator = 0;
-        foreach (var tilemap in tilemaps)
+        foreach (Tilemap tilemap in tilemaps)
         {
-            var bounds = tilemap.cellBounds;
-            var bases = tilemap.GetTilesBlock(bounds);
+            tilemap.CompressBounds();
+            
             List<SerializableVector3Int> tilePositionsInTilemap = new List<SerializableVector3Int>();
             List<string> namesInTilemap = new List<string>();
             List<float> xmins = new List<float>();
@@ -53,9 +53,9 @@ public class TileMapSerializer
             List<float> widths = new List<float>();
             List<float> heights = new List<float>();
             float pixelsPerUnit = 0;
+            int layerNumber = layerNumbers[iterator];
             
-
-            foreach (var tilePosition in tilemap.cellBounds.allPositionsWithin)
+            foreach (Vector3Int tilePosition in tilemap.cellBounds.allPositionsWithin)
             {
                 if (tilemap.GetTile(tilePosition) != null)
                 {
@@ -76,7 +76,7 @@ public class TileMapSerializer
             
             tilemapWrappers[iterator] = new TilemapWrapper(tilePositionsInTilemap.ToArray(),namesInTilemap.ToArray(),
                 xmins.ToArray(), ymins.ToArray(), widths.ToArray(),
-                heights.ToArray(), halfPivot, pixelsPerUnit, bounds.position, bounds.size);
+                heights.ToArray(), halfPivot, pixelsPerUnit, layerNumber);
             iterator++;
         }
         
@@ -103,7 +103,7 @@ public class TileMapSerializer
             GameObject layerObject = new GameObject(layerIndexer.ToString());
             layerObject.transform.SetParent(roomObject.transform);
             Tilemap objectTilemap = layerObject.AddComponent<Tilemap>();
-            layerObject.AddComponent<TilemapRenderer>().sortingOrder = layerIndexer;
+            layerObject.AddComponent<TilemapRenderer>().sortingOrder = tilemapWrappers[layerIndexer].layerNumber;
             
             int tileIndexer = 0;
             Tile[] singleLayerTiles = new Tile[tilemapWrapper.tilePositions.Length];
@@ -137,7 +137,7 @@ public class TileMapSerializer
     {
         public TilemapWrapper(SerializableVector3Int[] tilePositions, string[] textureNames, float[] mXMins, 
             float[] mYMins, float[] mWidths, float[] mHeights, SerializableVector2 pivot, float pixelPerUnit, 
-            SerializableVector3Int layerPosition, SerializableVector3Int layerSize)
+            int layerNumber)
         {
             this.tilePositions = tilePositions;
             this.textureNames = textureNames;
@@ -147,22 +147,24 @@ public class TileMapSerializer
             m_Heights = mHeights;
             this.pivot = pivot;
             this.pixelPerUnit = pixelPerUnit;
-            LayerPosition = layerPosition;
-            LayerSize = layerSize;
+            this.layerNumber = layerNumber;
         }
 
         /// <summary>
-        /// Positions of the tiles
+        /// Positions of the tiles.
         /// </summary>
         public SerializableVector3Int[] tilePositions;
 
         /// <summary>
         /// Texture name storage, used to recreate Sprite
+        /// Its an array, because we can use multiple textures to create a room
         /// </summary>
         public string[] textureNames;
         
         /// <summary>
         /// Recreation of Rect, Rect is used to recreate Sprite
+        /// Could be replaced with two SerializableVector2s
+        /// Maybe dosent require a array because they are the same for all sprites, but just to be sure.
         /// </summary>
         public float[] m_XMins;
         public float[] m_YMins;
@@ -178,16 +180,11 @@ public class TileMapSerializer
         /// Pixel per units, will probably be a constant number, maybe change in future to store in RoomWrapper.
         /// </summary>
         public float pixelPerUnit;
-        
-        /// <summary>
-        /// Used to create BoundsInt. BoundsInt will be used in SetTilesBlock.
-        /// </summary>
-        public SerializableVector3Int LayerPosition;
 
         /// <summary>
-        /// Used to create BoundsInt. BoundsInt will be used in SetTilesBlock.
+        /// What we sort the layers by, lower means down, higher means up.
         /// </summary>
-        public SerializableVector3Int LayerSize;
+        public int layerNumber;
 
     }
     
