@@ -642,8 +642,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridObject: {fileID: 667531182}
-  load: 0
-  save: 1
+  load: 1
+  save: 0
 --- !u!4 &1332018536
 Transform:
   m_ObjectHideFlags: 0
