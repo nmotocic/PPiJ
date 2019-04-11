@@ -12,6 +12,7 @@ public class EntityScript : MonoBehaviour
     {
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (entityType.Equals("player")) { controller = new PlayerController(); }
+        if (entityType.Equals("enemy")) { controller = new EnemyController(rb2d);  }
     }
 
     // Update is called once per frame

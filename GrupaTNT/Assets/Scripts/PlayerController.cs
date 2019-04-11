@@ -17,5 +17,5 @@ public class PlayerController : EntityControllerInterface
         float Y = Input.GetAxis("Vertical");
         direction = new Vector2(X, Y);
     }
-    public Vector2 getMovement() { return direction*speed; }
+    public Vector2 getMovement() { return direction * speed; }
 }
