@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -33,14 +34,18 @@ public class TileMapSerializer
     public void SerializeRoom(Tilemap[] tilemaps, int[] layerNumbers, String FileName)
     {
         FileName = "PremadeRooms/" + FileName;
-        TilemapWrapper[] tilemapWrappers = new TilemapWrapper[tilemaps.Length];
+        List<TilemapWrapper> tilemapWrappers = new List<TilemapWrapper>();
         _stream = File.Open(Path.Combine(Application.dataPath, FileName), FileMode.OpenOrCreate);
         
         Vector3Int[] positions = new Vector3Int[tilemaps.Length];
         
-        ///HARDCODED TO 0.5, because unity treats it as half, it will always be half
+        // HARDCODED TO 0.5, because unity treats it as half, it will always be half
         Vector2 halfPivot = new Vector2(0.5f, 0.5f);
+        
+        TilemapWrapper? tilemapFlag = null;
 
+        int sizeOfTilemaps = 0;
+        
         int iterator = 0;
         foreach (Tilemap tilemap in tilemaps)
         {
@@ -73,15 +78,35 @@ public class TileMapSerializer
                     pixelsPerUnit = sprite.pixelsPerUnit;
                 }
             }
+
+            if (tilemap.gameObject.tag == "Flag")
+            {
+                tilemapFlag = new TilemapWrapper(tilePositionsInTilemap.ToArray(),
+                    namesInTilemap.ToArray(), xmins.ToArray(), ymins.ToArray(), widths.ToArray(),
+                    heights.ToArray(), halfPivot, pixelsPerUnit, layerNumber);
+            }
+            else
+            {
+                tilemapWrappers.Add(new TilemapWrapper(tilePositionsInTilemap.ToArray(),
+                    namesInTilemap.ToArray(), xmins.ToArray(), ymins.ToArray(), widths.ToArray(),
+                    heights.ToArray(), halfPivot, pixelsPerUnit, layerNumber));   
+            }
             
-            tilemapWrappers[iterator] = new TilemapWrapper(tilePositionsInTilemap.ToArray(),namesInTilemap.ToArray(),
-                xmins.ToArray(), ymins.ToArray(), widths.ToArray(),
-                heights.ToArray(), halfPivot, pixelsPerUnit, layerNumber);
             iterator++;
         }
-        
-        RoomWrapper roomWrapper = new RoomWrapper(tilemapWrappers);
-        _formatter.Serialize(_stream, roomWrapper);
+
+        // if we didnt manage to find the tileflag throw a warning
+        if (tilemapFlag != null)
+        {
+            RoomWrapper roomWrapper = new RoomWrapper(tilemapWrappers.ToArray(), tilemapFlag.Value);
+            _formatter.Serialize(_stream, roomWrapper);
+        }
+        else
+        {
+            Debug.LogError("No tilemap flag was added, make sure this is intentional." +
+                             "Object: " + FileName);
+        }
+
         _stream.Close();
     }
 
@@ -92,7 +117,8 @@ public class TileMapSerializer
         FileName = "PremadeRooms/" + FileName;
         _stream = File.Open(Path.Combine(Application.dataPath, FileName), FileMode.Open);
         RoomWrapper roomWrapper = (RoomWrapper) _formatter.Deserialize(_stream);
-        TilemapWrapper[] tilemapWrappers = roomWrapper._tilemapLayers;
+        TilemapWrapper[] tilemapWrappers = roomWrapper.tilemapLayers;
+        TilemapWrapper? tilemapFlag = roomWrapper.tilemapFlag;
 
         GameObject roomObject = new GameObject(FileName);
         roomObject.transform.SetParent(gridObject.transform);
@@ -106,6 +132,7 @@ public class TileMapSerializer
             layerObject.AddComponent<TilemapRenderer>().sortingOrder = tilemapWrappers[layerIndexer].layerNumber;
             
             int tileIndexer = 0;
+
             Tile[] singleLayerTiles = new Tile[tilemapWrapper.tilePositions.Length];
             foreach (var tilePosition in tilemapWrapper.tilePositions)
             {
@@ -123,6 +150,38 @@ public class TileMapSerializer
             }
          
             layerIndexer++;
+        }
+
+        // we deal with the flagtile differently
+        if (tilemapFlag != null)
+        {
+            //we know the flag is there so we get rid of the nullable
+            TilemapWrapper tilemapFlagValue = tilemapFlag.Value;
+            
+            GameObject layerObject = new GameObject(layerIndexer.ToString());
+            layerObject.transform.SetParent(roomObject.transform);
+            Tilemap objectTilemap = layerObject.AddComponent<Tilemap>();
+            
+            //just for debugging
+            layerObject.AddComponent<TilemapRenderer>().enabled = false;
+            layerObject.tag = "Flag";
+            
+            int tileIndexer = 0;
+            Tile[] singleLayerTiles = new Tile[tilemapFlagValue.tilePositions.Length];
+            foreach (var tilePosition in tilemapFlagValue.tilePositions)
+            {
+                Rect rect = new Rect(tilemapFlagValue.m_XMins[tileIndexer], tilemapFlagValue.m_YMins[tileIndexer],
+                    tilemapFlagValue.m_Widths[tileIndexer], tilemapFlagValue.m_Heights[tileIndexer]);
+                Tile createdTile = ScriptableObject.CreateInstance<Tile>();
+                
+                Texture2D texture2D = Resources.Load<Texture2D>(tilemapFlagValue.textureNames[tileIndexer]);
+                Sprite recreatedSprite = Sprite.Create(texture2D, rect, 
+                    tilemapFlagValue.pivot, tilemapFlagValue.pixelPerUnit);
+
+                createdTile.sprite = recreatedSprite;
+                objectTilemap.SetTile(tilePosition, createdTile);
+                tileIndexer++;
+            }
         }
 
         _stream.Close();
@@ -194,13 +253,15 @@ public class TileMapSerializer
     [Serializable]
     public struct RoomWrapper
     {
-        public RoomWrapper(TilemapWrapper[] tilemapLayers)
+        public RoomWrapper(TilemapWrapper[] tilemapLayers, TilemapWrapper tilemapFlag)
         {
-            _tilemapLayers = tilemapLayers;
+            this.tilemapLayers = tilemapLayers;
+            this.tilemapFlag = tilemapFlag;
         }
 
-        public TilemapWrapper[] _tilemapLayers;
-        
+        public TilemapWrapper[] tilemapLayers;
+
+        public TilemapWrapper tilemapFlag;
         // ADD MORE ITEMS HERE IF NEEDED
     }
     
