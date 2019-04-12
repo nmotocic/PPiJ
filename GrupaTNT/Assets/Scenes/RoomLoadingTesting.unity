@@ -2186,7 +2186,7 @@ GameObject:
   - component: {fileID: 1826296099}
   - component: {fileID: 1826296098}
   m_Layer: 0
-  m_Name: Tilemap
+  m_Name: Doors
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
