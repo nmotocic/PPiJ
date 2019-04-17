@@ -6,7 +6,7 @@ public class EnemyController : EntityControllerInterface
 {
     Vector2 direction;
     Rigidbody2D rb2d;
-    static float defSpeed = 2f;
+    static float defSpeed = 0f; //Disabled
     float speed = defSpeed;
 
     public EnemyController(Rigidbody2D rb) {

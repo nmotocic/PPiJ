@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class EntityScript : MonoBehaviour
 {
     EntityControllerInterface controller;
     Rigidbody2D rb2d;
-    public string entityType= "player";int i = 0;
+    public string entityType= "player";
     // Start is called before the first frame update
     public void Start()
     {
