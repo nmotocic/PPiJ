@@ -36,7 +36,7 @@ public class EntityScript : MonoBehaviour
         if (entityType.Equals("player")) {
         }
     }
-    void fireObject(GameObject dispensable,)
+    void fireObject(GameObject dispensable)
     {
         GameObject x = Instantiate(dispensable);
         ProjectileScript y = x.GetComponent<ProjectileScript>();
