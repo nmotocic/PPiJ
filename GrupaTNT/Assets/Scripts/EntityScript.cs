@@ -6,6 +6,7 @@ public class EntityScript : MonoBehaviour
 {
     EntityControllerInterface controller;
     public List<GameObject> projectileOptions;
+    List<GameObject> firedProjectiles = new List<GameObject>();
     Rigidbody2D rb2d;
     public float speed=5;
     public string entityType= "player";int i = 0;
@@ -34,6 +35,14 @@ public class EntityScript : MonoBehaviour
         }
         if (entityType.Equals("player")) {
         }
+    }
+    void fireObject(GameObject dispensable,)
+    {
+        GameObject x = Instantiate(dispensable);
+        ProjectileScript y = x.GetComponent<ProjectileScript>();
+        Vector2 v = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(1.0f, -1.0f));
+        y.direction = v.normalized;
+        y.speed = 0.2f;
     }
     Vector2 getLocation() {
         return gameObject.transform.position;
