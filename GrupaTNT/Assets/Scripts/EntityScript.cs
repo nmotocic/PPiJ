@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class EntityScript : MonoBehaviour
 {
-    EntityControllerInterface controller;
+    public EntityControllerInterface controller;
+    public List<GameObject> fireableProjectiles;
     Rigidbody2D rb2d;
     public float speed=5;
     public string entityType= "player";int i = 0;
@@ -31,7 +32,13 @@ public class EntityScript : MonoBehaviour
         if (ES!=null)
         {
         }
-        if (entityType.Equals("player")) {
+        if (entityType.Equals("player"))
+        {
+            print("Touched a player");
+        }
+        else
+        {
+            print("Hit by projectile");
         }
     }
     Vector2 getLocation() {
