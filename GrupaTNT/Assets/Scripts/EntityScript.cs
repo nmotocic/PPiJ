@@ -6,11 +6,12 @@ public class EntityScript : MonoBehaviour
 {
     EntityControllerInterface controller;
     Rigidbody2D rb2d;
-    public float speed = 5;
+    public float speed=5;
     public string entityType= "player";int i = 0;
     // Start is called before the first frame update
     public void Start()
     {
+        controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (entityType.Equals("player")) { controller = new PlayerController(speed); }
     }
@@ -18,6 +19,7 @@ public class EntityScript : MonoBehaviour
     // Update is called once per frame
     public void Update()
     {
+        if (controller == null) { return; }
         controller.Update();
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
@@ -31,5 +33,8 @@ public class EntityScript : MonoBehaviour
         }
         if (entityType.Equals("player")) {
         }
+    }
+    Vector2 getLocation() {
+        return gameObject.transform.position;
     }
 }

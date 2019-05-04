@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : EntityControllerInterface
+public class PlayerController : MonoBehaviour, EntityControllerInterface
 {
     Vector2 direction;
-    float speed = 10f;
+    float speed = 2f;
+    float health = 20f;
     // Start is called before the first frame update
     public PlayerController(float v) {
         speed=v;
