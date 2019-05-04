@@ -8,8 +8,8 @@ public class PlayerController : MonoBehaviour, EntityControllerInterface
     float speed = 2f;
     float health = 20f;
     // Start is called before the first frame update
-    public PlayerController(float speed) {
-        this.speed = speed;
+    public PlayerController(float v) {
+        speed=v;
     }
     // Update is called once per frame
     public void Update()
