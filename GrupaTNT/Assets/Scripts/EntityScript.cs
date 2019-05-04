@@ -5,6 +5,7 @@ using UnityEngine;
 public class EntityScript : MonoBehaviour
 {
     EntityControllerInterface controller;
+    public List<GameObject> projectileOptions;
     Rigidbody2D rb2d;
     public float speed=5;
     public string entityType= "player";int i = 0;
