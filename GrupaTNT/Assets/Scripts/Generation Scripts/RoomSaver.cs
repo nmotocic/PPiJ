@@ -11,12 +11,13 @@ public class RoomSaver : MonoBehaviour
 {
    
     [SerializeField] GameObject gridObject;
-
-    private TileMapSerializer _serializer;
-
+    
     [SerializeField] public bool load;
 
     [SerializeField] public bool save;
+    
+    private TileMapSerializer _serializer;
+
     
     // Start is called before the first frame update
     void Start()
@@ -51,26 +52,26 @@ public class RoomSaver : MonoBehaviour
             _roomObjects[i] = gridObject.transform.GetChild(i).gameObject;
             int NumLayersInRoom = _roomObjects[i].transform.childCount;
             
-            GameObject[][] _tileMapObjects = new GameObject[NumOfRooms][];
+            GameObject[][] tileMapObjects = new GameObject[NumOfRooms][];
             GameObject[] roomObjectChildren = new GameObject[NumLayersInRoom];
-            Tilemap[] SingleRoomTileMaps = new Tilemap[NumLayersInRoom];
+            Tilemap[] singleRoomTileMaps = new Tilemap[NumLayersInRoom];
             layerNumbers = new int[NumLayersInRoom];
             
             for (int j = 0; j < NumLayersInRoom; j++)
             {
                 roomObjectChildren[j] = _roomObjects[i].transform.GetChild(j).gameObject;
-                SingleRoomTileMaps[j] = _roomObjects[i].transform.GetChild(j).gameObject.GetComponent<Tilemap>();
+                singleRoomTileMaps[j] = _roomObjects[i].transform.GetChild(j).gameObject.GetComponent<Tilemap>();
                 layerNumbers[j] = _roomObjects[i].transform.GetChild(j).GetComponent<TilemapRenderer>().sortingOrder;
             }
 
-            _tileMapObjects[i] = roomObjectChildren;
-            _tilemaps[i] = SingleRoomTileMaps;
+            tileMapObjects[i] = roomObjectChildren;
+            _tilemaps[i] = singleRoomTileMaps;
         }                           
 
         for (int i = 0; i < NumOfRooms; i++)
         {
             Tilemap[] map = _tilemaps[i];
-            _serializer.SerializeRoom(map, layerNumbers, "Tilemap- " + i.ToString() + " -" + 
+            _serializer.SerializeRoom(map, layerNumbers,   i.ToString() + " -" + 
                                            _roomObjects[i].name + ".room");
         }
     }
