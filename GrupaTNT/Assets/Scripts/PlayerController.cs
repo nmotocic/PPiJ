@@ -7,8 +7,8 @@ public class PlayerController : EntityControllerInterface
     Vector2 direction;
     float speed = 10f;
     // Start is called before the first frame update
-    public static void main() {
-        return;
+    public PlayerController(float v) {
+        speed=v;
     }
     // Update is called once per frame
     public void Update()
