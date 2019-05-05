@@ -837,6 +837,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13eda9b69f88645da9f0b7f52deb8ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flagTypes:
+    PowerUpSpawn: {fileID: 21300002, guid: 35f5ce21c9f6493dc9a9daba6b4cc5f3, type: 3}
+    EnemySpawn: {fileID: 21300016, guid: 35f5ce21c9f6493dc9a9daba6b4cc5f3, type: 3}
+    DoorRight: {fileID: 21300006, guid: 35f5ce21c9f6493dc9a9daba6b4cc5f3, type: 3}
+    DoorLeft: {fileID: 21300010, guid: 35f5ce21c9f6493dc9a9daba6b4cc5f3, type: 3}
+    DoorUp: {fileID: 21300012, guid: 35f5ce21c9f6493dc9a9daba6b4cc5f3, type: 3}
+    DoorDown: {fileID: 21300008, guid: 35f5ce21c9f6493dc9a9daba6b4cc5f3, type: 3}
 --- !u!1 &1445612085
 GameObject:
   m_ObjectHideFlags: 0
