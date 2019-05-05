@@ -20,7 +20,6 @@ public class TileMapSerializer
 {
     private Stream _stream;
     private BinaryFormatter _formatter;
-
     public TileMapSerializer()
     {
         _formatter = new BinaryFormatter();

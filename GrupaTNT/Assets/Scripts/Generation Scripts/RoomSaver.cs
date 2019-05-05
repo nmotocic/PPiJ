@@ -12,7 +12,7 @@ public class RoomSaver : MonoBehaviour
    
     [SerializeField] GameObject gridObject;
     
-    [SerializeField] public bool load;
+    [SerializeField] public bool load_ONLY_DEBUG;
 
     [SerializeField] public bool save;
     
@@ -28,7 +28,7 @@ public class RoomSaver : MonoBehaviour
         if(save)
             SaveRooms();
         
-        if(load)
+        if(load_ONLY_DEBUG)
             LoadRooms();
     }
 
@@ -76,6 +76,7 @@ public class RoomSaver : MonoBehaviour
         }
     }
 
+    
     void LoadRooms()
     {
         
