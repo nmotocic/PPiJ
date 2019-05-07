@@ -6,12 +6,13 @@ public class ProjectileController : EntityControllerInterface
 {
     EntityScript parentScript;
     Vector2 direction;
-    float speed = 1f;
+    float speed;
     // Start is called before the first frame update
-    public ProjectileController(EntityScript ps, Vector2 directioninput)
+    public ProjectileController(EntityScript ps, Vector2 direction, float speed)
     {
-        this.direction = directioninput;
-        parentScript = ps;
+        this.direction = direction;
+        this.parentScript = ps;
+        this.speed = speed;
     }
     // Update is called once per frame
     public void Update()

@@ -20,10 +20,13 @@ public class DispenserScript : MonoBehaviour
         counter++;
         if (counter == DispensingFrames) {
             GameObject x = Instantiate(dispensable);
-            EntityScript ES = new EntityScript();
-            v = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(1.0f, -1.0f));
-            ProjectileController PC = new ProjectileController(ES,v.normalized);
-            y.speed = 0.2f;
+            v = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(-1.0f, 1.0f));
+            EntityScript ES = x.GetComponent<EntityScript>();
+            if (ES == null)
+            {
+                ES = x.AddComponent<EntityScript>();
+                ES.init("projectile", v.normalized, 20f);
+            }
             counter++;
             counter %= 4;
         }
