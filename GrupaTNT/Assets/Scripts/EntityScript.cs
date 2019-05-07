@@ -11,14 +11,15 @@ public class EntityScript : MonoBehaviour
     public float speed=5;
     public string entityType= "player";
     // Start is called before the first frame update
-    public void init(string entityType,Vector2 direction,float speed)
+    public void Init(string entityType,Vector2 location,Vector2 direction,float speed)
     {
+        gameObject.transform.position = location;
         gameObject.SetActive(true);
         this.entityType = entityType;
         controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
-        if (entityType.Equals("player")) { controller = new PlayerController(speed); }
+        if (entityType.Equals("player")) { controller = new PlayerController(this,speed); }
         else if (!entityType.Equals("projectiles")) { controller = new ProjectileController(this,direction,speed); }
     }
     public void Start()
@@ -27,31 +28,27 @@ public class EntityScript : MonoBehaviour
         controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
-        controller = new PlayerController(speed);
+        controller = new PlayerController(this,speed);
     }
 
     // Update is called once per frame
     public void Update()
     {
         if (controller == null) { return; }
-        Debug.Log(controller==null);
-        Debug.Log(controller);
         controller.Update();
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
-        if (!entityType.Equals("player")) { print(movement); }
     }
     void OnCollisionEnter2D(Collision2D col)
     {
         
     }
-    void DispenseObject(GameObject dispensable, Vector2 direction, float speed=0.2f)
+    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
     {
+        Debug.Log("Dispensing...");
         GameObject x = Instantiate(dispensable);
-        ProjectileScript y = x.GetComponent<ProjectileScript>();
-        Vector2 v = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(1.0f, -1.0f));
-        y.direction = v.normalized;
-        y.speed = speed;
+        EntityScript y = x.AddComponent<EntityScript>();
+        y.Init("projectile",location,direction,speed);
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;

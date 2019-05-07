@@ -306,7 +306,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!50 &1117863275
 Rigidbody2D:
   serializedVersion: 4
@@ -438,7 +438,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectileOptions: []
+  projectileOptions:
+  - {fileID: 1117863274}
   speed: 5
   entityType: player
 --- !u!212 &1350809391

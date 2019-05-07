@@ -25,7 +25,7 @@ public class DispenserScript : MonoBehaviour
             if (ES == null)
             {
                 ES = x.AddComponent<EntityScript>();
-                ES.init("projectile", v.normalized, 20f);
+                ES.Init("projectile", gameObject.transform.position, v.normalized, 20f);
             }
             counter++;
             counter %= 4;

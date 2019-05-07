@@ -17,8 +17,6 @@ public class ProjectileController : EntityControllerInterface
     // Update is called once per frame
     public void Update()
     {
-        Debug.Log("Hewwo?");
-        Debug.Log(speed);
     }
     public Vector2 getMovement() { return direction * speed; }
     public void OnCollisionEnter2D(Collision2D col)
