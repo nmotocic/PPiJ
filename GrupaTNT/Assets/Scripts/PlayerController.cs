@@ -16,7 +16,12 @@ public class PlayerController : MonoBehaviour, EntityControllerInterface
     {
         float X = Input.GetAxis("Horizontal");
         float Y = Input.GetAxis("Vertical");
+        if (Input.GetMouseButtonDown(0)) {
+
+        }
         direction = new Vector2(X, Y);
     }
     public Vector2 getMovement() { return direction*speed; }
+    public void OnCollisionEnter2D(Collision2D col) {
+    }
 }

@@ -29,20 +29,15 @@ public class EntityScript : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D col)
     {
-        EntityScript ES = col.otherCollider.gameObject.GetComponent<EntityScript>();
-        if (ES!=null)
-        {
-        }
-        if (entityType.Equals("player")) {
-        }
+        
     }
-    void fireObject(GameObject dispensable)
+    void dispenseObject(GameObject dispensable, Vector2 direction, float speed=0.2f)
     {
         GameObject x = Instantiate(dispensable);
         ProjectileScript y = x.GetComponent<ProjectileScript>();
         Vector2 v = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(1.0f, -1.0f));
         y.direction = v.normalized;
-        y.speed = 0.2f;
+        y.speed = speed;
     }
     Vector2 getLocation() {
         return gameObject.transform.position;

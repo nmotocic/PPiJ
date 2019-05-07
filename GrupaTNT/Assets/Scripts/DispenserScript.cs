@@ -20,9 +20,9 @@ public class DispenserScript : MonoBehaviour
         counter++;
         if (counter == DispensingFrames) {
             GameObject x = Instantiate(dispensable);
-            ProjectileScript y = x.GetComponent<ProjectileScript>();
+            EntityScript ES = new EntityScript();
             v = new Vector2(Random.Range(-1.0f, 1.0f), Random.Range(1.0f, -1.0f));
-            y.direction = v.normalized;
+            ProjectileController PC = new ProjectileController(ES,v.normalized);
             y.speed = 0.2f;
             counter++;
             counter %= 4;
