@@ -13,7 +13,7 @@ public class EntityScript : MonoBehaviour
     // Start is called before the first frame update
     public void init(string entityType,Vector2 direction,float speed)
     {
-
+        gameObject.SetActive(true);
         this.entityType = entityType;
         controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
