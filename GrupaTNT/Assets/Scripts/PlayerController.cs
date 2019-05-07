@@ -19,12 +19,10 @@ public class PlayerController : EntityControllerInterface
         float X = Input.GetAxis("Horizontal");
         float Y = Input.GetAxis("Vertical");
         direction = new Vector2(X, Y);
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0)||Input.GetKeyDown("q"))
         {
-            Debug.Log("Dispensing...");
             Vector2 position = parentScript.gameObject.transform.position;
-            Vector2 firingDirection = (Vector2)Input.mousePosition - position;
-            parentScript.DispenseObject(parentScript.projectileOptions[0], position, firingDirection.normalized);
+            parentScript.DispenseObject(parentScript.projectileOptions[0], position+direction*0.01f, direction.normalized,20f);
         }
     }
     public Vector2 getMovement() { return direction*speed; }

@@ -41,11 +41,10 @@ public class EntityScript : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D col)
     {
-        
+        print(col.otherCollider.gameObject);
     }
     public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
     {
-        Debug.Log("Dispensing...");
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
         y.Init("projectile",location,direction,speed);
