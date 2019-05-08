@@ -13,6 +13,13 @@ public class FloatStat
         this.name = name;
         this.factors = new Dictionary<string, float>();
     }
+    public FloatStat(string name, float baseValue)
+    {
+        compoundValue = 1f;
+        this.name = name;
+        this.factors = new Dictionary<string, float>();
+        this.setFactor("baseValue", baseValue);
+    }
     public string getName() { return name; }
     public float getCompoundValue() {
         return (nullifiers == 0) ? compoundValue : 0;
