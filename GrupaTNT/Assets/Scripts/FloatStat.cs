@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FloatStat
 {
-    string name;
+    string name; 
     Dictionary<string, float> factors;
     int nullifiers = 0;
     float compoundValue;
@@ -13,7 +13,8 @@ public class FloatStat
         this.name = name;
         this.factors = new Dictionary<string, float>();
     }
-    public float get() {
+    public string getName() { return name; }
+    public float getCompoundValue() {
         return (nullifiers == 0) ? compoundValue : 0;
     }
     public float getFactor(string name, float def = 0f)
