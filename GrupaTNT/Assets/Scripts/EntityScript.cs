@@ -23,7 +23,7 @@ public class EntityScript : MonoBehaviour
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
         if (entityType.Equals("player")) { controller = new PlayerController(this,speed); }
         else if (entityType.Equals("projectile")) { controller = new ProjectileController(this,direction,speed); }
-        else if (entityType.Equals("powerup")) { controller = new ProjectileController(this, direction, speed); }
+        else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
     }
     public void Start()
     {
@@ -46,7 +46,7 @@ public class EntityScript : MonoBehaviour
     {
         GameObject other = col.collider.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
-        Debug.Log(parent);
+        Debug.Log(gameObject);
         if (entityType == "projectile" && parent != other && parent!=null)
         {
             if (otherES.entityType == "player") {
@@ -56,6 +56,17 @@ public class EntityScript : MonoBehaviour
                 Debug.Log(x);
                 health.setFactor("current", (x > 0) ? x : 0f);
             }
+            GameObject.Destroy(gameObject);
+        }
+        if (entityType == "powerup" && otherES.entityType == "player")
+        {
+            FloatStat health = otherES.stats["health"];
+            float x = health.getFactor("current", 1f);
+            x += 0.02f;
+            Debug.Log(x);
+            health.setFactor("current", (x > 0) ? x : 0f);
+            Vector2 V2 = new Vector2(Random.Range(-5f, 5f), Random.Range(-2f, 2f));
+            this.DispenseObject(gameObject, V2, new Vector2(), 0f);//za demonstraciju
             GameObject.Destroy(gameObject);
         }
     }
