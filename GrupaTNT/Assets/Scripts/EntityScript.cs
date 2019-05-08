@@ -4,16 +4,18 @@ using UnityEngine;
 
 public class EntityScript : MonoBehaviour
 {
+    public GameObject parent;
     public EntityControllerInterface controller;
-    public Dictionary<string, string> stats; //Za sada public
+    public Dictionary<string, FloatStat> stats = new Dictionary<string, FloatStat>();
     public List<GameObject> projectileOptions = new List<GameObject>();
     List<GameObject> firedProjectiles = new List<GameObject>();
     Rigidbody2D rb2d;
     public float speed=5;
     public string entityType;
     // Start is called before the first frame update
-    public void Init(string entityType,Vector2 location,Vector2 direction,float speed)
+    public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
     {
+        this.parent = parent;
         gameObject.transform.position = location;
         gameObject.SetActive(true);
         this.entityType = entityType;
@@ -42,14 +44,26 @@ public class EntityScript : MonoBehaviour
     }
     void OnCollisionEnter2D(Collision2D col)
     {
-        print(col.otherCollider.gameObject);
+        GameObject other = col.collider.gameObject;
+        EntityScript otherES = other.GetComponent<EntityScript>();
+        Debug.Log(parent);
+        if (entityType == "projectile" && parent != other && parent!=null)
+        {
+            if (otherES.entityType == "player") {
+                FloatStat health = otherES.stats["health"];
+                float x = health.getFactor("current",1f);
+                x -= 0.02f;
+                Debug.Log(x);
+                health.setFactor("current", (x > 0) ? x : 0f);
+            }
+            GameObject.Destroy(gameObject);
+        }
     }
     public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
-        Debug.Log(direction.ToString() + " " + speed.ToString());
-        y.Init("projectile",location,direction,speed);
+        y.Init("projectile",location,direction,speed,gameObject);
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;
