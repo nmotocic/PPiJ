@@ -25,6 +25,9 @@ public class FlagController : Singleton<FlagController>
     public Sprite DoorDown;
 
 
+    /// <summary>
+    /// Probably not needed
+    /// </summary>
     private void Awake()
     {
         Instance.DoorDown = DoorDown;
@@ -60,7 +63,7 @@ public class FlagController : Singleton<FlagController>
     // Start is called before the first frame update
     void Start()
     {
-        return;
+        
     }
 
     // Update is called once per frame

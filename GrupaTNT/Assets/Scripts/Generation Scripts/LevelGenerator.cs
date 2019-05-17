@@ -55,7 +55,8 @@ public class LevelGenerator : MonoBehaviour
         foreach (string filename in roomNames)
         {
             GameObject createdRoom = Resources.Load<GameObject>(room_prefix +
-                                                                filename.Substring(0, filename.LastIndexOf(".")));
+                                                                filename.Substring(0, 
+                                                                    filename.LastIndexOf(".")));
             rooms.Add(createdRoom);
         }
 
