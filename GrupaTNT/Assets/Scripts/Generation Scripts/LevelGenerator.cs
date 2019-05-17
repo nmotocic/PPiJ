@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -67,54 +68,71 @@ public class LevelGenerator : MonoBehaviour
 
     public class Door
     {
-        public Door(List<TileBase> tiles)
+        public Door(List<Vector3Int> tiles, Sprite flagTypes)
         {
             Tiles = tiles;
+            type = flagTypes;
         }
-        public List<TileBase> Tiles { get; set; }
+        public List<Vector3Int> Tiles { get; set; }
+        public Sprite type { get; set; }
     }
     
-    public static List<Door> DoorSearch(Tilemap tilemap)
+    public List<Door> DoorSearch(Tilemap tilemap)
     {
         TileBase[] tiles = tilemap.GetTilesBlock(tilemap.cellBounds);
         List<string> foundFlags = new List<string>();
-        Dictionary<string, List<TileBase>> doors = new Dictionary<string, List<TileBase>>();
+        Dictionary<string, List<Vector3Int>> doors = new Dictionary<string, List<Vector3Int>>();
         
         foreach (var tilePosition in tilemap.cellBounds.allPositionsWithin)
         {   
             TileBase tile = tilemap.GetTile(tilePosition);
-            if (tile == null) continue;
+            if (tile == null) 
+                continue;
             
             string spriteName = tilemap.GetSprite(tilePosition).name;
             if (!foundFlags.Contains(spriteName))
             {
+                if (!doors.ContainsKey(spriteName))
+                {
+                    doors.Add(spriteName, new List<Vector3Int>());
+                }
+                
                 foundFlags.Add(spriteName);
-                FloodSearchTileMap(tilemap, doors, tilePosition, spriteName);
+                FloodSearchTileMap(tilemap, doors[spriteName], tilePosition, spriteName);
             }
         }
-        
-        return null; 
-    }
 
-    private static void FloodSearchTileMap(Tilemap tilemap, Dictionary<string, List<TileBase>> doors, 
-        Vector3Int start, string spriteName)
-    {
-        
-        Debug.Log(tilemap.GetSprite(start).name);
-        if (tilemap.GetSprite(start).name == spriteName)
+        List<Door> doorList = new List<Door>(doors.Keys.Count);
+
+        foreach (var door in doors)
         {
-          
+            Door DoorHolder = new Door(door.Value, FlagController.Instance.FindSpriteWithString(door.Key));
+            doorList.Add(DoorHolder);
         }
 
-        return;
+        return doorList;
+    }
 
+    private static void FloodSearchTileMap(Tilemap tilemap, List<Vector3Int> doors, 
+        Vector3Int start, string spriteName)
+    {
+        if (tilemap.GetSprite(start) == null)
+            return;
+        
+        Debug.Log(tilemap.GetSprite(start).name);
+        if ((tilemap.GetSprite(start).name != spriteName) || (doors.Contains(start)))
+        {
+            return;
+        }
+
+        doors.Add(start);
+        
+        
         FloodSearchTileMap(tilemap, doors, new Vector3Int(start.x + 1, start.y, start.z), spriteName);
         FloodSearchTileMap(tilemap, doors, new Vector3Int(start.x - 1, start.y, start.z), spriteName);
         FloodSearchTileMap(tilemap, doors, new Vector3Int(start.x, start.y + 1, start.z), spriteName);
         FloodSearchTileMap(tilemap, doors, new Vector3Int(start.x, start.y - 1, start.z), spriteName);
-        FloodSearchTileMap(tilemap, doors, new Vector3Int(start.x, start.y, start.z + 1), spriteName);
-        FloodSearchTileMap(tilemap, doors, new Vector3Int(start.x, start.y, start.z - 1), spriteName);
-        
+
     }
 
 }

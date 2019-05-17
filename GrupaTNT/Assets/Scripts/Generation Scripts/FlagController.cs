@@ -6,35 +6,55 @@ using JetBrains.Annotations;
 using UnityEditor.VersionControl;
 using UnityEngine;
 
-public class FlagController : MonoBehaviour
+public class FlagController : Singleton<FlagController>
 {
     /// <summary>
     /// We manually set the sprites in the inspector
     /// </summary>
-    [System.Serializable]
-    public struct FlagTypes
-    {
-        
-        public Sprite PowerUpSpawn;
-        public Sprite EnemySpawn;
-        public Sprite DoorRight;
-        public Sprite DoorLeft;
-        public Sprite DoorUp;
-        public Sprite DoorDown;
-    }    
-    
-    private FlagTypes types;
-    private static List<FlagTypes> Flags = null;
+    [SerializeField]
+    public Sprite PowerUpSpawn;
+    [SerializeField]
+    public Sprite EnemySpawn;
+    [SerializeField]
+    public Sprite DoorRight;
+    [SerializeField]
+    public Sprite DoorLeft;
+    [SerializeField]
+    public Sprite DoorUp;
+    [SerializeField]
+    public Sprite DoorDown;
+
 
     private void Awake()
     {
-        Flags = new List<FlagTypes>();
-        Flags.Add(types);
+        Instance.DoorDown = DoorDown;
+        Instance.DoorUp = DoorUp;
+        Instance.DoorLeft = DoorLeft;
+        Instance.DoorRight = DoorRight;
+        Instance.EnemySpawn = EnemySpawn;
+        Instance.PowerUpSpawn = PowerUpSpawn;
     }
 
-    public static FlagTypes GetFlags()
+    //Disallow constructor use
+    protected FlagController() { }
+    
+    public Sprite FindSpriteWithString(string str)
     {
-        return Flags[0];
+        if (DoorDown.name == str)
+            return DoorDown;
+        if (DoorUp.name == str)
+            return DoorUp;
+        if (DoorLeft.name == str)
+            return DoorLeft;
+        if (DoorRight.name == str)
+            return DoorRight;
+        if (PowerUpSpawn.name == str)
+            return PowerUpSpawn;
+        if (EnemySpawn.name == str)
+            return EnemySpawn;
+
+        Debug.LogError("No string passed in findSpriteWithString");
+        return null;
     }
 
     // Start is called before the first frame update
