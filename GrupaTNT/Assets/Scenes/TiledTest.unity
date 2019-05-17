@@ -184,13 +184,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13eda9b69f88645da9f0b7f52deb8ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  types:
-    PowerUpSpawn: {fileID: 21300018, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
-    EnemySpawn: {fileID: 21300016, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
-    DoorRight: {fileID: 21300006, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
-    DoorLeft: {fileID: 21300010, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
-    DoorUp: {fileID: 21300012, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
-    DoorDown: {fileID: 21300008, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  PowerUpSpawn: {fileID: 21300018, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  EnemySpawn: {fileID: 21300016, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  DoorRight: {fileID: 21300006, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  DoorLeft: {fileID: 21300010, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  DoorUp: {fileID: 21300012, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  DoorDown: {fileID: 21300008, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
 --- !u!1001 &275035047
 PrefabInstance:
   m_ObjectHideFlags: 0
