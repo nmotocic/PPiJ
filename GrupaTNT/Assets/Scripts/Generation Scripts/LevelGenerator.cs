@@ -22,16 +22,13 @@ public class LevelGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-        //GameObject flagChild = grid.transform.Find("Flags").gameObject;
-        //Tilemap flagMap = flagChild.GetComponent<Tilemap>();
+        Tilemap flagMap = GameObject.FindWithTag("Flag").GetComponent<Tilemap>();
 
         SetupMainRoom();
-        
-
+            
         //Loading all the saved room prefabs
         
-        //_rooms = LoadGameObjectRooms();
+        _rooms = LoadGameObjectRooms();
         //List<Door> doors = DoorSearch(flagMap);
         //Use rooms and flags to generate the level
         //GenerateRooms(roomGenNumber);
@@ -63,7 +60,6 @@ public class LevelGenerator : MonoBehaviour
             layer.transform.SetParent(roomHolder.transform, false);
         }
         
-
         //transfer all components
         var components = _tempMainRoomInstantiation.GetComponents<Component>();
         foreach (var component in components)
@@ -74,9 +70,12 @@ public class LevelGenerator : MonoBehaviour
         
         Destroy(_tempMainRoomInstantiation);
         Destroy(mainRoom);
+        gridObject.tag = "Grid";
         
         _grid = gridObject;
     }
+    
+    
 
     List<GameObject> LoadGameObjectRooms()
     {
@@ -95,23 +94,25 @@ public class LevelGenerator : MonoBehaviour
         List<GameObject> rooms = new List<GameObject>();
 
         string room_prefix = "PremadeRooms/";
-        
-        //Since we get a grid in the prefab for each room, we take one grid and apply it to everyone
-        GameObject sampleRoom = Resources.Load<GameObject>(room_prefix +
-                                                            roomNames[0].Substring(0, 
-                                                                roomNames[0].LastIndexOf(".")));
-        var components = sampleRoom.GetComponents<Component>();
-        
-        
-        
-        sampleRoom.GetComponent<Grid>();
 
         foreach (string filename in roomNames)
         {
-            GameObject createdRoom = Resources.Load<GameObject>(room_prefix +
+            GameObject loadedRoom = Resources.Load<GameObject>(room_prefix +
                                                                 filename.Substring(0, 
                                                                     filename.LastIndexOf(".")));
-            rooms.Add(createdRoom);
+            GameObject createdRoom = Instantiate(loadedRoom);
+            GameObject transformedRoom = new GameObject(loadedRoom.name);
+            
+            for (int i = createdRoom.transform.childCount - 1; i >= 0; i--)
+            {
+                var layer = createdRoom.transform.GetChild(i);
+                layer.transform.SetParent(transformedRoom.transform, false);
+            }
+            
+            transformedRoom.transform.SetParent(_grid.transform, false);
+            
+            Destroy(createdRoom);
+            rooms.Add(transformedRoom);
         }
 
         return rooms;
