@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -10,28 +11,71 @@ public class LevelGenerator : MonoBehaviour
 {
     [SerializeField] public int roomGenNumber;
 
-    [SerializeField] public GameObject grid;
+    //Dont use
+    [SerializeField] public GameObject mainRoom;
+    
+    private GameObject _tempMainRoomInstantiation;
+    private GameObject _grid;
     
     private List<GameObject> _rooms;
 
     // Start is called before the first frame update
     void Start()
     {
-        GameObject flagChild = grid.transform.Find("Flags").gameObject;
-        Tilemap flagMap = flagChild.GetComponent<Tilemap>();
-    
+        
+        //GameObject flagChild = grid.transform.Find("Flags").gameObject;
+        //Tilemap flagMap = flagChild.GetComponent<Tilemap>();
+
+        SetupMainRoom();
+        
+
         //Loading all the saved room prefabs
-        _rooms = LoadGameObjectRooms();
-        DoorSearch(flagMap);
+        
+        //_rooms = LoadGameObjectRooms();
+        //List<Door> doors = DoorSearch(flagMap);
         //Use rooms and flags to generate the level
         //GenerateRooms(roomGenNumber);
+        //GenerateRooms(roomGenNumber);
 
+    }
+    
+    void Awake () {
+        _tempMainRoomInstantiation = Instantiate(mainRoom.gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    private void SetupMainRoom()
+    {
+        GameObject gridObject = new GameObject("Grid");
+        GameObject roomHolder = new GameObject("[ROOM]Main");
+        
+        roomHolder.transform.parent = gridObject.transform;
+        
+        for (int i = _tempMainRoomInstantiation.transform.childCount - 1; i >= 0; i--)
+        {
+            var layer = _tempMainRoomInstantiation.transform.GetChild(i);
+            // transfer layers to holder
+            layer.transform.SetParent(roomHolder.transform, false);
+        }
+        
+
+        //transfer all components
+        var components = _tempMainRoomInstantiation.GetComponents<Component>();
+        foreach (var component in components)
+        {
+            UnityEditorInternal.ComponentUtility.CopyComponent(component);
+            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(gridObject);
+        }
+        
+        Destroy(_tempMainRoomInstantiation);
+        Destroy(mainRoom);
+        
+        _grid = gridObject;
     }
 
     List<GameObject> LoadGameObjectRooms()
@@ -47,10 +91,20 @@ public class LevelGenerator : MonoBehaviour
             if (filename.Name.StartsWith("[ROOM]") && filename.Name.EndsWith(".prefab"))
                 roomNames.Add(filename.Name);
         }
-
+        
         List<GameObject> rooms = new List<GameObject>();
 
         string room_prefix = "PremadeRooms/";
+        
+        //Since we get a grid in the prefab for each room, we take one grid and apply it to everyone
+        GameObject sampleRoom = Resources.Load<GameObject>(room_prefix +
+                                                            roomNames[0].Substring(0, 
+                                                                roomNames[0].LastIndexOf(".")));
+        var components = sampleRoom.GetComponents<Component>();
+        
+        
+        
+        sampleRoom.GetComponent<Grid>();
 
         foreach (string filename in roomNames)
         {
@@ -65,6 +119,7 @@ public class LevelGenerator : MonoBehaviour
 
     void GenerateRooms(int roomGenNumber)
     {
+        
     }
 
     public class Door
