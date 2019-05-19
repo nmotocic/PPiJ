@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class LevelGenerator : MonoBehaviour
 {
@@ -18,21 +19,30 @@ public class LevelGenerator : MonoBehaviour
     private GameObject _grid;
     
     private List<GameObject> _rooms;
+    
+    private Vector3Int roomMove = new Vector3Int(1000,1000,0);
+    private Vector3Int ReverseRoomMove = new Vector3Int(-1000,-1000,0);
 
+    private Vector3 modifier;
     // Start is called before the first frame update
     void Start()
     {
         Tilemap flagMap = GameObject.FindWithTag("Flag").GetComponent<Tilemap>();
 
+        //we get _grid
         SetupMainRoom();
-            
-        //Loading all the saved room prefabs
+
+        //We get the modifier that we have to multiply delta movement by because of how Tiler scales things
+        modifier = _grid.GetComponent<Grid>().cellSize;
         
+        //Loading all the saved room prefabs
         _rooms = LoadGameObjectRooms();
-        //List<Door> doors = DoorSearch(flagMap);
+        List<Door> doors = DoorSearch(flagMap);
+        
+        //Get home room
+        var homeRoom = _grid.transform.GetChild(0).gameObject;
         //Use rooms and flags to generate the level
-        //GenerateRooms(roomGenNumber);
-        //GenerateRooms(roomGenNumber);
+        GenerateRooms(roomGenNumber, homeRoom);
 
     }
     
@@ -74,8 +84,6 @@ public class LevelGenerator : MonoBehaviour
         
         _grid = gridObject;
     }
-    
-    
 
     List<GameObject> LoadGameObjectRooms()
     {
@@ -109,20 +117,130 @@ public class LevelGenerator : MonoBehaviour
                 layer.transform.SetParent(transformedRoom.transform, false);
             }
             
-            transformedRoom.transform.SetParent(_grid.transform, false);
-            
             Destroy(createdRoom);
+            
+            transformedRoom.transform.Translate(roomMove);
             rooms.Add(transformedRoom);
         }
 
         return rooms;
     }
 
-    void GenerateRooms(int roomGenNumber)
+    void GenerateRooms(int roomGenNumber, GameObject previousRoom)
     {
+        if (roomGenNumber == 0)
+        {
+            return;
+        }
+
+        GameObject pickedRoom = null;
+        Sprite randomDirectionSprite = null;
+
+        do
+        {
+            pickedRoom = _rooms[Random.Range(0, _rooms.Count - 1)];
+            randomDirectionSprite = FlagController.Instance.GetRandomDirection();
+        } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom));
+
+        if(pickedRoom == null || randomDirectionSprite == null)
+            throw new Exception("Room or Sprite is null in GenerateRooms");
+
+        var doorsOld = DoorSearch(previousRoom.transform.Find("Flags").GetComponent<Tilemap>());
+        Door oldConnectionDoor = null;
         
+        foreach (var door in doorsOld)
+        {
+            if (door.type.name == randomDirectionSprite.name)
+            {
+                oldConnectionDoor = door;
+                break;
+            }
+        }
+        
+        if (oldConnectionDoor == null) 
+            throw new Exception("no connection found");
+        
+        //create clone room from template room
+        var clonedRoom = Instantiate(pickedRoom, _grid.transform, true);
+        //reverse original transition
+        clonedRoom.transform.Translate(ReverseRoomMove);
+
+        var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
+        var oppositeSprite = FlagController.Instance.GetOppositeDirection(randomDirectionSprite.name);
+
+        Door newConnectionDoor = null;
+        
+        foreach (var door in newDoors)
+        {
+            if (door.type.name == oppositeSprite.name)
+            {
+                newConnectionDoor = door;
+                break;
+            }
+        }
+
+        if (newConnectionDoor == null) 
+            throw new Exception("no connection found");
+
+        var doorTilesNew = newConnectionDoor.Tiles[0];
+        var doorTilesOld = oldConnectionDoor.Tiles[0];
+        var deltaTiles = doorTilesOld - doorTilesNew;
+        
+        Vector3 deltaTilesMid = new Vector3(
+            Mathf.Clamp(deltaTiles.x, -1, 1)*(-1) + deltaTiles.x,
+            Mathf.Clamp(deltaTiles.y, -1, 1)*(-1) + deltaTiles.y,
+            deltaTiles.z);
+        
+        clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.transform.position.x, 
+            modifier.y*deltaTilesMid.y + previousRoom.transform.position.y,
+            modifier.z*deltaTilesMid.z + previousRoom.transform.position.z), Space.World);
+
+        GenerateRooms(roomGenNumber - 1, clonedRoom);
+    }
+    
+    bool RoomHasOppositeDirection(Sprite original, GameObject roomCompare)
+    {
+        var oppositeSprite = FlagController.Instance.GetOppositeDirection(original.name);
+        return RoomHasDirection(roomCompare, oppositeSprite);
     }
 
+    bool RoomHasDirection(GameObject room, Sprite sprite)
+    {
+        var flags = FindFlagLayer(room);
+
+        if (flags == null)
+        {
+           throw new Exception("No flag layer found. Maybe tag missing?");
+        }
+
+        var doors = DoorSearch(flags.GetComponent<Tilemap>());
+
+        foreach (var door in doors)
+        {
+            if (sprite.name.Equals(door.type.name))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private GameObject FindFlagLayer(GameObject room)
+    {
+        GameObject flags = null;
+        for (int i = 0; i < room.transform.childCount; i++)
+        {
+            var layer = room.transform.GetChild(i);
+            if (layer.CompareTag("Flag"))
+            {
+                flags = layer.gameObject;
+            }
+        }
+
+        return flags;
+    }
+    
     public class Door
     {
         public Door(List<Vector3Int> tiles, Sprite flagTypes)
@@ -176,7 +294,7 @@ public class LevelGenerator : MonoBehaviour
         if (tilemap.GetSprite(start) == null)
             return;
         
-        Debug.Log(tilemap.GetSprite(start).name);
+        //Debug.Log(tilemap.GetSprite(start).name);
         if ((tilemap.GetSprite(start).name != spriteName) || (doors.Contains(start)))
         {
             return;

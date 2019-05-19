@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using UnityEditor.VersionControl;
 using UnityEngine;
+using Random = System.Random;
 
 public class FlagController : Singleton<FlagController>
 {
@@ -23,8 +24,7 @@ public class FlagController : Singleton<FlagController>
     public Sprite DoorUp;
     [SerializeField]
     public Sprite DoorDown;
-
-
+    
     /// <summary>
     /// Probably not needed
     /// </summary>
@@ -40,6 +40,35 @@ public class FlagController : Singleton<FlagController>
 
     //Disallow constructor use
     protected FlagController() { }
+
+    public Sprite GetRandomDirection()
+    {
+        var picker = UnityEngine.Random.Range(0, 4);
+
+        switch (picker)
+        {
+            case 0: return DoorDown;
+            case 1: return DoorUp;
+            case 2: return DoorLeft;
+            case 3: return DoorRight;
+        }
+
+        return null;
+    }
+
+    public Sprite GetOppositeDirection(string str)
+    {
+        if (DoorDown.name == str)
+            return DoorUp;
+        if (DoorUp.name == str)
+            return DoorDown;
+        if (DoorLeft.name == str)
+            return DoorRight;
+        if (DoorRight.name == str)
+            return DoorLeft;
+        
+        return null;
+    }
     
     public Sprite FindSpriteWithString(string str)
     {
