@@ -144,7 +144,8 @@ public class LevelGenerator : MonoBehaviour
         {
             pickedRoom = _roomObjects[Random.Range(0, _roomObjects.Count)];
             randomDirectionSprite = FlagController.Instance.GetRandomDirection();
-        } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom) );
+        } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom)
+        || (previousRoom.IsConnected(randomDirectionSprite) && previousRoom.CanConnect(randomDirectionSprite)));
 
         if(pickedRoom == null || randomDirectionSprite == null)
             throw new Exception("Room or Sprite is null in GenerateRooms");
@@ -176,10 +177,10 @@ public class LevelGenerator : MonoBehaviour
 
         //Connect new room with old room 
         Room newRoom = new Room(newDoors, clonedRoom);
-        newRoom.Connect(newConnectionDoor, previousRoom);
+        newRoom.Connect(newConnectionDoor.type, previousRoom);
         
         //Connect old room with new room
-        previousRoom.Connect(oldConnectionDoor, newRoom);
+        previousRoom.Connect(oldConnectionDoor.type, newRoom);
         
         roomConnectionList.Add(newRoom);
 
@@ -254,28 +255,36 @@ public class LevelGenerator : MonoBehaviour
             Doors = doors;
             Position = container.transform.position;
             Container = container;
-            ConnectedRoomDictionary = new Dictionary<Door, Room>(4);
-            HasDoor = new Dictionary<Door, bool>(4);
+            ConnectedRoomDictionary = new Dictionary<Sprite, Room>(4);
+            HasDoor = new Dictionary<Sprite, bool>(4);
 
             foreach (var door in doors)
             {
-                ConnectedRoomDictionary[door] = null;
-                HasDoor[door] = true;
+                ConnectedRoomDictionary[door.type] = null;
+                HasDoor[door.type] = true;
             }
         }
 
-        public void Connect(Door myDoor, Room other)
+        public void Connect(Sprite sprite, Room other)
         {
-            ConnectedRoomDictionary[myDoor] = other;
+            ConnectedRoomDictionary[sprite] = other;
         }
-        
 
-        public Dictionary<Door, bool> HasDoor;
+        public bool IsConnected(Sprite sprite)
+        {
+            return ConnectedRoomDictionary[sprite] != null;
+        }
+
+        public bool CanConnect(Sprite sprite)
+        {
+            return HasDoor[sprite] == true;
+        }
+
+        public Dictionary<Sprite, bool> HasDoor;
         public List<Door> Doors;
         public Vector3 Position { get; set; }
         public GameObject Container { get; set; }
-
-        private Dictionary<Door, Room> ConnectedRoomDictionary;
+        private Dictionary<Sprite, Room> ConnectedRoomDictionary;
 
     }
     
