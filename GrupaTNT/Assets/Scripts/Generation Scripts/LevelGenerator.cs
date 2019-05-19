@@ -18,7 +18,8 @@ public class LevelGenerator : MonoBehaviour
     private GameObject _tempMainRoomInstantiation;
     private GameObject _grid;
     
-    private List<GameObject> _rooms;
+    private List<GameObject> _roomObjects;
+    private List<Room> roomConnectionList = new List<Room>();
     
     private Vector3Int roomMove = new Vector3Int(1000,1000,0);
     private Vector3Int ReverseRoomMove = new Vector3Int(-1000,-1000,0);
@@ -36,13 +37,13 @@ public class LevelGenerator : MonoBehaviour
         modifier = _grid.GetComponent<Grid>().cellSize;
         
         //Loading all the saved room prefabs
-        _rooms = LoadGameObjectRooms();
+        _roomObjects = LoadGameObjectRooms();
         List<Door> doors = DoorSearch(flagMap);
         
         //Get home room
         var homeRoom = _grid.transform.GetChild(0).gameObject;
         //Use rooms and flags to generate the level
-        GenerateRooms(roomGenNumber, homeRoom);
+        GenerateRooms(roomGenNumber, roomConnectionList[0]);
 
     }
     
@@ -82,6 +83,9 @@ public class LevelGenerator : MonoBehaviour
         Destroy(mainRoom);
         gridObject.tag = "Grid";
         
+        Room room = new Room(DoorSearch(roomHolder.transform.Find("Flags").GetComponent<Tilemap>()), 
+            roomHolder);
+        roomConnectionList.Add(room);
         _grid = gridObject;
     }
 
@@ -126,7 +130,7 @@ public class LevelGenerator : MonoBehaviour
         return rooms;
     }
 
-    void GenerateRooms(int roomGenNumber, GameObject previousRoom)
+    void GenerateRooms(int roomGenNumber, Room previousRoom)
     {
         if (roomGenNumber == 0)
         {
@@ -138,28 +142,15 @@ public class LevelGenerator : MonoBehaviour
 
         do
         {
-            pickedRoom = _rooms[Random.Range(0, _rooms.Count - 1)];
+            pickedRoom = _roomObjects[Random.Range(0, _roomObjects.Count)];
             randomDirectionSprite = FlagController.Instance.GetRandomDirection();
-        } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom));
+        } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom) );
 
         if(pickedRoom == null || randomDirectionSprite == null)
             throw new Exception("Room or Sprite is null in GenerateRooms");
 
-        var doorsOld = DoorSearch(previousRoom.transform.Find("Flags").GetComponent<Tilemap>());
-        Door oldConnectionDoor = null;
-        
-        foreach (var door in doorsOld)
-        {
-            if (door.type.name == randomDirectionSprite.name)
-            {
-                oldConnectionDoor = door;
-                break;
-            }
-        }
-        
-        if (oldConnectionDoor == null) 
-            throw new Exception("no connection found");
-        
+        var oldConnectionDoor = FindConnectionDoor(previousRoom.Doors, randomDirectionSprite);
+
         //create clone room from template room
         var clonedRoom = Instantiate(pickedRoom, _grid.transform, true);
         //reverse original transition
@@ -168,19 +159,7 @@ public class LevelGenerator : MonoBehaviour
         var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
         var oppositeSprite = FlagController.Instance.GetOppositeDirection(randomDirectionSprite.name);
 
-        Door newConnectionDoor = null;
-        
-        foreach (var door in newDoors)
-        {
-            if (door.type.name == oppositeSprite.name)
-            {
-                newConnectionDoor = door;
-                break;
-            }
-        }
-
-        if (newConnectionDoor == null) 
-            throw new Exception("no connection found");
+        var newConnectionDoor = FindConnectionDoor(newDoors, oppositeSprite);
 
         var doorTilesNew = newConnectionDoor.Tiles[0];
         var doorTilesOld = oldConnectionDoor.Tiles[0];
@@ -191,13 +170,40 @@ public class LevelGenerator : MonoBehaviour
             Mathf.Clamp(deltaTiles.y, -1, 1)*(-1) + deltaTiles.y,
             deltaTiles.z);
         
-        clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.transform.position.x, 
-            modifier.y*deltaTilesMid.y + previousRoom.transform.position.y,
-            modifier.z*deltaTilesMid.z + previousRoom.transform.position.z), Space.World);
+        clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.Position.x, 
+            modifier.y*deltaTilesMid.y + previousRoom.Position.y,
+            modifier.z*deltaTilesMid.z + previousRoom.Position.z), Space.World);
 
-        GenerateRooms(roomGenNumber - 1, clonedRoom);
+        //Connect new room with old room 
+        Room newRoom = new Room(newDoors, clonedRoom);
+        newRoom.Connect(newConnectionDoor, previousRoom);
+        
+        //Connect old room with new room
+        previousRoom.Connect(oldConnectionDoor, newRoom);
+        
+        roomConnectionList.Add(newRoom);
+
+        GenerateRooms(roomGenNumber - 1, newRoom);
     }
-    
+
+    private Door FindConnectionDoor(List<Door> doors, Sprite randomDirectionSprite)
+    {
+        Door ConnectionDoor = null;
+
+        foreach (var door in doors)
+        {
+            if (door.type.name == randomDirectionSprite.name)
+            {
+                ConnectionDoor = door;
+                break;
+            }
+        }
+
+        if (ConnectionDoor == null)
+            throw new Exception("no connection found");
+        return ConnectionDoor;
+    }
+
     bool RoomHasOppositeDirection(Sprite original, GameObject roomCompare)
     {
         var oppositeSprite = FlagController.Instance.GetOppositeDirection(original.name);
@@ -239,6 +245,38 @@ public class LevelGenerator : MonoBehaviour
         }
 
         return flags;
+    }
+
+    public class Room
+    {
+        public Room(List<Door> doors, GameObject container)
+        {
+            Doors = doors;
+            Position = container.transform.position;
+            Container = container;
+            ConnectedRoomDictionary = new Dictionary<Door, Room>(4);
+            HasDoor = new Dictionary<Door, bool>(4);
+
+            foreach (var door in doors)
+            {
+                ConnectedRoomDictionary[door] = null;
+                HasDoor[door] = true;
+            }
+        }
+
+        public void Connect(Door myDoor, Room other)
+        {
+            ConnectedRoomDictionary[myDoor] = other;
+        }
+        
+
+        public Dictionary<Door, bool> HasDoor;
+        public List<Door> Doors;
+        public Vector3 Position { get; set; }
+        public GameObject Container { get; set; }
+
+        private Dictionary<Door, Room> ConnectedRoomDictionary;
+
     }
     
     public class Door
