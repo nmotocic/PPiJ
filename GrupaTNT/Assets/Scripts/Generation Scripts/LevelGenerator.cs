@@ -14,12 +14,18 @@ public class LevelGenerator : MonoBehaviour
 
     //Dont use
     [SerializeField] public GameObject mainRoom;
+
+    [SerializeField] public int gridSize;
+
+    private Room[,] _roomGrid;
     
     private GameObject _tempMainRoomInstantiation;
     private GameObject _grid;
     
     private List<GameObject> _roomObjects;
-    private List<Room> roomConnectionList = new List<Room>();
+    //private List<Room> roomConnectionList = new List<Room>();
+
+    private Vector2Int startingGridPostion;
     
     private Vector3Int roomMove = new Vector3Int(1000,1000,0);
     private Vector3Int ReverseRoomMove = new Vector3Int(-1000,-1000,0);
@@ -28,6 +34,11 @@ public class LevelGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        //Grid init
+        _roomGrid = new Room[gridSize, gridSize];
+        
+        startingGridPostion = new Vector2Int(gridSize/2, gridSize/2);
+        
         Tilemap flagMap = GameObject.FindWithTag("Flag").GetComponent<Tilemap>();
 
         //we get _grid
@@ -43,7 +54,7 @@ public class LevelGenerator : MonoBehaviour
         //Get home room
         var homeRoom = _grid.transform.GetChild(0).gameObject;
         //Use rooms and flags to generate the level
-        GenerateRooms(roomGenNumber, roomConnectionList[0]);
+        GenerateRooms(roomGenNumber, _roomGrid[startingGridPostion.x, startingGridPostion.y]);
 
     }
     
@@ -84,8 +95,8 @@ public class LevelGenerator : MonoBehaviour
         gridObject.tag = "Grid";
         
         Room room = new Room(DoorSearch(roomHolder.transform.Find("Flags").GetComponent<Tilemap>()), 
-            roomHolder);
-        roomConnectionList.Add(room);
+            roomHolder, startingGridPostion);
+        _roomGrid[startingGridPostion.x, startingGridPostion.y] = room;
         _grid = gridObject;
     }
 
@@ -172,20 +183,23 @@ public class LevelGenerator : MonoBehaviour
             Mathf.Clamp(deltaTiles.y, -1, 1)*(-1) + deltaTiles.y,
             deltaTiles.z);
         
-        clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.Position.x, 
-            modifier.y*deltaTilesMid.y + previousRoom.Position.y,
-            modifier.z*deltaTilesMid.z + previousRoom.Position.z), Space.World);
+        clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.RealPosition.x, 
+            modifier.y*deltaTilesMid.y + previousRoom.RealPosition.y,
+            modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
 
+        // Calculating the new room gridPosition
+        Vector2Int newRoomGridPositionDelta = FlagController.Instance.DirectionToDeltaVector(randomDirectionSprite);
+        Vector2Int newRoomGridPosition = previousRoom.GridPosition + newRoomGridPositionDelta;
+        
         //Connect new room with old room 
-        Room newRoom = new Room(newDoors, clonedRoom);
+        Room newRoom = new Room(newDoors, clonedRoom, newRoomGridPosition);
         newRoom.Connect(newConnectionDoor.type, previousRoom);
         
         //Connect old room with new room
         previousRoom.Connect(oldConnectionDoor.type, newRoom);
-        
-        roomConnectionList.Add(newRoom);
 
-                
+        _roomGrid[newRoomGridPosition.x, newRoomGridPosition.y] = newRoom;
+        
         GenerateRooms(roomGenNumber - 1, newRoom);
     }
 
@@ -252,10 +266,18 @@ public class LevelGenerator : MonoBehaviour
 
     public class Room
     {
-        public Room(List<Door> doors, GameObject container)
+        public Dictionary<Sprite, bool> HasDoor;
+        public List<Door> Doors;
+        public Vector3 RealPosition { get; set; }
+        public Vector2Int GridPosition { get; set; }
+        public GameObject Container { get; set; }
+        private Dictionary<Sprite, Room> ConnectedRoomDictionary;
+        
+        public Room(List<Door> doors, GameObject container, Vector2Int gridPosition)
         {
             Doors = doors;
-            Position = container.transform.position;
+            RealPosition = container.transform.position;
+            GridPosition = gridPosition;
             Container = container;
             ConnectedRoomDictionary = new Dictionary<Sprite, Room>(4);
             HasDoor = new Dictionary<Sprite, bool>(4);
@@ -298,12 +320,6 @@ public class LevelGenerator : MonoBehaviour
         {
             return HasDoor[sprite] == true;
         }
-
-        public Dictionary<Sprite, bool> HasDoor;
-        public List<Door> Doors;
-        public Vector3 Position { get; set; }
-        public GameObject Container { get; set; }
-        private Dictionary<Sprite, Room> ConnectedRoomDictionary;
 
     }
     

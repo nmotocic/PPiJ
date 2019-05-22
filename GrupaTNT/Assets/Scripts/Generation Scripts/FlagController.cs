@@ -56,6 +56,20 @@ public class FlagController : Singleton<FlagController>
         return null;
     }
 
+    public Vector2Int DirectionToDeltaVector(Sprite direction)
+    {
+        if (direction == DoorDown)
+            return new Vector2Int(0, -1);
+        if (direction == DoorUp)
+            return new Vector2Int(0, 1);
+        if (direction == DoorLeft)
+            return new Vector2Int(-1, 0);
+        if (direction == DoorRight)
+            return new Vector2Int(1, 0);
+
+        throw new Exception("Direction not valid" + direction);
+    }
+
     public Sprite GetOppositeDirection(string str)
     {
         if (DoorDown.name == str)
