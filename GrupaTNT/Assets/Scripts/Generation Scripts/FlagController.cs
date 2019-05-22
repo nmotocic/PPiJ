@@ -44,7 +44,7 @@ public class FlagController : Singleton<FlagController>
     public Sprite GetRandomDirection()
     {
         var picker = UnityEngine.Random.Range(0, 4);
-
+    
         switch (picker)
         {
             case 0: return DoorDown;

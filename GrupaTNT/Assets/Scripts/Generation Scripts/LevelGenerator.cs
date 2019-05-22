@@ -11,22 +11,22 @@ using Random = UnityEngine.Random;
 public class LevelGenerator : MonoBehaviour
 {
     [SerializeField] public int roomGenNumber;
-
+    private int roomsToGen;
+    
     //Dont use
     [SerializeField] public GameObject mainRoom;
-
-    [SerializeField] public int gridSize;
-
+    
     private Room[,] _roomGrid;
-    
-    private GameObject _tempMainRoomInstantiation;
-    private GameObject _grid;
-    
-    private List<GameObject> _roomObjects;
-    //private List<Room> roomConnectionList = new List<Room>();
-
     private Vector2Int startingGridPostion;
-    
+    [SerializeField] public int gridWidthHeight;
+
+    private GameObject _tempMainRoomInstantiation;
+    private GameObject _gridGameObject;
+    //private List<GameObject> _roomGameObjects;
+
+    //index 0 -> 1 exit, 1 -> 2 exits, 2 -> 3 exits, 3 -> 4 exits
+    private List<GameObject>[] GameObjectRoomsByExits;
+
     private Vector3Int roomMove = new Vector3Int(1000,1000,0);
     private Vector3Int ReverseRoomMove = new Vector3Int(-1000,-1000,0);
 
@@ -35,26 +35,29 @@ public class LevelGenerator : MonoBehaviour
     void Start()
     {
         //Grid init
-        _roomGrid = new Room[gridSize, gridSize];
+        _roomGrid = new Room[gridWidthHeight, gridWidthHeight];
+
+        roomsToGen = roomGenNumber;
         
-        startingGridPostion = new Vector2Int(gridSize/2, gridSize/2);
+        startingGridPostion = new Vector2Int(gridWidthHeight/2, gridWidthHeight/2);
         
         Tilemap flagMap = GameObject.FindWithTag("Flag").GetComponent<Tilemap>();
 
-        //we get _grid
-        SetupMainRoom();
+        //Create main room on grid
+        var homeRoom = SetupMainRoom();
 
         //We get the modifier that we have to multiply delta movement by because of how Tiler scales things
-        modifier = _grid.GetComponent<Grid>().cellSize;
+        modifier = _gridGameObject.GetComponent<Grid>().cellSize;
         
         //Loading all the saved room prefabs
-        _roomObjects = LoadGameObjectRooms();
-        List<Door> doors = DoorSearch(flagMap);
+        var _roomGameObjects = LoadGameObjectRooms();
+        GameObjectRoomsByExits = SortGameObjectRoomsBySize(_roomGameObjects);
         
-        //Get home room
-        var homeRoom = _grid.transform.GetChild(0).gameObject;
+
         //Use rooms and flags to generate the level
-        GenerateRooms(roomGenNumber, _roomGrid[startingGridPostion.x, startingGridPostion.y]);
+        GenerateRoomsNew(startingGridPostion.x, startingGridPostion.y);
+
+        //GenerateRooms(_roomGrid[startingGridPostion.x, startingGridPostion.y]);
 
     }
     
@@ -68,7 +71,7 @@ public class LevelGenerator : MonoBehaviour
 
     }
 
-    private void SetupMainRoom()
+    private GameObject SetupMainRoom()
     {
         GameObject gridObject = new GameObject("Grid");
         GameObject roomHolder = new GameObject("[ROOM]Main");
@@ -97,7 +100,9 @@ public class LevelGenerator : MonoBehaviour
         Room room = new Room(DoorSearch(roomHolder.transform.Find("Flags").GetComponent<Tilemap>()), 
             roomHolder, startingGridPostion);
         _roomGrid[startingGridPostion.x, startingGridPostion.y] = room;
-        _grid = gridObject;
+        _gridGameObject = gridObject;
+
+        return _gridGameObject.transform.GetChild(0).gameObject;
     }
 
     List<GameObject> LoadGameObjectRooms()
@@ -141,9 +146,35 @@ public class LevelGenerator : MonoBehaviour
         return rooms;
     }
 
-    void GenerateRooms(int roomGenNumber, Room previousRoom)
+    bool IsRoomOnGridEdge(Room room)
     {
-        if (roomGenNumber == 0)
+        if ((room.GridPosition.x + 1) == gridWidthHeight)
+            return true;
+        if ((room.GridPosition.x) == 0)
+            return true;
+        if ((room.GridPosition.y + 1) == gridWidthHeight)
+            return true;
+        if ((room.GridPosition.y) == 0)
+            return true;
+    
+        //Else not on edge
+        return false;
+    }
+
+    void GenerateRoomsNew(int gridX, int gridY)
+    {
+        
+    }
+    
+    /*
+    void GenerateRooms(Room previousRoom)
+    {
+        if (roomsToGen == 0)
+        {
+            return;
+        }
+
+        if (IsRoomOnGridEdge(previousRoom))
         {
             return;
         }
@@ -153,7 +184,7 @@ public class LevelGenerator : MonoBehaviour
 
         do
         {
-            pickedRoom = _roomObjects[Random.Range(0, _roomObjects.Count)];
+            pickedRoom = _roomGameObjects[Random.Range(0, _roomGameObjects.Count)];
             randomDirectionSprite = FlagController.Instance.GetRandomDirection();
         } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom)
         || previousRoom.IsConnected(randomDirectionSprite) 
@@ -165,7 +196,7 @@ public class LevelGenerator : MonoBehaviour
         var oldConnectionDoor = FindConnectionDoor(previousRoom.Doors, randomDirectionSprite);
 
         //create clone room from template room
-        var clonedRoom = Instantiate(pickedRoom, _grid.transform, true);
+        var clonedRoom = Instantiate(pickedRoom, _gridGameObject.transform, true);
         //reverse original transition
         clonedRoom.transform.Translate(ReverseRoomMove);
 
@@ -199,9 +230,10 @@ public class LevelGenerator : MonoBehaviour
         previousRoom.Connect(oldConnectionDoor.type, newRoom);
 
         _roomGrid[newRoomGridPosition.x, newRoomGridPosition.y] = newRoom;
-        
-        GenerateRooms(roomGenNumber - 1, newRoom);
+        roomsToGen--;
+        GenerateRooms(newRoom);
     }
+    */
 
     private Door FindConnectionDoor(List<Door> doors, Sprite randomDirectionSprite)
     {
@@ -266,11 +298,12 @@ public class LevelGenerator : MonoBehaviour
 
     public class Room
     {
+
         public Dictionary<Sprite, bool> HasDoor;
         public List<Door> Doors;
         public Vector3 RealPosition { get; set; }
         public Vector2Int GridPosition { get; set; }
-        public GameObject Container { get; set; }
+        public GameObject roomGameObject { get; set; }
         private Dictionary<Sprite, Room> ConnectedRoomDictionary;
         
         public Room(List<Door> doors, GameObject container, Vector2Int gridPosition)
@@ -278,7 +311,7 @@ public class LevelGenerator : MonoBehaviour
             Doors = doors;
             RealPosition = container.transform.position;
             GridPosition = gridPosition;
-            Container = container;
+            roomGameObject = container;
             ConnectedRoomDictionary = new Dictionary<Sprite, Room>(4);
             HasDoor = new Dictionary<Sprite, bool>(4);
 
@@ -320,7 +353,7 @@ public class LevelGenerator : MonoBehaviour
         {
             return HasDoor[sprite] == true;
         }
-
+        
     }
     
     public class Door
@@ -392,4 +425,25 @@ public class LevelGenerator : MonoBehaviour
 
     }
 
+    private List<GameObject>[] SortGameObjectRoomsBySize(List<GameObject> roomsGameObjects)
+    {
+        var sortedArray = new List<GameObject>[4];
+        
+        foreach (var roomGameObject in roomsGameObjects)
+        {
+            var flagTilemap = roomGameObject.transform.Find("Flags").GetComponent<Tilemap>();
+            List<Door> doors = DoorSearch(flagTilemap);
+            
+            if (doors.Count == 0) throw new Exception("Room with 0 exits");
+            
+            if (sortedArray[doors.Count - 1] == null)
+                sortedArray[doors.Count - 1] = new List<GameObject>();
+                
+            sortedArray[doors.Count - 1].Add(roomGameObject);
+        }
+
+        return sortedArray;
+    }
+
+    
 }
