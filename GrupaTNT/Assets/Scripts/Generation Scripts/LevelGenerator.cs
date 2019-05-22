@@ -170,18 +170,18 @@ public class LevelGenerator : MonoBehaviour
         return rooms;
     }
 
-    bool IsRoomOnGridEdge(int x, int y)
+    bool IsRoomOutOfGrid(int x, int y)
     {
-        if ((x + 1) == gridWidthHeight)
+        if ((x + 1) >= gridWidthHeight)
             return true;
-        if ((x) == 0)
+        if ((x) <= 0)
             return true;
-        if ((y + 1) == gridWidthHeight)
+        if ((y + 1) >= gridWidthHeight)
             return true;
-        if ((y) == 0)
+        if ((y) <= 0)
             return true;
     
-        //Else not on edge
+        //Else inside
         return false;
     }
 
@@ -195,7 +195,7 @@ public class LevelGenerator : MonoBehaviour
         if (thisRoom != null)
             return;
 
-        if (IsRoomOnGridEdge(gridX, gridY))
+        if (IsRoomOutOfGrid(gridX, gridY))
         {
             return;
         }
@@ -355,7 +355,8 @@ public class LevelGenerator : MonoBehaviour
         foreach (var direction in directions)
         {
             var deltaVector = FlagController.Instance.DirectionToDeltaVector(direction);
-            positionDict[direction] = new Vector2Int(gridPosition.x + deltaVector.x, gridPosition.y + deltaVector.y);
+            positionDict[direction] = new Vector2Int(gridPosition.x + deltaVector.x, 
+                gridPosition.y + deltaVector.y);
         }
 
         foreach (var tuple in positionDict)
@@ -367,8 +368,11 @@ public class LevelGenerator : MonoBehaviour
             }
             catch (IndexOutOfRangeException e)
             {
-                // Its not in the grid so we cant connect.
-                return false;
+                // We check if we have to connect, if yes we give result.
+                if (room.CanConnect(tuple.Key))
+                    return false;
+                else 
+                    continue;
             }
 
             if(checkRoom == null)
