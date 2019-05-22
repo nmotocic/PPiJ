@@ -145,7 +145,8 @@ public class LevelGenerator : MonoBehaviour
             pickedRoom = _roomObjects[Random.Range(0, _roomObjects.Count)];
             randomDirectionSprite = FlagController.Instance.GetRandomDirection();
         } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom)
-        || (previousRoom.IsConnected(randomDirectionSprite) && previousRoom.CanConnect(randomDirectionSprite)));
+        || previousRoom.IsConnected(randomDirectionSprite) 
+        || !previousRoom.CanConnect(randomDirectionSprite));
 
         if(pickedRoom == null || randomDirectionSprite == null)
             throw new Exception("Room or Sprite is null in GenerateRooms");
@@ -184,6 +185,7 @@ public class LevelGenerator : MonoBehaviour
         
         roomConnectionList.Add(newRoom);
 
+                
         GenerateRooms(roomGenNumber - 1, newRoom);
     }
 
@@ -258,9 +260,18 @@ public class LevelGenerator : MonoBehaviour
             ConnectedRoomDictionary = new Dictionary<Sprite, Room>(4);
             HasDoor = new Dictionary<Sprite, bool>(4);
 
+            //Ugly manual setting for each type of entrance
+            ConnectedRoomDictionary[FlagController.Instance.DoorUp] = null;
+            HasDoor[FlagController.Instance.DoorUp] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorDown] = null;
+            HasDoor[FlagController.Instance.DoorDown] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorLeft] = null;
+            HasDoor[FlagController.Instance.DoorLeft] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorRight] = null;
+            HasDoor[FlagController.Instance.DoorRight] = false;
+            
             foreach (var door in doors)
             {
-                ConnectedRoomDictionary[door.type] = null;
                 HasDoor[door.type] = true;
             }
         }
@@ -272,7 +283,15 @@ public class LevelGenerator : MonoBehaviour
 
         public bool IsConnected(Sprite sprite)
         {
-            return ConnectedRoomDictionary[sprite] != null;
+            try
+            {
+                return ConnectedRoomDictionary[sprite] != null;
+            }
+            catch (KeyNotFoundException e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public bool CanConnect(Sprite sprite)
