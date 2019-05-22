@@ -1,0 +1,52 @@
+fileFormatVersion: 2
+guid: e15c96050b05ce58a9f711d26314126b
+ScriptedImporter:
+  fileIDToRecycleName:
+    100000: _MapPrfab/[ROOM]_7
+    100002: _MapPrfab/[ROOM]_7/Flags
+    100004: _MapPrfab/[ROOM]_7/Floor
+    100006: _MapPrfab/[ROOM]_7/Walls
+    400000: _MapPrfab/[ROOM]_7/Transform
+    400002: _MapPrfab/[ROOM]_7/Flags/Transform
+    400004: _MapPrfab/[ROOM]_7/Floor/Transform
+    400006: _MapPrfab/[ROOM]_7/Walls/Transform
+    11400000: _MapPrfab/[ROOM]_7/MonoBehaviour-SuperTiled2Unity.SuperMap
+    11400002: _MapPrfab/[ROOM]_7/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400004: _MapPrfab/[ROOM]_7/Flags/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400006: _MapPrfab/[ROOM]_7/Flags/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400008: _MapPrfab/[ROOM]_7/Flags/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400010: _MapPrfab/[ROOM]_7/Floor/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400012: _MapPrfab/[ROOM]_7/Floor/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400014: _MapPrfab/[ROOM]_7/Floor/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400016: _MapPrfab/[ROOM]_7/Walls/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400018: _MapPrfab/[ROOM]_7/Walls/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400020: _MapPrfab/[ROOM]_7/Walls/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400022: _superAsset
+    100100000: _MapPrfab
+    2569400265252428796: _MapPrfab/[ROOM]_7/Grid
+    3664157343022684176: _MapPrfab/[ROOM]_7/Flags/TilemapRenderer
+    3664157343022684178: _MapPrfab/[ROOM]_7/Floor/TilemapRenderer
+    3664157343022684180: _MapPrfab/[ROOM]_7/Walls/TilemapRenderer
+    8195094279510102542: _MapPrfab/[ROOM]_7/Flags/Tilemap
+    8195094279510102544: _MapPrfab/[ROOM]_7/Floor/Tilemap
+    8195094279510102546: _MapPrfab/[ROOM]_7/Walls/Tilemap
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 1fa25d03934ea624a82bf2fcee6f0873, type: 3}
+  missingFiles: []
+  errors: []
+  warnings: []
+  missingSortingLayers: []
+  missingLayers: []
+  missingTags: []
+  importerVersion: 12
+  pixelsPerUnit: 100
+  edgesPerEllipse: 32
+  numberOfObjectsImported: 2
+  tilesAsObjects: 0
+  sortingMode: 0
+  isIsometric: 0
+  customImporterClassName: 
+  internalTilesets: []

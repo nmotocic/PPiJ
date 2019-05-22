@@ -70,16 +70,48 @@ public class LevelGenerator : MonoBehaviour
         var deltaVectors = new[]
         {
             new Vector2Int(1, 0),
-            new Vector2Int(- 1, 0),
+            new Vector2Int(-1, 0),
             new Vector2Int(0,  1),
-            new Vector2Int(0, - 1)
+            new Vector2Int(0, -1)
+        };
+        var directionsDelta = new[]
+        {
+            FlagController.Instance.DoorRight,
+            FlagController.Instance.DoorLeft,
+            FlagController.Instance.DoorUp,
+            FlagController.Instance.DoorDown
         };
 
-        Vector2Int randomDeltaVec = deltaVectors[Random.Range(0, deltaVectors.Length)];
-
-        GenerateRoomsNew(startingGridPostion.x + randomDeltaVec.x, 
-            startingGridPostion.y + randomDeltaVec.y,
-            FlagController.Instance.DoorUp, homeRoom);
+        var actionList = new[]
+        {
+            new Action( () =>
+            {
+                GenerateRoomsNew(startingGridPostion.x + deltaVectors[0].x, 
+                    startingGridPostion.y + deltaVectors[0].y, directionsDelta[0], homeRoom);  
+            }),
+            new Action( () =>
+            {
+                GenerateRoomsNew(startingGridPostion.x + deltaVectors[1].x, 
+                    startingGridPostion.y + deltaVectors[1].y, directionsDelta[1], homeRoom);  
+            }),
+            new Action( () =>
+            {
+                GenerateRoomsNew(startingGridPostion.x + deltaVectors[2].x, 
+                    startingGridPostion.y + deltaVectors[2].y, directionsDelta[2], homeRoom);  
+            }),
+            new Action( () =>
+            {
+                GenerateRoomsNew(startingGridPostion.x + deltaVectors[3].x, 
+                    startingGridPostion.y + deltaVectors[3].y, directionsDelta[3], homeRoom);  
+            })
+        }.ToList();
+        
+        Shuffle(actionList);
+        for (int i = 0; i < actionList.Count; i++)
+        {
+            var action = actionList[i];
+            action();    
+        }
 
         //GenerateRooms(_roomGrid[startingGridPostion.x, startingGridPostion.y]);
 
@@ -188,26 +220,43 @@ public class LevelGenerator : MonoBehaviour
     void GenerateRoomsNew(int gridX, int gridY, Sprite direction, Room previousRoom)
     {
         if (roomsToGen == 0)
+        {
+            Debug.Log("Exited because room number ran out.");
             return;
-        
+        }
+
         Room thisRoom = _roomGrid[gridX, gridY];
-        
+
         if (thisRoom != null)
+        {
+            Debug.Log("Exited because room already exists");
             return;
+        }
 
         if (IsRoomOutOfGrid(gridX, gridY))
         {
+            Debug.Log("Exited because went off of grid");
             return;
         }
 
         int numExitsMin = FindRequiredExits(new Vector2Int(gridX, gridY));
-        
+        int pickedExits;
         //TODO ------------------------------
-        var pickedExits = 4;
+        //var pickedExits = 4;
         //TODO USE THIS WHEN ROOMS ARE DONE!!!!!!
-        //var pickedExits = Random.Range(numExitsMin, 4);
+        if (((float) roomsToGen / roomGenNumber) >= (0.8))
+        {
+            pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(3, numExitsMin), 4));
+        } else if (((float) roomsToGen / roomGenNumber) >= 0.3)
+        {
+            pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(1, numExitsMin), 3));
+        }
+        else
+        {
+            pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(1, numExitsMin), 2));
+        }
 
-        int timeOutQueue = 30;
+        int timeOutQueue = 10;
         
         // Information we randomly generate based on rules in while()
         GameObject pickedRoom = null;
@@ -223,12 +272,12 @@ public class LevelGenerator : MonoBehaviour
             }
 
             if (timeOutQueue == 0)
-                break;
+                return;
 
             List<GameObject> listOfRoomsInCategory = null;
             try
             {
-                Debug.Log(pickedExits - 1);
+                //Debug.Log(pickedExits - 1);
                 listOfRoomsInCategory = GameObjectRoomsByExits[pickedExits - 1];
             }
             catch (Exception e)
@@ -253,8 +302,19 @@ public class LevelGenerator : MonoBehaviour
 
             var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
             var oppositeSprite = FlagController.Instance.GetOppositeDirection(direction.name);
-
-            var newConnectionDoor = FindConnectionDoor(newDoors, oppositeSprite);
+            
+            Door newConnectionDoor;
+            try
+            {
+                newConnectionDoor = FindConnectionDoor(newDoors, oppositeSprite);
+            }
+            catch
+            {
+                pickedExits = FindRequiredExits(new Vector2Int(gridX, gridY));
+                listOfRoomsInCategory = GameObjectRoomsByExits[pickedExits - 1];
+                Debug.LogWarning("Wanted connection for room not found!!!!");
+                continue;
+            }
 
             var doorTilesNew = newConnectionDoor.Tiles[0];
             var doorTilesOld = oldConnectionDoor.Tiles[0];
@@ -275,16 +335,20 @@ public class LevelGenerator : MonoBehaviour
         
             //Connect new room with old room 
             newRoom = new Room(newDoors, clonedRoom, newRoomGridPosition);
-            Debug.Log("While iteration :" + timeOutQueue);
+            //Debug.Log("While iteration :" + timeOutQueue);
             timeOutQueue--;
-        } while (!RoomCanConnectToAll(newRoom));
+        } while (newRoom == null || !RoomCanConnectToAll(newRoom));
 
         if (timeOutQueue == 0)
+        {
+            Debug.Log("Exited with timeout");
             return;
+            
+        }
 
         _roomGrid[newRoom.GridPosition.x, newRoom.GridPosition.y] = newRoom;
-        roomsToGen--;
-        Debug.Log("Recursion iteration");
+        Debug.Log(roomsToGen--);
+        //Debug.Log("Recursion iteration");
         
         var actionList = new[]
         {
@@ -332,8 +396,16 @@ public class LevelGenerator : MonoBehaviour
         
         foreach (var tuple in positionDict)
         {
-            var checkRoom = _roomGrid[tuple.Value.x, tuple.Value.y];
-            
+            Room checkRoom = null;
+            try
+            {
+                checkRoom = _roomGrid[tuple.Value.x, tuple.Value.y];
+            }
+            catch
+            {
+                throw new Exception("Went out off grid");
+            }
+
             if(checkRoom == null)
                 continue;
 
