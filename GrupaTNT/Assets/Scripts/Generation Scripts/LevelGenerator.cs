@@ -13,6 +13,7 @@ public class LevelGenerator : MonoBehaviour
 {
     [SerializeField] public int roomGenNumber;
     private int roomsToGen;
+    [SerializeField] public int branchMaxLength;
     
     //Dont use
     [SerializeField] public GameObject mainRoom;
@@ -71,8 +72,8 @@ public class LevelGenerator : MonoBehaviour
         {
             new Vector2Int(1, 0),
             new Vector2Int(-1, 0),
-            new Vector2Int(0,  1),
-            new Vector2Int(0, -1)
+            new Vector2Int(0,  -1),
+            new Vector2Int(0, 1)
         };
         var directionsDelta = new[]
         {
@@ -87,34 +88,47 @@ public class LevelGenerator : MonoBehaviour
             new Action( () =>
             {
                 GenerateRoomsNew(startingGridPostion.x + deltaVectors[0].x, 
-                    startingGridPostion.y + deltaVectors[0].y, directionsDelta[0], homeRoom);  
+                    startingGridPostion.y + deltaVectors[0].y, directionsDelta[0], homeRoom, branchMaxLength);  
             }),
             new Action( () =>
             {
                 GenerateRoomsNew(startingGridPostion.x + deltaVectors[1].x, 
-                    startingGridPostion.y + deltaVectors[1].y, directionsDelta[1], homeRoom);  
+                    startingGridPostion.y + deltaVectors[1].y, directionsDelta[1], homeRoom, branchMaxLength);  
             }),
             new Action( () =>
             {
                 GenerateRoomsNew(startingGridPostion.x + deltaVectors[2].x, 
-                    startingGridPostion.y + deltaVectors[2].y, directionsDelta[2], homeRoom);  
+                    startingGridPostion.y + deltaVectors[2].y, directionsDelta[2], homeRoom, branchMaxLength);  
             }),
             new Action( () =>
             {
                 GenerateRoomsNew(startingGridPostion.x + deltaVectors[3].x, 
-                    startingGridPostion.y + deltaVectors[3].y, directionsDelta[3], homeRoom);  
+                    startingGridPostion.y + deltaVectors[3].y, directionsDelta[3], homeRoom, branchMaxLength);  
             })
         }.ToList();
         
-        Shuffle(actionList);
+        //Shuffle(actionList);
         for (int i = 0; i < actionList.Count; i++)
         {
             var action = actionList[i];
             action();    
         }
-
-        //GenerateRooms(_roomGrid[startingGridPostion.x, startingGridPostion.y]);
-
+        
+        //Pretty print
+        int rowLength = _roomGrid.GetLength(0);
+        int colLength = _roomGrid.GetLength(1);
+        string arrayString = "";
+        for (int i = 0; i < rowLength; i++)
+        {
+            for (int j = 0; j < colLength; j++)
+            {
+                arrayString += string.Format("{0} ", _roomGrid[i, j] == null ? "None" : _roomGrid[i,j].roomGameObject.name);
+                arrayString += "     ";
+            }
+            arrayString += Environment.NewLine + Environment.NewLine;
+        }
+        Debug.Log(arrayString);
+        
     }
     
     void Awake () {
@@ -155,7 +169,7 @@ public class LevelGenerator : MonoBehaviour
         
         Room room = new Room(DoorSearch(roomHolder.transform.Find("Flags").GetComponent<Tilemap>()), 
             roomHolder, startingGridPostion);
-        _roomGrid[startingGridPostion.x, startingGridPostion.y] = room;
+        _roomGrid[startingGridPostion.y, startingGridPostion.x] = room;
         _gridGameObject = gridObject;
 ;
         return room;
@@ -217,37 +231,38 @@ public class LevelGenerator : MonoBehaviour
         return false;
     }
 
-    void GenerateRoomsNew(int gridX, int gridY, Sprite direction, Room previousRoom)
+    void GenerateRoomsNew(int gridX, int gridY, Sprite direction, Room previousRoom, int n)
     {
         if (roomsToGen == 0)
         {
             Debug.Log("Exited because room number ran out.");
             return;
         }
-
-        Room thisRoom = _roomGrid[gridX, gridY];
-
-        if (thisRoom != null)
-        {
-            Debug.Log("Exited because room already exists");
-            return;
-        }
-
+        
         if (IsRoomOutOfGrid(gridX, gridY))
         {
             Debug.Log("Exited because went off of grid");
             return;
         }
 
+        Room thisRoom = _roomGrid[gridY, gridX];
+
+        if (thisRoom != null)
+        {
+            Debug.Log("Exited because room already exists");
+            return;
+        }
+        
+
         int numExitsMin = FindRequiredExits(new Vector2Int(gridX, gridY));
         int pickedExits;
         //TODO ------------------------------
         //var pickedExits = 4;
         //TODO USE THIS WHEN ROOMS ARE DONE!!!!!!
-        if (((float) roomsToGen / roomGenNumber) >= (0.8))
+        if (((float) n / branchMaxLength) >= (0.8))
         {
             pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(3, numExitsMin), 4));
-        } else if (((float) roomsToGen / roomGenNumber) >= 0.3)
+        } else if (((float) n / branchMaxLength) >= 0.3)
         {
             pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(1, numExitsMin), 3));
         }
@@ -255,6 +270,8 @@ public class LevelGenerator : MonoBehaviour
         {
             pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(1, numExitsMin), 2));
         }
+        
+        //pickedExits = 3;
 
         int timeOutQueue = 10;
         
@@ -265,6 +282,8 @@ public class LevelGenerator : MonoBehaviour
         
         do
         {
+            pickedRoom = null;
+            newRoom = null;
             if (clonedRoom != null)
             {
                 Destroy(clonedRoom);
@@ -289,11 +308,20 @@ public class LevelGenerator : MonoBehaviour
                 throw new Exception("No room with " + pickedExits + " exits was designed");
 
             pickedRoom = listOfRoomsInCategory[Random.Range(0, listOfRoomsInCategory.Count)];
+            //pickedRoom = listOfRoomsInCategory[3];
 
             if(pickedRoom == null)
                 throw new Exception("Room or Sprite is null in GenerateRooms");
 
-            var oldConnectionDoor = FindConnectionDoor(previousRoom.Doors, direction);
+            Door oldConnectionDoor;
+            try
+            {
+                oldConnectionDoor = FindConnectionDoor(previousRoom.Doors, direction);
+            }
+            catch (Exception e)
+            {
+                return;
+            }
 
             //create clone room from template room
             clonedRoom = Instantiate(pickedRoom, _gridGameObject.transform, true);
@@ -310,9 +338,11 @@ public class LevelGenerator : MonoBehaviour
             }
             catch
             {
-                pickedExits = FindRequiredExits(new Vector2Int(gridX, gridY));
-                listOfRoomsInCategory = GameObjectRoomsByExits[pickedExits - 1];
+                //pickedExits = FindRequiredExits(new Vector2Int(gridX, gridY));
+                //listOfRoomsInCategory = GameObjectRoomsByExits[pickedExits - 1];
                 Debug.LogWarning("Wanted connection for room not found!!!!");
+                
+                timeOutQueue--;
                 continue;
             }
 
@@ -324,20 +354,17 @@ public class LevelGenerator : MonoBehaviour
                 Mathf.Clamp(deltaTiles.x, -1, 1)*(-1) + deltaTiles.x,
                 Mathf.Clamp(deltaTiles.y, -1, 1)*(-1) + deltaTiles.y,
                 deltaTiles.z);
-        
-            clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.RealPosition.x, 
-                modifier.y*deltaTilesMid.y + previousRoom.RealPosition.y,
-                modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
-
-            // Calculating the new room gridPosition
-            Vector2Int newRoomGridPositionDelta = FlagController.Instance.DirectionToDeltaVector(direction);
-            Vector2Int newRoomGridPosition = previousRoom.GridPosition + newRoomGridPositionDelta;
-        
+   
+            
+            clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTiles.x + previousRoom.RealPosition.x, 
+                modifier.y*deltaTiles.y + previousRoom.RealPosition.y,
+                modifier.z*deltaTiles.z + previousRoom.RealPosition.z), Space.World);
+            
             //Connect new room with old room 
-            newRoom = new Room(newDoors, clonedRoom, newRoomGridPosition);
+            newRoom = new Room(newDoors, clonedRoom, new Vector2Int(gridX, gridY));
             //Debug.Log("While iteration :" + timeOutQueue);
             timeOutQueue--;
-        } while (newRoom == null || !RoomCanConnectToAll(newRoom));
+        } while (newRoom == null || RoomCantConnectToAny(newRoom));
 
         if (timeOutQueue == 0)
         {
@@ -346,7 +373,7 @@ public class LevelGenerator : MonoBehaviour
             
         }
 
-        _roomGrid[newRoom.GridPosition.x, newRoom.GridPosition.y] = newRoom;
+        _roomGrid[newRoom.GridPosition.y, newRoom.GridPosition.x] = newRoom;
         Debug.Log(roomsToGen--);
         //Debug.Log("Recursion iteration");
         
@@ -354,23 +381,23 @@ public class LevelGenerator : MonoBehaviour
         {
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorRight]) 
-                    GenerateRoomsNew(gridX + 1, gridY, FlagController.Instance.DoorRight, newRoom);
+                if(newRoom.HasDoor[FlagController.Instance.DoorRight.name]) 
+                    GenerateRoomsNew(gridX + 1, gridY, FlagController.Instance.DoorRight, newRoom,n - 1);
             }),
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorLeft])
-                    GenerateRoomsNew(gridX - 1, gridY, FlagController.Instance.DoorLeft, newRoom);
+                if(newRoom.HasDoor[FlagController.Instance.DoorLeft.name])
+                    GenerateRoomsNew(gridX - 1, gridY, FlagController.Instance.DoorLeft, newRoom, n - 1);
             }),
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorUp])
-                    GenerateRoomsNew(gridX, gridY + 1, FlagController.Instance.DoorUp, newRoom);
+                if(newRoom.HasDoor[FlagController.Instance.DoorUp.name])
+                    GenerateRoomsNew(gridX, gridY - 1, FlagController.Instance.DoorUp, newRoom, n - 1);
             }),
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorDown])
-                    GenerateRoomsNew(gridX, gridY - 1, FlagController.Instance.DoorDown, newRoom);
+                if(newRoom.HasDoor[FlagController.Instance.DoorDown.name])
+                    GenerateRoomsNew(gridX, gridY + 1, FlagController.Instance.DoorDown, newRoom, n - 1);
             })
         }.ToList();
 
@@ -384,12 +411,12 @@ public class LevelGenerator : MonoBehaviour
 
     private int FindRequiredExits(Vector2Int gridPosition)
     {
-        Dictionary<Sprite, Vector2Int> positionDict = new Dictionary<Sprite, Vector2Int>();
+        Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
 
         foreach (var direction in directions)
         {
-            var deltaVector = FlagController.Instance.DirectionToDeltaVector(direction);
-            positionDict[direction] = new Vector2Int(gridPosition.x + deltaVector.x, gridPosition.y + deltaVector.y);
+            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, gridPosition.y + deltaVector.y);
         }
 
         int counter = 0;
@@ -399,7 +426,7 @@ public class LevelGenerator : MonoBehaviour
             Room checkRoom = null;
             try
             {
-                checkRoom = _roomGrid[tuple.Value.x, tuple.Value.y];
+                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
             }
             catch
             {
@@ -419,15 +446,16 @@ public class LevelGenerator : MonoBehaviour
     }
 
     bool RoomCanConnectToAll(Room room)
-    {
+    { 
+        //TODO Still srpite
         var gridPosition = room.GridPosition;
         
-        Dictionary<Sprite, Vector2Int> positionDict = new Dictionary<Sprite, Vector2Int>();
+        Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
 
         foreach (var direction in directions)
         {
-            var deltaVector = FlagController.Instance.DirectionToDeltaVector(direction);
-            positionDict[direction] = new Vector2Int(gridPosition.x + deltaVector.x, 
+            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, 
                 gridPosition.y + deltaVector.y);
         }
 
@@ -436,7 +464,7 @@ public class LevelGenerator : MonoBehaviour
             Room checkRoom;
             try
             {
-                checkRoom = _roomGrid[tuple.Value.x, tuple.Value.y];
+                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
             }
             catch (IndexOutOfRangeException e)
             {
@@ -457,6 +485,57 @@ public class LevelGenerator : MonoBehaviour
         }
 
         return true;
+
+    }
+    
+    bool RoomCantConnectToAny(Room room)
+    {
+        var gridPosition = room.GridPosition;
+        
+        Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
+
+        foreach (var direction in directions)
+        {
+            
+            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, 
+                gridPosition.y + deltaVector.y);
+        }
+
+        foreach (var tuple in positionDict)
+        {
+
+            Room checkRoom;
+            try
+            {
+                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
+            }
+            catch (IndexOutOfRangeException e)
+            {
+                // We check if we have to connect, if yes we give result.
+                if (!room.CanConnect(tuple.Key))
+                    return true;
+                else 
+                    continue;
+            }
+
+            if(checkRoom == null)
+                continue;
+
+            if (RoomHasOppositeDirection(tuple.Key, checkRoom.roomGameObject))
+            {
+                if (room.CanConnect(tuple.Key))
+                    continue;
+                else
+                    return true;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        return false;
 
     }
     
@@ -536,7 +615,7 @@ public class LevelGenerator : MonoBehaviour
 
         foreach (var door in doors)
         {
-            if (door.type.name == randomDirectionSprite.name)
+            if (door.type.name.Equals(randomDirectionSprite.name))
             {
                 ConnectionDoor = door;
                 break;
@@ -548,9 +627,9 @@ public class LevelGenerator : MonoBehaviour
         return ConnectionDoor;
     }
 
-    bool RoomHasOppositeDirection(Sprite original, GameObject roomCompare)
+    bool RoomHasOppositeDirection(string original, GameObject roomCompare)
     {
-        var oppositeSprite = FlagController.Instance.GetOppositeDirection(original.name);
+        var oppositeSprite = FlagController.Instance.GetOppositeDirection(original);
         return RoomHasDirection(roomCompare, oppositeSprite);
     }
 
@@ -594,12 +673,12 @@ public class LevelGenerator : MonoBehaviour
     public class Room
     {
 
-        public Dictionary<Sprite, bool> HasDoor;
+        public Dictionary<string, bool> HasDoor;
         public List<Door> Doors;
         public Vector3 RealPosition { get; set; }
         public Vector2Int GridPosition { get; set; }
         public GameObject roomGameObject { get; set; }
-        private Dictionary<Sprite, Room> ConnectedRoomDictionary;
+        private Dictionary<string, Room> ConnectedRoomDictionary;
         
         public Room(List<Door> doors, GameObject container, Vector2Int gridPosition)
         {
@@ -607,31 +686,31 @@ public class LevelGenerator : MonoBehaviour
             RealPosition = container.transform.position;
             GridPosition = gridPosition;
             roomGameObject = container;
-            ConnectedRoomDictionary = new Dictionary<Sprite, Room>(4);
-            HasDoor = new Dictionary<Sprite, bool>(4);
+            ConnectedRoomDictionary = new Dictionary<string, Room>(4);
+            HasDoor = new Dictionary<string, bool>(4);
 
             //Ugly manual setting for each type of entrance
-            ConnectedRoomDictionary[FlagController.Instance.DoorUp] = null;
-            HasDoor[FlagController.Instance.DoorUp] = false;
-            ConnectedRoomDictionary[FlagController.Instance.DoorDown] = null;
-            HasDoor[FlagController.Instance.DoorDown] = false;
-            ConnectedRoomDictionary[FlagController.Instance.DoorLeft] = null;
-            HasDoor[FlagController.Instance.DoorLeft] = false;
-            ConnectedRoomDictionary[FlagController.Instance.DoorRight] = null;
-            HasDoor[FlagController.Instance.DoorRight] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorUp.name] = null;
+            HasDoor[FlagController.Instance.DoorUp.name] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorDown.name] = null;
+            HasDoor[FlagController.Instance.DoorDown.name] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorLeft.name] = null;
+            HasDoor[FlagController.Instance.DoorLeft.name] = false;
+            ConnectedRoomDictionary[FlagController.Instance.DoorRight.name] = null;
+            HasDoor[FlagController.Instance.DoorRight.name] = false;
             
             foreach (var door in doors)
             {
-                HasDoor[door.type] = true;
+                HasDoor[door.type.name] = true;
             }
         }
 
-        public void Connect(Sprite sprite, Room other)
+        public void Connect(string sprite, Room other)
         {
             ConnectedRoomDictionary[sprite] = other;
         }
 
-        public bool IsConnected(Sprite sprite)
+        public bool IsConnected(string sprite)
         {
             try
             {
@@ -644,7 +723,7 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        public bool CanConnect(Sprite sprite)
+        public bool CanConnect(string sprite)
         {
             return HasDoor[sprite] == true;
         }

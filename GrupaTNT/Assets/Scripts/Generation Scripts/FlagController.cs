@@ -56,15 +56,15 @@ public class FlagController : Singleton<FlagController>
         return null;
     }
 
-    public Vector2Int DirectionToDeltaVector(Sprite direction)
+    public Vector2Int DirectionToDeltaGridVector(string direction)
     {
-        if (direction == DoorDown)
-            return new Vector2Int(0, -1);
-        if (direction == DoorUp)
+        if (direction == DoorDown.name)
             return new Vector2Int(0, 1);
-        if (direction == DoorLeft)
+        if (direction == DoorUp.name)
+            return new Vector2Int(0, -1);
+        if (direction == DoorLeft.name)
             return new Vector2Int(-1, 0);
-        if (direction == DoorRight)
+        if (direction == DoorRight.name)
             return new Vector2Int(1, 0);
 
         throw new Exception("Direction not valid" + direction);
