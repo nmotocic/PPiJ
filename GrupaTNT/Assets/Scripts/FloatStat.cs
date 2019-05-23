@@ -43,6 +43,7 @@ public class FloatStat
         {
             compoundValue *= value;
         }
+        factors[name] = value;
     }
     public void removeFactor(string name)
     {
