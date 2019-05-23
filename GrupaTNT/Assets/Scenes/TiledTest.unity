@@ -157,8 +157,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomGenNumber: 200
+  branchMaxLength: 50
   mainRoom: {fileID: 8078007396984294305}
-  gridWidthHeight: 10
+  gridWidthHeight: 20
 --- !u!114 &99134318
 MonoBehaviour:
   m_ObjectHideFlags: 0
