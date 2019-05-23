@@ -158,7 +158,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomGenNumber: 200
   mainRoom: {fileID: 8078007396984294305}
-  gridWidthHeight: 20
+  gridWidthHeight: 10
 --- !u!114 &99134318
 MonoBehaviour:
   m_ObjectHideFlags: 0
