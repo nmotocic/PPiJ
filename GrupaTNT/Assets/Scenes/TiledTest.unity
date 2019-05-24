@@ -156,10 +156,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30bed00cc69f6b5e78c4732dd1e837a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomGenNumber: 200
+  roomGenNumber: 100
   branchMaxLength: 50
   mainRoom: {fileID: 8078007396984294305}
-  gridWidthHeight: 20
+  gridWidthHeight: 40
 --- !u!114 &99134318
 MonoBehaviour:
   m_ObjectHideFlags: 0

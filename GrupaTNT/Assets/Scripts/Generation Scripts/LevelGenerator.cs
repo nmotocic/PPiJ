@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.SocialPlatforms;
@@ -107,12 +108,14 @@ public class LevelGenerator : MonoBehaviour
             })
         }.ToList();
         
-        //Shuffle(actionList);
+        Shuffle(actionList);
         for (int i = 0; i < actionList.Count; i++)
         {
             var action = actionList[i];
             action();    
         }
+
+        PatchLeftovers();
         
         //Pretty print
         int rowLength = _roomGrid.GetLength(0);
@@ -130,7 +133,151 @@ public class LevelGenerator : MonoBehaviour
         Debug.Log(arrayString);
         
     }
+
+    private void PatchLeftovers()
+    {
+        for(int j = 0; j < gridWidthHeight; j++)
+        {
+            for (int i = 0; i < gridWidthHeight; i++)
+            {
+                if (_roomGrid[j,i] != null)
+                    continue;
+                
+                Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
+
+                foreach (var direction in directions)
+                {
+                    var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+                    positionDict[direction.name] = new Vector2Int(i + deltaVector.x, j + deltaVector.y);
+                }
+
+                List<string> unconnectedNeighbors = FindUnconnectedNeighbors(new Vector2Int(i, j));
+                
+                if (unconnectedNeighbors.Count == 0)
+                {
+                    continue;
+                }
+                
+                var availableRooms = FindGameObjectRoomsWithExits(unconnectedNeighbors);
+                var pickedRoom = availableRooms[Random.Range(0, availableRooms.Count)];
+
+                Door oldConnectionDoor;
+                Room connectRoom;
+                
+                try
+                {
+                    var connectedRoomLocation = positionDict[unconnectedNeighbors[0]];
+                    
+                    connectRoom = _roomGrid[connectedRoomLocation.y, connectedRoomLocation.x];
+                    oldConnectionDoor = FindConnectionDoor(connectRoom.Doors, 
+                        FlagController.Instance.GetOppositeDirection(unconnectedNeighbors[0]));
+
+                }
+                catch (Exception e)
+                {
+                    return;
+                }
+
+                //create clone room from template room
+                var clonedRoom = Instantiate(pickedRoom, _gridGameObject.transform, true);
+                //reverse original transition
+                clonedRoom.transform.Translate(ReverseRoomMove);
+
+                var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
+                var oppositeSprite = FlagController.Instance.FindSpriteWithString(unconnectedNeighbors[0]);
+                
+                Door newConnectionDoor = null;
+                try
+                {
+                    newConnectionDoor = FindConnectionDoor(newDoors, FlagController.Instance.FindSpriteWithString(unconnectedNeighbors[0]));
+                }
+                catch
+                {
+                    Debug.LogWarning("Wanted connection for room not found!!!!");
+                }
+
+                var doorTilesNew = newConnectionDoor.Tiles[0];
+                var doorTilesOld = oldConnectionDoor.Tiles[0];
+                var deltaTiles = doorTilesOld - doorTilesNew;
+            
+                Vector3 deltaTilesMid = new Vector3(
+                    Mathf.Clamp(deltaTiles.x, -1, 1)*(-1) + deltaTiles.x,
+                    Mathf.Clamp(deltaTiles.y, -1, 1)*(-1) + deltaTiles.y,
+                    deltaTiles.z);
+       
+                
+                clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + connectRoom.RealPosition.x, 
+                    modifier.y*deltaTilesMid.y + connectRoom.RealPosition.y,
+                    modifier.z*deltaTilesMid.z + connectRoom.RealPosition.z), Space.World);
+            }
+        }
+    }
+
+    private List<GameObject> FindGameObjectRoomsWithExits(List<string> exits)
+    {
+        List<GameObject> listOfRoomsInCategory = null;
+        try
+        {
+            listOfRoomsInCategory = GameObjectRoomsByExits[exits.Count - 1];
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Error while looking for rooms, wrong index. " + e.Message);
+        }
+
+        List<GameObject> foundRooms = new List<GameObject>();
+        foreach (var room in listOfRoomsInCategory)
+        {
+            if (RoomHasAllDirections(room, exits))
+                foundRooms.Add(room);
+        }
+
+        return foundRooms;
+    }
     
+    
+
+    private List<string> FindUnconnectedNeighbors(Vector2Int selfPosition)
+    {
+        Room foundRoom = _roomGrid[selfPosition.y, selfPosition.x];
+        if (foundRoom != null) 
+            return null;
+        
+        Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
+
+        foreach (var direction in directions)
+        {
+            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            positionDict[direction.name] = new Vector2Int(selfPosition.x + deltaVector.x, selfPosition.y + deltaVector.y);
+        }
+
+        List<string> unconnectedDirections = new List<string>();
+        
+        foreach (var tuple in positionDict)
+        {
+            Room checkRoom = null;
+            try
+            {
+                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
+            }
+            catch
+            {
+                continue;
+                //throw new Exception("Went out off grid");
+            }
+
+            if(checkRoom == null)
+                continue;
+
+            if (RoomHasOppositeDirection(tuple.Key, checkRoom.roomGameObject))
+            {
+                unconnectedDirections.Add(tuple.Key);
+            }
+        }
+
+        return unconnectedDirections;
+    }
+
     void Awake () {
         _tempMainRoomInstantiation = Instantiate(mainRoom.gameObject);
     }
@@ -356,9 +503,9 @@ public class LevelGenerator : MonoBehaviour
                 deltaTiles.z);
    
             
-            clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTiles.x + previousRoom.RealPosition.x, 
-                modifier.y*deltaTiles.y + previousRoom.RealPosition.y,
-                modifier.z*deltaTiles.z + previousRoom.RealPosition.z), Space.World);
+            clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.RealPosition.x, 
+                modifier.y*deltaTilesMid.y + previousRoom.RealPosition.y,
+                modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
             
             //Connect new room with old room 
             newRoom = new Room(newDoors, clonedRoom, new Vector2Int(gridX, gridY));
@@ -630,10 +777,23 @@ public class LevelGenerator : MonoBehaviour
     bool RoomHasOppositeDirection(string original, GameObject roomCompare)
     {
         var oppositeSprite = FlagController.Instance.GetOppositeDirection(original);
-        return RoomHasDirection(roomCompare, oppositeSprite);
+        return RoomHasDirection(roomCompare, oppositeSprite.name);
     }
 
-    bool RoomHasDirection(GameObject room, Sprite sprite)
+    bool RoomHasAllDirections(GameObject room, List<string> sprites)
+    {
+        foreach (var direction in sprites)
+        {
+            if (!RoomHasDirection(room, direction))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    bool RoomHasDirection(GameObject room, string sprite)
     {
         var flags = FindFlagLayer(room);
 
@@ -646,7 +806,7 @@ public class LevelGenerator : MonoBehaviour
 
         foreach (var door in doors)
         {
-            if (sprite.name.Equals(door.type.name))
+            if (sprite.Equals(door.type.name))
             {
                 return true;
             }
