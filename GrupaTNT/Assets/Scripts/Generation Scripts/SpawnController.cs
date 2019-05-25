@@ -6,17 +6,25 @@ using UnityEngine.Tilemaps;
 
 public class SpawnController : Singleton<SpawnController>
 {
-    [SerializeField] public GameObject[] Enemys;
-    [SerializeField] public GameObject[] PowerUps;
-
     [SerializeField] public int gridHeightWidth;
 
     private LevelGenerator.Room[,] roomGrid;
+
+    private List<string> enemyNames;
     
     // Start is called before the first frame update
     void Start()
     {
-       
+        DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
+        FileInfo[] filenames = directoryInfo.GetFiles();
+
+        //There could be other metafiles in the directory so we check how many room files we have.
+        enemyNames = new List<string>();
+        foreach (FileInfo filename in filenames)
+        {
+            if (filename.Name.EndsWith(".prefab"))
+                enemyNames.Add(filename.Name);
+        }
     }
 
     public void Initialize()
@@ -41,17 +49,6 @@ public class SpawnController : Singleton<SpawnController>
 
         if (enemyWorldPositions == null) return;
 
-        DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
-        FileInfo[] filenames = directoryInfo.GetFiles();
-
-        //There could be other metafiles in the directory so we check how many room files we have.
-        List<string> enemyNames = new List<string>();
-        foreach (FileInfo filename in filenames)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-                enemyNames.Add(filename.Name);
-        }
-        
         List<GameObject> enemies = new List<GameObject>();
 
         string room_prefix = "EnemyData/";
