@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Grid
   - Flag
+  - Obstruction
+  - Projectile
   layers:
   - Default
   - TransparentFX
