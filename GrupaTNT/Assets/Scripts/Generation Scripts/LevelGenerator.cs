@@ -19,7 +19,7 @@ public class LevelGenerator : MonoBehaviour
     //Dont use
     [SerializeField] public GameObject mainRoom;
     
-    private Room[,] _roomGrid;
+    public static Room[,] RoomGrid;
     private Vector2Int startingGridPostion;
     [SerializeField] public int gridWidthHeight;
 
@@ -33,7 +33,7 @@ public class LevelGenerator : MonoBehaviour
     private Vector3Int roomMove = new Vector3Int(1000,1000,0);
     private Vector3Int ReverseRoomMove = new Vector3Int(-1000,-1000,0);
 
-    private Vector3 modifier;
+    public static  Vector3 modifier;
 
     private Vector2Int[] deltaVectors;
     private Sprite[] directionsDelta;
@@ -42,7 +42,7 @@ public class LevelGenerator : MonoBehaviour
     void Start()
     {
         //Grid init
-        _roomGrid = new Room[gridWidthHeight, gridWidthHeight];
+        RoomGrid = new Room[gridWidthHeight, gridWidthHeight];
 
         roomsToGen = roomGenNumber;
 
@@ -98,19 +98,22 @@ public class LevelGenerator : MonoBehaviour
         PatchLeftovers();
         
         //Pretty print
-        int rowLength = _roomGrid.GetLength(0);
-        int colLength = _roomGrid.GetLength(1);
+        int rowLength = RoomGrid.GetLength(0);
+        int colLength = RoomGrid.GetLength(1);
         string arrayString = "";
         for (int i = 0; i < rowLength; i++)
         {
             for (int j = 0; j < colLength; j++)
             {
-                arrayString += string.Format("{0} ", _roomGrid[i, j] == null ? "None" : _roomGrid[i,j].roomGameObject.name);
+                arrayString += string.Format("{0} ", RoomGrid[i, j] == null ? "None" : RoomGrid[i,j].roomGameObject.name);
                 arrayString += "     ";
             }
             arrayString += Environment.NewLine + Environment.NewLine;
         }
+
         
+        this.gameObject.GetComponent<SpawnController>().Initialize();
+        this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
     }
 
     private void PatchLeftovers()
@@ -119,7 +122,7 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int i = 0; i < gridWidthHeight; i++)
             {
-                if (_roomGrid[j,i] != null)
+                if (RoomGrid[j,i] != null)
                     continue;
                 
                 Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
@@ -147,7 +150,7 @@ public class LevelGenerator : MonoBehaviour
                 {
                     var connectedRoomLocation = positionDict[unconnectedNeighbors[0]];
                     
-                    connectRoom = _roomGrid[connectedRoomLocation.y, connectedRoomLocation.x];
+                    connectRoom = RoomGrid[connectedRoomLocation.y, connectedRoomLocation.x];
                     oldConnectionDoor = FindConnectionDoor(connectRoom.Doors, 
                         FlagController.Instance.GetOppositeDirection(unconnectedNeighbors[0]));
 
@@ -218,7 +221,7 @@ public class LevelGenerator : MonoBehaviour
 
     private List<string> FindUnconnectedNeighbors(Vector2Int selfPosition)
     {
-        Room foundRoom = _roomGrid[selfPosition.y, selfPosition.x];
+        Room foundRoom = RoomGrid[selfPosition.y, selfPosition.x];
         if (foundRoom != null) 
             return null;
         
@@ -237,7 +240,7 @@ public class LevelGenerator : MonoBehaviour
             Room checkRoom = null;
             try
             {
-                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
+                checkRoom = RoomGrid[tuple.Value.y, tuple.Value.x];
             }
             catch
             {
@@ -295,7 +298,7 @@ public class LevelGenerator : MonoBehaviour
         
         Room room = new Room(DoorSearch(roomHolder.transform.Find("Flags").GetComponent<Tilemap>()), 
             roomHolder, startingGridPostion);
-        _roomGrid[startingGridPostion.y, startingGridPostion.x] = room;
+        RoomGrid[startingGridPostion.y, startingGridPostion.x] = room;
         _gridGameObject = gridObject;
 ;
         return room;
@@ -371,7 +374,7 @@ public class LevelGenerator : MonoBehaviour
             return;
         }
 
-        Room thisRoom = _roomGrid[gridY, gridX];
+        Room thisRoom = RoomGrid[gridY, gridX];
 
         if (thisRoom != null)
         {
@@ -493,7 +496,7 @@ public class LevelGenerator : MonoBehaviour
             
         }
 
-        _roomGrid[newRoom.GridPosition.y, newRoom.GridPosition.x] = newRoom;
+        RoomGrid[newRoom.GridPosition.y, newRoom.GridPosition.x] = newRoom;
         roomsToGen--;
 
         var actionList = new[]
@@ -545,7 +548,7 @@ public class LevelGenerator : MonoBehaviour
             Room checkRoom = null;
             try
             {
-                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
+                checkRoom = RoomGrid[tuple.Value.y, tuple.Value.x];
             }
             catch
             {
@@ -584,7 +587,7 @@ public class LevelGenerator : MonoBehaviour
             Room checkRoom;
             try
             {
-                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
+                checkRoom = RoomGrid[tuple.Value.y, tuple.Value.x];
             }
             catch (IndexOutOfRangeException e)
             {

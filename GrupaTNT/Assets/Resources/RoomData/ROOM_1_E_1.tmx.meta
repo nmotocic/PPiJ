@@ -1,0 +1,81 @@
+fileFormatVersion: 2
+guid: fbada1bed8197a3e79067863e0c26c50
+ScriptedImporter:
+  fileIDToRecycleName:
+    100000: _MapPrfab/ROOM_1_E_1
+    100002: _MapPrfab/ROOM_1_E_1/Candles
+    100004: _MapPrfab/ROOM_1_E_1/Debris
+    100006: _MapPrfab/ROOM_1_E_1/Doors
+    100008: _MapPrfab/ROOM_1_E_1/Flags
+    100010: _MapPrfab/ROOM_1_E_1/Floor
+    100012: _MapPrfab/ROOM_1_E_1/Pillars
+    100014: _MapPrfab/ROOM_1_E_1/Walls
+    400000: _MapPrfab/ROOM_1_E_1/Transform
+    400002: _MapPrfab/ROOM_1_E_1/Candles/Transform
+    400004: _MapPrfab/ROOM_1_E_1/Debris/Transform
+    400006: _MapPrfab/ROOM_1_E_1/Doors/Transform
+    400008: _MapPrfab/ROOM_1_E_1/Flags/Transform
+    400010: _MapPrfab/ROOM_1_E_1/Floor/Transform
+    400012: _MapPrfab/ROOM_1_E_1/Pillars/Transform
+    400014: _MapPrfab/ROOM_1_E_1/Walls/Transform
+    11400000: _MapPrfab/ROOM_1_E_1/MonoBehaviour-SuperTiled2Unity.SuperMap
+    11400002: _MapPrfab/ROOM_1_E_1/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400004: _MapPrfab/ROOM_1_E_1/Candles/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400006: _MapPrfab/ROOM_1_E_1/Candles/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400008: _MapPrfab/ROOM_1_E_1/Candles/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400010: _MapPrfab/ROOM_1_E_1/Debris/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400012: _MapPrfab/ROOM_1_E_1/Debris/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400014: _MapPrfab/ROOM_1_E_1/Debris/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400016: _MapPrfab/ROOM_1_E_1/Doors/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400018: _MapPrfab/ROOM_1_E_1/Doors/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400020: _MapPrfab/ROOM_1_E_1/Doors/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400022: _MapPrfab/ROOM_1_E_1/Flags/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400024: _MapPrfab/ROOM_1_E_1/Flags/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400026: _MapPrfab/ROOM_1_E_1/Flags/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400028: _MapPrfab/ROOM_1_E_1/Floor/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400030: _MapPrfab/ROOM_1_E_1/Floor/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400032: _MapPrfab/ROOM_1_E_1/Floor/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400034: _MapPrfab/ROOM_1_E_1/Pillars/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400036: _MapPrfab/ROOM_1_E_1/Pillars/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400038: _MapPrfab/ROOM_1_E_1/Pillars/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400040: _MapPrfab/ROOM_1_E_1/Walls/MonoBehaviour-SuperTiled2Unity.SuperTileLayer
+    11400042: _MapPrfab/ROOM_1_E_1/Walls/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
+    11400044: _MapPrfab/ROOM_1_E_1/Walls/MonoBehaviour-SuperTiled2Unity.TilemapData
+    11400046: _superAsset
+    100100000: _MapPrfab
+    2569400265252428796: _MapPrfab/ROOM_1_E_1/Grid
+    3664157343022684176: _MapPrfab/ROOM_1_E_1/Candles/TilemapRenderer
+    3664157343022684178: _MapPrfab/ROOM_1_E_1/Debris/TilemapRenderer
+    3664157343022684180: _MapPrfab/ROOM_1_E_1/Doors/TilemapRenderer
+    3664157343022684182: _MapPrfab/ROOM_1_E_1/Flags/TilemapRenderer
+    3664157343022684184: _MapPrfab/ROOM_1_E_1/Floor/TilemapRenderer
+    3664157343022684186: _MapPrfab/ROOM_1_E_1/Pillars/TilemapRenderer
+    3664157343022684188: _MapPrfab/ROOM_1_E_1/Walls/TilemapRenderer
+    8195094279510102542: _MapPrfab/ROOM_1_E_1/Candles/Tilemap
+    8195094279510102544: _MapPrfab/ROOM_1_E_1/Debris/Tilemap
+    8195094279510102546: _MapPrfab/ROOM_1_E_1/Doors/Tilemap
+    8195094279510102548: _MapPrfab/ROOM_1_E_1/Flags/Tilemap
+    8195094279510102550: _MapPrfab/ROOM_1_E_1/Floor/Tilemap
+    8195094279510102552: _MapPrfab/ROOM_1_E_1/Pillars/Tilemap
+    8195094279510102554: _MapPrfab/ROOM_1_E_1/Walls/Tilemap
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: 1fa25d03934ea624a82bf2fcee6f0873, type: 3}
+  missingFiles: []
+  errors: []
+  warnings: []
+  missingSortingLayers:
+  - Player
+  missingLayers: []
+  missingTags: []
+  importerVersion: 12
+  pixelsPerUnit: 100
+  edgesPerEllipse: 32
+  numberOfObjectsImported: 2
+  tilesAsObjects: 0
+  sortingMode: 0
+  isIsometric: 0
+  customImporterClassName: 
+  internalTilesets: []
