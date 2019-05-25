@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -772,7 +772,14 @@ public class LevelGenerator : MonoBehaviour
             if (tile == null) 
                 continue;
             
-            string spriteName = tilemap.GetSprite(tilePosition).name;
+            var sprite = tilemap.GetSprite(tilePosition);
+
+            // Check if the sprite is actually a door.
+            if (!FlagController.Instance.directionsDelta.Contains(sprite))
+                continue;
+
+            var spriteName = sprite.name;
+            
             if (!foundFlags.Contains(spriteName))
             {
                 if (!doors.ContainsKey(spriteName))
