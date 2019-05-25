@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class EntityScript : MonoBehaviour
 {
     public GameObject parent;
@@ -21,9 +22,10 @@ public class EntityScript : MonoBehaviour
         this.entityType = entityType;
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
-        if (entityType.Equals("player")) { controller = new PlayerController(this,speed); }
-        else if (entityType.Equals("projectile")) { controller = new ProjectileController(this,direction,speed); }
+        if (entityType.Equals("player")) { controller = new PlayerController(this, speed); }
+        else if (entityType.Equals("projectile")) { controller = new ProjectileController(this, direction, speed); }
         else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
+        else if (entityType.Equals("enemy")) { controller = new EnemyController(this); }
     }
     public void Start()
     {
@@ -47,11 +49,19 @@ public class EntityScript : MonoBehaviour
         GameObject other = col.collider.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
         Debug.Log(gameObject);
-        if (entityType == "projectile" && parent != other && parent!=null)
+        if (otherES == null) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
-            if (otherES.entityType == "player") {
+            if (other.CompareTag(GameDefaults.Obstruction()) && gameObject.CompareTag(GameDefaults.Projectile()))
+            {
+                GameObject.Destroy(gameObject);
+            }
+        }
+        else if (entityType == "projectile" && parent != other && parent != null)
+        {
+            if (otherES.entityType == "player")
+            {
                 FloatStat health = otherES.stats["health"];
-                float x = health.getFactor("current",1f);
+                float x = health.getFactor("current", 1f);
                 x -= 0.02f;
                 Debug.Log(x);
                 health.setFactor("current", (x > 0) ? x : 0f);
@@ -70,6 +80,21 @@ public class EntityScript : MonoBehaviour
             GameObject.Destroy(gameObject);
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        GameObject other = collision.gameObject;
+        EntityScript otherES = other.GetComponent<EntityScript>();
+        Debug.Log(gameObject);
+        if (otherES == null) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
+        {
+            if (other.CompareTag(GameDefaults.Obstruction()) && gameObject.CompareTag(GameDefaults.Projectile()))
+            {
+                GameObject.Destroy(gameObject);
+            }
+        }
+    }
+
     public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
     {
         GameObject x = Instantiate(dispensable);
