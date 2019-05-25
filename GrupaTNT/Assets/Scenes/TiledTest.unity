@@ -143,9 +143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dab3872f8c6755898aebec121df64e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Enemys:
-  - {fileID: 1152368045431864853, guid: bf4b93ea8b0e7202887e4fff91d65b7c, type: 3}
-  PowerUps: []
   gridHeightWidth: 20
 --- !u!4 &99134316
 Transform:
