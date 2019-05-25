@@ -35,8 +35,9 @@ public class LevelGenerator : MonoBehaviour
 
     private Vector3 modifier;
 
-    private Sprite[] directions;
-
+    private Vector2Int[] deltaVectors;
+    private Sprite[] directionsDelta;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -46,14 +47,9 @@ public class LevelGenerator : MonoBehaviour
         roomsToGen = roomGenNumber;
 
         startingGridPostion = new Vector2Int(gridWidthHeight / 2, gridWidthHeight / 2);
-
-        directions = new[]
-        {
-            FlagController.Instance.DoorDown,
-            FlagController.Instance.DoorUp,
-            FlagController.Instance.DoorLeft,
-            FlagController.Instance.DoorRight
-        };
+        
+        deltaVectors = FlagController.Instance.deltaVectors;
+        directionsDelta = FlagController.Instance.directionsDelta;
 
         Tilemap flagMap = GameObject.FindWithTag("Flag").GetComponent<Tilemap>();
 
@@ -66,23 +62,7 @@ public class LevelGenerator : MonoBehaviour
         //Loading all the saved room prefabs
         var _roomGameObjects = LoadGameObjectRooms();
         GameObjectRoomsByExits = SortGameObjectRoomsBySize(_roomGameObjects);
-
-
-        //Use rooms and flags to generate the level, we set the position 1 different than the original !IMPORTANT!
-        var deltaVectors = new[]
-        {
-            new Vector2Int(1, 0),
-            new Vector2Int(-1, 0),
-            new Vector2Int(0,  -1),
-            new Vector2Int(0, 1)
-        };
-        var directionsDelta = new[]
-        {
-            FlagController.Instance.DoorRight,
-            FlagController.Instance.DoorLeft,
-            FlagController.Instance.DoorUp,
-            FlagController.Instance.DoorDown
-        };
+        
 
         var actionList = new[]
         {
@@ -130,7 +110,6 @@ public class LevelGenerator : MonoBehaviour
             }
             arrayString += Environment.NewLine + Environment.NewLine;
         }
-        Debug.Log(arrayString);
         
     }
 
@@ -145,7 +124,7 @@ public class LevelGenerator : MonoBehaviour
                 
                 Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
 
-                foreach (var direction in directions)
+                foreach (var direction in directionsDelta)
                 {
                     var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
                     positionDict[direction.name] = new Vector2Int(i + deltaVector.x, j + deltaVector.y);
@@ -193,7 +172,7 @@ public class LevelGenerator : MonoBehaviour
                 }
                 catch
                 {
-                    Debug.LogWarning("Wanted connection for room not found!!!!");
+                    //Debug.LogWarning("Wanted connection for room not found!!!!");
                 }
 
                 var doorTilesNew = newConnectionDoor.Tiles[0];
@@ -245,7 +224,7 @@ public class LevelGenerator : MonoBehaviour
         
         Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
 
-        foreach (var direction in directions)
+        foreach (var direction in directionsDelta)
         {
             var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
             positionDict[direction.name] = new Vector2Int(selfPosition.x + deltaVector.x, selfPosition.y + deltaVector.y);
@@ -382,13 +361,13 @@ public class LevelGenerator : MonoBehaviour
     {
         if (roomsToGen == 0)
         {
-            Debug.Log("Exited because room number ran out.");
+            //Debug.Log("Exited because room number ran out.");
             return;
         }
         
         if (IsRoomOutOfGrid(gridX, gridY))
         {
-            Debug.Log("Exited because went off of grid");
+            //Debug.Log("Exited because went off of grid");
             return;
         }
 
@@ -396,16 +375,14 @@ public class LevelGenerator : MonoBehaviour
 
         if (thisRoom != null)
         {
-            Debug.Log("Exited because room already exists");
+            //Debug.Log("Exited because room already exists");
             return;
         }
         
 
         int numExitsMin = FindRequiredExits(new Vector2Int(gridX, gridY));
         int pickedExits;
-        //TODO ------------------------------
-        //var pickedExits = 4;
-        //TODO USE THIS WHEN ROOMS ARE DONE!!!!!!
+
         if (((float) n / branchMaxLength) >= (0.8))
         {
             pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(3, numExitsMin), 4));
@@ -443,7 +420,6 @@ public class LevelGenerator : MonoBehaviour
             List<GameObject> listOfRoomsInCategory = null;
             try
             {
-                //Debug.Log(pickedExits - 1);
                 listOfRoomsInCategory = GameObjectRoomsByExits[pickedExits - 1];
             }
             catch (Exception e)
@@ -485,10 +461,7 @@ public class LevelGenerator : MonoBehaviour
             }
             catch
             {
-                //pickedExits = FindRequiredExits(new Vector2Int(gridX, gridY));
-                //listOfRoomsInCategory = GameObjectRoomsByExits[pickedExits - 1];
-                Debug.LogWarning("Wanted connection for room not found!!!!");
-                
+                //Debug.LogWarning("Wanted connection for room not found!!!!");
                 timeOutQueue--;
                 continue;
             }
@@ -509,7 +482,7 @@ public class LevelGenerator : MonoBehaviour
             
             //Connect new room with old room 
             newRoom = new Room(newDoors, clonedRoom, new Vector2Int(gridX, gridY));
-            //Debug.Log("While iteration :" + timeOutQueue);
+
             timeOutQueue--;
         } while (newRoom == null || RoomCantConnectToAny(newRoom));
 
@@ -521,9 +494,8 @@ public class LevelGenerator : MonoBehaviour
         }
 
         _roomGrid[newRoom.GridPosition.y, newRoom.GridPosition.x] = newRoom;
-        Debug.Log(roomsToGen--);
-        //Debug.Log("Recursion iteration");
-        
+        roomsToGen--;
+
         var actionList = new[]
         {
             new Action( () =>
@@ -560,7 +532,7 @@ public class LevelGenerator : MonoBehaviour
     {
         Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
 
-        foreach (var direction in directions)
+        foreach (var direction in directionsDelta)
         {
             var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
             positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, gridPosition.y + deltaVector.y);
@@ -592,56 +564,13 @@ public class LevelGenerator : MonoBehaviour
         return counter;
     }
 
-    bool RoomCanConnectToAll(Room room)
-    { 
-        //TODO Still srpite
-        var gridPosition = room.GridPosition;
-        
-        Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
-
-        foreach (var direction in directions)
-        {
-            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
-            positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, 
-                gridPosition.y + deltaVector.y);
-        }
-
-        foreach (var tuple in positionDict)
-        {
-            Room checkRoom;
-            try
-            {
-                checkRoom = _roomGrid[tuple.Value.y, tuple.Value.x];
-            }
-            catch (IndexOutOfRangeException e)
-            {
-                // We check if we have to connect, if yes we give result.
-                if (room.CanConnect(tuple.Key))
-                    return false;
-                else 
-                    continue;
-            }
-
-            if(checkRoom == null)
-                continue;
-
-            if (!RoomHasOppositeDirection(tuple.Key, checkRoom.roomGameObject))
-            {
-                return false;
-            }
-        }
-
-        return true;
-
-    }
-    
     bool RoomCantConnectToAny(Room room)
     {
         var gridPosition = room.GridPosition;
         
         Dictionary<string, Vector2Int> positionDict = new Dictionary<string, Vector2Int>();
 
-        foreach (var direction in directions)
+        foreach (var direction in directionsDelta)
         {
             
             var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
@@ -686,76 +615,6 @@ public class LevelGenerator : MonoBehaviour
 
     }
     
-    
-    /*
-    void GenerateRooms(Room previousRoom)
-    {
-        if (roomsToGen == 0)
-        {
-            return;
-        }
-
-        if (IsRoomOnGridEdge(previousRoom))
-        {
-            return;
-        }
-
-        GameObject pickedRoom = null;
-        Sprite randomDirectionSprite = null;
-
-        do
-        {
-            pickedRoom = _roomGameObjects[Random.Range(0, _roomGameObjects.Count)];
-            randomDirectionSprite = FlagController.Instance.GetRandomDirection();
-        } while (!RoomHasOppositeDirection(randomDirectionSprite, pickedRoom)
-        || previousRoom.IsConnected(randomDirectionSprite) 
-        || !previousRoom.CanConnect(randomDirectionSprite));
-
-        if(pickedRoom == null || randomDirectionSprite == null)
-            throw new Exception("Room or Sprite is null in GenerateRooms");
-
-        var oldConnectionDoor = FindConnectionDoor(previousRoom.Doors, randomDirectionSprite);
-
-        //create clone room from template room
-        var clonedRoom = Instantiate(pickedRoom, _gridGameObject.transform, true);
-        //reverse original transition
-        clonedRoom.transform.Translate(ReverseRoomMove);
-
-        var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
-        var oppositeSprite = FlagController.Instance.GetOppositeDirection(randomDirectionSprite.name);
-
-        var newConnectionDoor = FindConnectionDoor(newDoors, oppositeSprite);
-
-        var doorTilesNew = newConnectionDoor.Tiles[0];
-        var doorTilesOld = oldConnectionDoor.Tiles[0];
-        var deltaTiles = doorTilesOld - doorTilesNew;
-        
-        Vector3 deltaTilesMid = new Vector3(
-            Mathf.Clamp(deltaTiles.x, -1, 1)*(-1) + deltaTiles.x,
-            Mathf.Clamp(deltaTiles.y, -1, 1)*(-1) + deltaTiles.y,
-            deltaTiles.z);
-        
-        clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.RealPosition.x, 
-            modifier.y*deltaTilesMid.y + previousRoom.RealPosition.y,
-            modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
-
-        // Calculating the new room gridPosition
-        Vector2Int newRoomGridPositionDelta = FlagController.Instance.DirectionToDeltaVector(randomDirectionSprite);
-        Vector2Int newRoomGridPosition = previousRoom.GridPosition + newRoomGridPositionDelta;
-        
-        //Connect new room with old room 
-        Room newRoom = new Room(newDoors, clonedRoom, newRoomGridPosition);
-        newRoom.Connect(newConnectionDoor.type, previousRoom);
-        
-        //Connect old room with new room
-        previousRoom.Connect(oldConnectionDoor.type, newRoom);
-
-        _roomGrid[newRoomGridPosition.x, newRoomGridPosition.y] = newRoom;
-        roomsToGen--;
-        GenerateRooms(newRoom);
-    }
-    */
-
     private Door FindConnectionDoor(List<Door> doors, Sprite randomDirectionSprite)
     {
         Door ConnectionDoor = null;

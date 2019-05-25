@@ -25,6 +25,15 @@ public class FlagController : Singleton<FlagController>
     [SerializeField]
     public Sprite DoorDown;
     
+    public Vector2Int[] deltaVectors = new[]
+    {
+        new Vector2Int(1, 0),
+        new Vector2Int(-1, 0),
+        new Vector2Int(0,  -1),
+        new Vector2Int(0, 1)
+    };
+
+    public Sprite[] directionsDelta;
     /// <summary>
     /// Probably not needed
     /// </summary>
@@ -35,7 +44,23 @@ public class FlagController : Singleton<FlagController>
         Instance.DoorLeft = DoorLeft;
         Instance.DoorRight = DoorRight;
         Instance.EnemySpawn = EnemySpawn;
-        Instance.PowerUpSpawn = PowerUpSpawn;
+        Instance.PowerUpSpawn = PowerUpSpawn; 
+        
+        directionsDelta = new[]
+        {
+            FlagController.Instance.DoorRight,
+            FlagController.Instance.DoorLeft,
+            FlagController.Instance.DoorUp,
+            FlagController.Instance.DoorDown
+        };
+        
+        deltaVectors = new[]
+        {
+            new Vector2Int(1, 0),
+            new Vector2Int(-1, 0),
+            new Vector2Int(0,  -1),
+            new Vector2Int(0, 1)
+        };
     }
 
     //Disallow constructor use
@@ -59,13 +84,13 @@ public class FlagController : Singleton<FlagController>
     public Vector2Int DirectionToDeltaGridVector(string direction)
     {
         if (direction == DoorDown.name)
-            return new Vector2Int(0, 1);
+            return deltaVectors[3];
         if (direction == DoorUp.name)
-            return new Vector2Int(0, -1);
+            return deltaVectors[2];
         if (direction == DoorLeft.name)
-            return new Vector2Int(-1, 0);
+            return deltaVectors[1];
         if (direction == DoorRight.name)
-            return new Vector2Int(1, 0);
+            return deltaVectors[0];
 
         throw new Exception("Direction not valid" + direction);
     }
