@@ -12,13 +12,13 @@ public class RangedAI : MonoBehaviour
     private int state = 0; //State machine
 
     //Attack range stats
-    private int attackTriggerRange = 8; //Maxiumum range before attack windup
-    private int attackSpeed = 5; //Speed of the attack
-    private int maxAttackDist = 3; //Maximum distance this object will move while attacking (not implemented)
+    public int attackTriggerRange = 8; //Maxiumum range before attack windup
+    public int attackSpeed = 5; //Speed of the attack
+    public int maxAttackDist = 3; //Maximum distance this object will move while attacking (not implemented)
     //Attack timing stats (seconds)
-    private double attackWindup = 2; //Seconds before attack
-    private double attackDuration = 0.5; //Seconds attacking(moving)
-    private double attackCooldown = 1;
+    public double attackWindup = 2; //Seconds before attack
+    public double attackDuration = 0.5; //Seconds attacking(moving)
+    public double attackCooldown = 1;
 
     //Projectile
     public GameObject projectileObject;

@@ -16,4 +16,9 @@ public abstract class GameDefaults
     {
         return (1 << LayerMask.NameToLayer("Wall"));
     }
+
+    public static string Player()
+    {
+        return "Player";
+    }
 }
