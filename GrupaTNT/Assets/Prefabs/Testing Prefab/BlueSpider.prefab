@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 6800536775554594652}
   m_Layer: 0
   m_Name: BlueSpider
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -130,6 +130,11 @@ MonoBehaviour:
   attackDuration: 0.5
   attackCooldown: 0.8
   targetObjectTag: Player
+  health: 10
+  poise: 0
+  armor: 0
+  stunMod: 1
+  contactDamage: 1
 --- !u!1001 &6800536775056597415
 PrefabInstance:
   m_ObjectHideFlags: 0
