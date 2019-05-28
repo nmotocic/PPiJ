@@ -120,19 +120,28 @@ public class EntityScript : MonoBehaviour
                     GameObject.Destroy(gameObject);
                 }
                 //Enemy
-                else if (other.CompareTag(GameDefaults.Enemy())) {
+                else if (other.CompareTag(GameDefaults.Enemy()))
+                {
                     var es = other.gameObject.GetComponent<EntityScript>();
-                    if (parent != other) {
+                    if (!parent.CompareTag(other.gameObject.tag))
+                    {
                         controller.OnTriggerEnter2D(collision);
                         GameObject.Destroy(gameObject);
                     }
-                    
+
                 }
                 //Projectile
                 else if (other.CompareTag(GameDefaults.Enemy()))
                 {
                     //Nista?
 
+                }
+                else if (other.CompareTag(GameDefaults.Player())) {
+                    var es = other.gameObject.GetComponent<EntityScript>();
+                    if (!parent.CompareTag(other.gameObject.tag)) {
+                        controller.OnTriggerEnter2D(collision);
+                        GameObject.Destroy(gameObject);
+                    }
                 }
             }
             //Enemy coll

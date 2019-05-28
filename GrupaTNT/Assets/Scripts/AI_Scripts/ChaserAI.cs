@@ -28,7 +28,7 @@ public class ChaserAI : AiScriptBase
     public int health = 0;
     public int poise = 0;
     public int armor = 0;
-    public int stunMod = 1;
+    public float stunMod = 1;
     public int contactDamage = 1;
     private bool danger = false;
 
@@ -70,6 +70,7 @@ public class ChaserAI : AiScriptBase
         {
             target = targetObject.transform.position;
         }
+        //Update animation
         updateAnimation(Mathf.Sign(my_pos.x-target.x));
         target.z = 0;
 
@@ -84,7 +85,7 @@ public class ChaserAI : AiScriptBase
             if (state != 0) // Stop moving if winding up an attack
             {
                 agent.destination = my_pos;
-                rbody2d.velocity = new Vector2(0, 0);
+                //rbody2d.velocity = new Vector2(0, 0);
             }
             else //Move
             {
@@ -156,7 +157,7 @@ public class ChaserAI : AiScriptBase
         state = set;
     }
 
-    public override void setAlarm(int duration)
+    public override void setAlarm(float duration)
     {
         if (state == GameDefaults.hitState()) {
             duration *= stunMod;
