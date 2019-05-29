@@ -12,6 +12,7 @@ public struct FSQI
     }
 }
 
+
 public class EntityScript : MonoBehaviour
 {
     public const float TIMEBASE = 60f;

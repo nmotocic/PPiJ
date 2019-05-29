@@ -20,7 +20,7 @@ public class PlayerController : EntityControllerInterface
     // Update is called once per frame
     public void Update()
     {
-        Debug.Log(parentScript.stats["health"].getCompoundValue());
+        //Debug.Log(parentScript.stats["health"].getCompoundValue());
         float X = Input.GetAxis("Horizontal");
         float Y = Input.GetAxis("Vertical");
         direction = new Vector2(X, Y);
@@ -32,5 +32,16 @@ public class PlayerController : EntityControllerInterface
     }
     public Vector2 getMovement() { return direction*speed; }
     public void OnCollisionEnter2D(Collision2D col) {
+    }
+
+    public void damage(int dmg)
+    {
+        health -= Mathf.Abs(dmg);
+        Debug.Log("Hp:"+health);
+    }
+
+    public void OnTriggerEnter2D(Collider2D col)
+    {
+        //Do stuff
     }
 }
