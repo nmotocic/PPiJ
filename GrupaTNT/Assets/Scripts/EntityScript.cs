@@ -167,11 +167,12 @@ public class EntityScript : MonoBehaviour
         }
     }
 
-    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
+    public GameObject DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
         y.Init("projectile",location,direction,speed,gameObject);
+        return x;
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;

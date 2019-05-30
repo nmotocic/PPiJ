@@ -76,4 +76,8 @@ public class EnemyController : EntityControllerInterface
             stun = poiseMax;
         }
     }
+
+    public int getHealth() {
+        return health;
+    }
 }
