@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class SpawnController : Singleton<SpawnController>
 {
@@ -15,6 +17,10 @@ public class SpawnController : Singleton<SpawnController>
     // Start is called before the first frame update
     void Start()
     {
+    }
+
+    private void Awake()
+    {
         DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
         FileInfo[] filenames = directoryInfo.GetFiles();
 
@@ -25,6 +31,7 @@ public class SpawnController : Singleton<SpawnController>
             if (filename.Name.EndsWith(".prefab"))
                 enemyNames.Add(filename.Name);
         }
+
     }
 
     public void Initialize()

@@ -5,7 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
+using TMPro;
+using UnityEditor.Experimental.UIElements;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SocialPlatforms;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
@@ -33,7 +36,7 @@ public class LevelGenerator : MonoBehaviour
     private Vector3Int roomMove = new Vector3Int(1000,1000,0);
     private Vector3Int ReverseRoomMove = new Vector3Int(-1000,-1000,0);
 
-    public static  Vector3 modifier;
+    public static Vector3 modifier;
 
     private Vector2Int[] deltaVectors;
     private Sprite[] directionsDelta;
@@ -60,7 +63,6 @@ public class LevelGenerator : MonoBehaviour
         //Loading all the saved room prefabs
         var _roomGameObjects = LoadGameObjectRooms();
         GameObjectRoomsByExits = SortGameObjectRoomsBySize(_roomGameObjects);
-        
 
         var actionList = new[]
         {
@@ -94,7 +96,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
         PatchLeftovers();
-        
+
         //Pretty print
         int rowLength = RoomGrid.GetLength(0);
         int colLength = RoomGrid.GetLength(1);
@@ -109,10 +111,58 @@ public class LevelGenerator : MonoBehaviour
             arrayString += Environment.NewLine + Environment.NewLine;
         }
 
+        AddNavMeshModifierToWalls();
+        AddTagToEveryRoomWall();
+        BakeNavMesh();
         
         this.gameObject.GetComponent<SpawnController>().Initialize();
         this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
         
+    }
+
+    private void BakeNavMesh()
+    {
+        var navmeshObject = GameObject.Find("NavMesh Surface");
+        var navmeshComponent = navmeshObject.GetComponent<NavMeshSurface2d>();
+        
+        navmeshComponent.BuildNavMesh();
+    }
+
+    private void AddNavMeshModifierToWalls()
+    {
+        AddComponentToRooms(typeof(NavMeshModifier), "Walls", SetUnwalkableOverride);
+    }
+    private void SetUnwalkableOverride(Component component)
+    {
+        var Modcomponent = component as NavMeshModifier;
+        Modcomponent.overrideArea = true;
+        Modcomponent.area = NavMesh.GetAreaFromName("Not Walkable");
+    }
+
+    private void AddTagToEveryRoomWall()
+    {
+        AddLayerTagToEveryRoomObject("Obstruction", "Walls");
+    }
+
+    private void AddComponentToRooms(Type component, string layerName, Action<Component> componentSetup)
+    {
+        foreach (var room in RoomGrid)
+        {
+            if (room == null) continue;
+            
+            room.roomGameObject.transform.Find(layerName).gameObject.AddComponent(component);
+            componentSetup(room.roomGameObject.transform.Find(layerName).gameObject.GetComponent(component));
+        }
+    }
+
+    private void AddLayerTagToEveryRoomObject(string tag, string layerName)
+    {
+        foreach (var room in RoomGrid)
+        {    
+            if (room == null) continue;
+
+            room.roomGameObject.transform.Find(layerName).gameObject.tag = tag;
+        }
     }
 
     private void PatchLeftovers()
@@ -161,6 +211,7 @@ public class LevelGenerator : MonoBehaviour
 
                 //create clone room from template room
                 var clonedRoom = Instantiate(pickedRoom, _gridGameObject.transform, true);
+                clonedRoom.transform.Find("Flags").gameObject.tag = "Flag";
                 //reverse original transition
                 clonedRoom.transform.Translate(ReverseRoomMove);
 
@@ -190,6 +241,8 @@ public class LevelGenerator : MonoBehaviour
                 clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + connectRoom.RealPosition.x, 
                     modifier.y*deltaTilesMid.y + connectRoom.RealPosition.y,
                     modifier.z*deltaTilesMid.z + connectRoom.RealPosition.z), Space.World);
+                var newRoom = new Room(newDoors, clonedRoom, new Vector2Int(i, j));
+                RoomGrid[newRoom.GridPosition.y, newRoom.GridPosition.x] = newRoom;
             }
         }
     }
@@ -266,7 +319,7 @@ public class LevelGenerator : MonoBehaviour
     private Room SetupMainRoom()
     {
         GameObject gridObject = new GameObject("Grid");
-        GameObject roomHolder = new GameObject("[ROOM]Main");
+        GameObject roomHolder = new GameObject("ROOM_Main");
         
         roomHolder.transform.parent = gridObject.transform;
         
@@ -293,7 +346,9 @@ public class LevelGenerator : MonoBehaviour
             roomHolder, startingGridPostion);
         RoomGrid[startingGridPostion.y, startingGridPostion.x] = room;
         _gridGameObject = gridObject;
-;
+        
+        room.roomGameObject.transform.Find("Flags").gameObject.tag = "Flag";
+        
         return room;
     }
 
@@ -307,7 +362,7 @@ public class LevelGenerator : MonoBehaviour
         List<string> roomNames = new List<string>();
         foreach (FileInfo filename in filenames)
         {
-            if (filename.Name.StartsWith("[ROOM]") && filename.Name.EndsWith(".prefab"))
+            if (filename.Name.StartsWith("ROOM") && filename.Name.EndsWith(".prefab"))
                 roomNames.Add(filename.Name);
         }
         
@@ -321,6 +376,7 @@ public class LevelGenerator : MonoBehaviour
                                                                 filename.Substring(0, 
                                                                     filename.LastIndexOf(".")));
             GameObject createdRoom = Instantiate(loadedRoom);
+            createdRoom.transform.Find("Flags").gameObject.tag = "Flag";
             GameObject transformedRoom = new GameObject(loadedRoom.name);
             
             for (int i = createdRoom.transform.childCount - 1; i >= 0; i--)
@@ -393,7 +449,7 @@ public class LevelGenerator : MonoBehaviour
         
         //pickedExits = 3;
 
-        int timeOutQueue = 10;
+        int timeOutQueue = 40;
         
         // Information we randomly generate based on rules in while()
         GameObject pickedRoom = null;
@@ -444,6 +500,7 @@ public class LevelGenerator : MonoBehaviour
 
             //create clone room from template room
             clonedRoom = Instantiate(pickedRoom, _gridGameObject.transform, true);
+            clonedRoom.transform.Find("Flags").gameObject.tag = "Flag";
             //reverse original transition
             clonedRoom.transform.Translate(ReverseRoomMove);
 
