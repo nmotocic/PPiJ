@@ -51,4 +51,5 @@ public class ProjectileController : EntityControllerInterface
         es.controller.damage(contactDamage);
         //Do stuff
     }
+    public void death() { }
 }

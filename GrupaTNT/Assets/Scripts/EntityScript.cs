@@ -83,6 +83,7 @@ public class EntityScript : MonoBehaviour
         //DEBUG REMOVE AFTER TESTIIIING
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
+        if (stats.ContainsKey("health")&&stats["health"].getCompoundValue()<=0.0f) { controller.death(); }
     }
     void OnCollisionEnter2D(Collision2D col)
     {

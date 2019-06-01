@@ -20,6 +20,10 @@ public class PowerupController : EntityControllerInterface
 
     public void OnTriggerEnter2D(Collider2D col)
     {
+        Debug.Log(col.gameObject);
         //Do stuff
+    }
+    public void death() {
+        GameObject.Destroy(parentScript.gameObject);
     }
 }

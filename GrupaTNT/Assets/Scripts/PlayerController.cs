@@ -7,13 +7,13 @@ public class PlayerController : EntityControllerInterface
     EntityScript parentScript;
     Vector2 direction;
     float speed = 2f;
-    float health = 20f;
+    float health = 3f;
     // Start is called before the first frame update
     public PlayerController(EntityScript ps,float speed) {
         parentScript = ps;
         this.speed = speed;
         FloatStat FS = new FloatStat("health", 100);
-        FS.setFactor("current", 1f);
+        FS.setFactor("current", 100);
         parentScript.stats.Add("health",FS);
     }
     // Update is called once per frame
@@ -38,10 +38,15 @@ public class PlayerController : EntityControllerInterface
     {
         health -= Mathf.Abs(dmg);
         Debug.Log("Hp:"+health);
+        if (health==0) { death(); }
     }
 
     public void OnTriggerEnter2D(Collider2D col)
     {
+        Debug.Log(col.gameObject);
         //Do stuff
+    }
+    public void death() {
+        Debug.Log("Oof");
     }
 }

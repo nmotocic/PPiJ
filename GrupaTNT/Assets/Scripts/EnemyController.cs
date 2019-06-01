@@ -65,15 +65,19 @@ public class EnemyController : EntityControllerInterface
         dmg = Mathf.Abs(dmg);
         health -= dmg;
         stun -= dmg;
-        if (health <= 0) { //Death
-            myAi.setState(-2);
-            parent.GetComponent<Collider2D>().enabled = false;
-            myAi.setDanger(false);
+        if (health <= 0) {
+            death();
         }
         else if (stun <= -1) { //Stunned
             myAi.setState(-1);
             myAi.setAlarm(-stun);
             stun = poiseMax;
         }
+    }
+    public void death()//Death script
+    {
+        myAi.setState(-2);
+        parent.GetComponent<Collider2D>().enabled = false;
+        myAi.setDanger(false);
     }
 }
