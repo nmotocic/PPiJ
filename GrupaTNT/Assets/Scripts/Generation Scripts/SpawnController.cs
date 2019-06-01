@@ -66,8 +66,6 @@ public class SpawnController : Singleton<SpawnController>
             
             enemies.Add(createdEnemy);   
         }
-
-
     }
 
     private List<Vector3> FindRoomEnemies(Vector2Int position)
@@ -108,10 +106,5 @@ public class SpawnController : Singleton<SpawnController>
 
         return foundSpawns;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }

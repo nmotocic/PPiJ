@@ -50,9 +50,7 @@ public class LevelGenerator : MonoBehaviour
         
         deltaVectors = FlagController.Instance.deltaVectors;
         directionsDelta = FlagController.Instance.directionsDelta;
-
-        Tilemap flagMap = GameObject.FindWithTag("Flag").GetComponent<Tilemap>();
-
+        
         //Create main room on grid
         var homeRoom = SetupMainRoom();
 
@@ -114,6 +112,7 @@ public class LevelGenerator : MonoBehaviour
         
         this.gameObject.GetComponent<SpawnController>().Initialize();
         this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
+        
     }
 
     private void PatchLeftovers()
@@ -262,12 +261,6 @@ public class LevelGenerator : MonoBehaviour
 
     void Awake () {
         _tempMainRoomInstantiation = Instantiate(mainRoom.gameObject);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     private Room SetupMainRoom()
