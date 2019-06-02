@@ -13,39 +13,27 @@ public class LocationController : MonoBehaviour
 
     private string lastDirectionName;
     private bool isInitalized = false;
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     public void Initialize(Vector2Int locationOnRoomGrid, LevelGenerator.Room[,] roomGrid)
     {
         this.locationOnRoomGrid = locationOnRoomGrid;
         this.roomGrid = roomGrid;
-
+        
         boundsDict = new Dictionary<LevelGenerator.Room, Bounds>();
         foreach (var room in roomGrid)
         {
-            if(room != null)
-                boundsDict[room] = room.roomGameObject.GetComponent<Tilemap>().localBounds;
+            if (room != null)
+            {
+                var tilemap = room.roomGameObject.transform.Find("Walls").GetComponent<Tilemap>();
+                var bounds = tilemap.localBounds;
+                var worldBounds = new Bounds(tilemap.LocalToWorld(bounds.center),
+                    tilemap.localBounds.size);
+
+                boundsDict[room] = worldBounds;
+            }
         }
 
         isInitalized = true;
-    }
-
-    public void MovePosition(string spriteName)
-    {
-        if (spriteName != lastDirectionName)
-        {
-            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(spriteName);
-            locationOnRoomGrid.x += deltaVector.x;
-            locationOnRoomGrid.y += deltaVector.y;
-            lastDirectionName = spriteName;
-        }
-        
-        Debug.Log("Location of new room" + locationOnRoomGrid.ToString());
     }
 
     // Update is called once per frame
@@ -55,12 +43,15 @@ public class LocationController : MonoBehaviour
         {
             foreach (var tuple in boundsDict)
             {
+                var bounds = tuple.Value;
                 if (tuple.Value.Contains(playerObject.transform.position))
                 {
                     locationOnRoomGrid = tuple.Key.GridPosition;
                     break;
                 }
             }
+            
+            Debug.Log("Location of new room" + locationOnRoomGrid.ToString());
         }
     }
     
