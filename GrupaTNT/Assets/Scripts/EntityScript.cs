@@ -30,6 +30,7 @@ public class EntityScript : MonoBehaviour
     Rigidbody2D rb2d;
     public float speed = 5;
     public string entityType;
+
     // Start is called before the first frame update
     public void Init(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {

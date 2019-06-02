@@ -424,11 +424,24 @@ namespace UnityEngine.AI
 
         private static Bounds CalculateGridWorldBounds(Matrix4x4 worldToLocal)
         {
-            var grid = FindObjectOfType<Grid>();
+            //var grid = FindObjectOfType<Grid>();
+            var grid = GameObject.FindWithTag("Grid");
+            
             var tilemaps = grid.GetComponentsInChildren<Tilemap>();
+
             if (tilemaps == null || tilemaps.Length < 1)
             {
-                throw new NullReferenceException("Add at least one tilemap");
+                ///******** DODANO ****************
+                ///
+                tilemaps = new Tilemap[grid.transform.childCount];
+                for (int i = 0; i < grid.transform.childCount; i++)
+                {
+                    tilemaps[i] = grid.transform.GetChild(i).GetComponent<Tilemap>();
+                }
+                ///
+                ///********************************
+                if (tilemaps.Length == 0)
+                    throw new NullReferenceException("Add at least one tilemap");
             }
             var bounds = new Bounds();
             foreach (var tilemap in tilemaps)
