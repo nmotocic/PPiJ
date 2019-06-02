@@ -170,10 +170,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30bed00cc69f6b5e78c4732dd1e837a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomGenNumber: 10
-  branchMaxLength: 20
+  roomGenNumber: 20
+  branchMaxLength: 30
   mainRoom: {fileID: 1285932640}
-  gridWidthHeight: 10
+  gridWidthHeight: 20
 --- !u!114 &99134318
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,7 +186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13eda9b69f88645da9f0b7f52deb8ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PowerUpSpawn: {fileID: 21300018, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
+  PowerUpSpawn: {fileID: 21300002, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
   EnemySpawn: {fileID: 21300016, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
   DoorRight: {fileID: 21300006, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
   DoorLeft: {fileID: 21300010, guid: d90ffa0304478ee658548ed027b865ea, type: 3}
@@ -360,8 +360,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1248042128}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5.23, y: -5.6, z: 0}
-  m_LocalScale: {x: 1.4310255, y: 1.752392, z: 1}
+  m_LocalPosition: {x: 5.25, y: -5.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1470293812}
   m_Father: {fileID: 0}
@@ -566,7 +566,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 1
+  orthographic size: 1.9173923
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using TMPro;
-using UnityEditor.Experimental.UIElements;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SocialPlatforms;
+using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
@@ -40,6 +35,8 @@ public class LevelGenerator : MonoBehaviour
 
     private Vector2Int[] deltaVectors;
     private Sprite[] directionsDelta;
+
+    private bool madeBossRoom = false;
     
     // Start is called before the first frame update
     void Start()
@@ -98,6 +95,7 @@ public class LevelGenerator : MonoBehaviour
 
         PatchLeftovers();
 
+        /**
         //Pretty print
         int rowLength = RoomGrid.GetLength(0);
         int colLength = RoomGrid.GetLength(1);
@@ -111,6 +109,7 @@ public class LevelGenerator : MonoBehaviour
             }
             arrayString += Environment.NewLine + Environment.NewLine;
         }
+        **/
 
         AddNavMeshModifierToWalls();
         AddTagToEveryRoomWall();
@@ -121,6 +120,9 @@ public class LevelGenerator : MonoBehaviour
 
         this.gameObject.GetComponent<LocationController>().Initialize(startingGridPostion, RoomGrid);
 
+        RemoveFlagRendering();
+
+        Debug.Assert(madeBossRoom);
     }
 
     private void BakeNavMesh()
@@ -145,6 +147,16 @@ public class LevelGenerator : MonoBehaviour
     private void AddTagToEveryRoomWall()
     {
         AddLayerTagToEveryRoomObject("Obstruction", "Walls");
+    }
+
+    private void RemoveFlagRendering()
+    {
+        foreach (var room in RoomGrid)
+        {
+            if (room == null) continue;
+
+            room.roomGameObject.transform.Find("Flags").GetComponent<Renderer>().enabled = false;
+        }
     }
 
     private void AddComponentToRooms(Type component, string layerName, Action<Component> componentSetup)
@@ -244,7 +256,16 @@ public class LevelGenerator : MonoBehaviour
                 clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + connectRoom.RealPosition.x, 
                     modifier.y*deltaTilesMid.y + connectRoom.RealPosition.y,
                     modifier.z*deltaTilesMid.z + connectRoom.RealPosition.z), Space.World);
-                var newRoom = new Room(newDoors, clonedRoom, new Vector2Int(i, j));
+
+                bool bossRoom = false;
+                if (madeBossRoom == false)
+                {
+                    bossRoom = true;
+                    Debug.Log("Made boss room");
+                    madeBossRoom = true;
+                }
+                
+                var newRoom = new Room(newDoors, clonedRoom, new Vector2Int(i, j), bossRoom);
                 RoomGrid[newRoom.GridPosition.y, newRoom.GridPosition.x] = newRoom;
             }
         }
@@ -346,7 +367,7 @@ public class LevelGenerator : MonoBehaviour
         gridObject.tag = "Grid";
         
         Room room = new Room(DoorSearch(roomHolder.transform.Find("Flags").GetComponent<Tilemap>()), 
-            roomHolder, startingGridPostion);
+            roomHolder, startingGridPostion, false);
         RoomGrid[startingGridPostion.y, startingGridPostion.x] = room;
         _gridGameObject = gridObject;
         
@@ -541,9 +562,17 @@ public class LevelGenerator : MonoBehaviour
             clonedRoom.transform.Translate(new Vector3(modifier.x*deltaTilesMid.x + previousRoom.RealPosition.x, 
                 modifier.y*deltaTilesMid.y + previousRoom.RealPosition.y,
                 modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
+
+            bool makeBossRoom = false;
+            if ((roomsToGen == 1 || n == 1) && (madeBossRoom == false))
+            {
+                makeBossRoom = true;
+                Debug.Log("MADE BOSS");
+                madeBossRoom = true;
+            }
             
             //Connect new room with old room 
-            newRoom = new Room(newDoors, clonedRoom, new Vector2Int(gridX, gridY));
+            newRoom = new Room(newDoors, clonedRoom, new Vector2Int(gridX, gridY), makeBossRoom);
 
             timeOutQueue--;
         } while (newRoom == null || RoomCantConnectToAny(newRoom));
@@ -760,8 +789,9 @@ public class LevelGenerator : MonoBehaviour
         public Vector2Int GridPosition { get; set; }
         public GameObject roomGameObject { get; set; }
         private Dictionary<string, Room> ConnectedRoomDictionary;
+        public bool bossRoom = false;
         
-        public Room(List<Door> doors, GameObject container, Vector2Int gridPosition)
+        public Room(List<Door> doors, GameObject container, Vector2Int gridPosition, bool bossRoom)
         {
             Doors = doors;
             RealPosition = container.transform.position;
@@ -784,6 +814,8 @@ public class LevelGenerator : MonoBehaviour
             {
                 HasDoor[door.type.name] = true;
             }
+
+            this.bossRoom = bossRoom;
         }
 
         public void Connect(string sprite, Room other)

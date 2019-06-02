@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -13,7 +11,9 @@ public class SpawnController : Singleton<SpawnController>
     private LevelGenerator.Room[,] roomGrid;
 
     private List<string> enemyNames;
-    
+    private List<string> powerUpNames;
+    private List<string> bossNames;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,17 +21,45 @@ public class SpawnController : Singleton<SpawnController>
 
     private void Awake()
     {
-        DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
-        FileInfo[] filenames = directoryInfo.GetFiles();
+        DirectoryInfo directoryInfoEnemy = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
+        FileInfo[] filenamesEnemy = directoryInfoEnemy.GetFiles();
 
         //There could be other metafiles in the directory so we check how many room files we have.
         enemyNames = new List<string>();
-        foreach (FileInfo filename in filenames)
+        foreach (FileInfo filename in filenamesEnemy)
         {
             if (filename.Name.EndsWith(".prefab"))
+            {
                 enemyNames.Add(filename.Name);
+            }
         }
 
+        DirectoryInfo directoryInfoPowerup = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/PowerupData"));
+        FileInfo[] filenamesPowerup = directoryInfoPowerup.GetFiles();
+
+        //There could be other metafiles in the directory so we check how many room files we have.
+        powerUpNames = new List<string>();
+        foreach (FileInfo filename in filenamesPowerup)
+        {
+            if (filename.Name.EndsWith(".prefab"))
+            {
+                powerUpNames.Add(filename.Name);
+            }
+        }
+        
+        
+        DirectoryInfo directoryInfoBoss = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/BossData"));
+        FileInfo[] filenamesBoss = directoryInfoBoss.GetFiles();
+
+        //There could be other metafiles in the directory so we check how many room files we have.
+        bossNames = new List<string>();
+        foreach (FileInfo filename in filenamesBoss)
+        {
+            if (filename.Name.EndsWith(".prefab"))
+            {
+                bossNames.Add(filename.Name);
+            }
+        }
     }
 
     public void Initialize()
@@ -46,8 +74,36 @@ public class SpawnController : Singleton<SpawnController>
         {
             for (int j = 0; j < gridHeightWidth; j++)
             {
-                SpawnRoomEnemies(new Vector2Int(i,j));
+                var vec = new Vector2Int(i, j);
+                SpawnRoomEnemies(vec);
+                SpawnRoomPowerUps(vec);
+                SpawnBoss(vec);
             }
+        }
+    }
+
+    private void SpawnRoomPowerUps(Vector2Int position)
+    {
+        var flagWorldPositions = FindRoomPowerups(position);
+
+        if (flagWorldPositions == null) return;
+
+        List<GameObject> powerUpObjects = new List<GameObject>();
+
+        string room_prefix = "PowerupData/";
+
+        foreach (var realPosition in flagWorldPositions)
+        {
+            string pickedFile = powerUpNames[Random.Range(0, powerUpNames.Count)];
+
+            GameObject loadedPowerup = Resources.Load<GameObject>(room_prefix +
+                                                                pickedFile.Substring(0,
+                                                                    pickedFile.LastIndexOf(".")));
+            GameObject createdPowerup = Instantiate(loadedPowerup);
+            createdPowerup.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
+            createdPowerup.transform.Translate(realPosition);
+            
+            powerUpObjects.Add(createdPowerup);
         }
     }
 
@@ -57,26 +113,57 @@ public class SpawnController : Singleton<SpawnController>
 
         if (enemyWorldPositions == null) return;
 
-        List<GameObject> enemies = new List<GameObject>();
-
-        string room_prefix = "EnemyData/";
-
-        foreach (var realPosition in enemyWorldPositions)
+        if (!roomGrid[position.y, position.x].bossRoom)
         {
-            string pickedFile = enemyNames[Random.Range(0, enemyNames.Count)];
 
-            GameObject loadedEnemy = Resources.Load<GameObject>(room_prefix +
-                                                                pickedFile.Substring(0,
-                                                                    pickedFile.LastIndexOf(".")));
-            GameObject createdEnemy = Instantiate(loadedEnemy);
-            createdEnemy.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
-            createdEnemy.transform.Translate(realPosition);
-            
-            enemies.Add(createdEnemy);   
+            List<GameObject> enemies = new List<GameObject>();
+
+            string room_prefix = "EnemyData/";
+
+            foreach (var realPosition in enemyWorldPositions)
+            {
+                string pickedFile = enemyNames[Random.Range(0, enemyNames.Count)];
+
+                GameObject loadedEnemy = Resources.Load<GameObject>(room_prefix +
+                                                                    pickedFile.Substring(0,
+                                                                        pickedFile.LastIndexOf(".")));
+                GameObject createdEnemy = Instantiate(loadedEnemy);
+                createdEnemy.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
+                createdEnemy.transform.Translate(realPosition);
+
+                enemies.Add(createdEnemy);
+            }
         }
     }
+    
+    private void SpawnBoss(Vector2Int position)
+    {
+        if (roomGrid[position.y, position.x] == null) return;
+        
+        if (roomGrid[position.y, position.x].bossRoom)
+        {
 
-    private List<Vector3> FindRoomEnemies(Vector2Int position)
+            var enemyWorldPositions = roomGrid[position.y, position.x].roomGameObject.transform.Find("Floor")
+                .GetComponent<Tilemap>().localBounds.center;
+
+            GameObject boss;
+
+            string room_prefix = "BossData/";
+
+            string pickedFile = bossNames[Random.Range(0, bossNames.Count)];
+
+            GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
+                                                               pickedFile.Substring(0,
+                                                                   pickedFile.LastIndexOf(".")));
+            GameObject createdBoss = Instantiate(loadedBoss);
+            createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
+            createdBoss.transform.Translate(enemyWorldPositions);
+
+            boss = createdBoss;
+        }
+    }
+    
+    private List<Vector3> FindRoomFlags(Vector2Int position, string flagName)
     {
         LevelGenerator.Room room;
         try
@@ -93,7 +180,7 @@ public class SpawnController : Singleton<SpawnController>
         var tilemap = room.roomGameObject.transform.Find("Flags").GetComponent<Tilemap>();
         
         TileBase[] tiles = tilemap.GetTilesBlock(tilemap.cellBounds);
-        List<Vector3> foundSpawns = new List<Vector3>();
+        List<Vector3> foundFlags = new List<Vector3>();
         
         foreach (var tilePosition in tilemap.cellBounds.allPositionsWithin)
         {   
@@ -104,15 +191,25 @@ public class SpawnController : Singleton<SpawnController>
             var sprite = tilemap.GetSprite(tilePosition);
 
             // Check if the sprite is actually a door.
-            if (!FlagController.Instance.EnemySpawn.name.Equals(sprite.name))
+            if (!flagName.Equals(sprite.name))
                 continue;
             
-            foundSpawns.Add(new Vector3(tilePosition.x * LevelGenerator.modifier.x, 
+            foundFlags.Add(new Vector3(tilePosition.x * LevelGenerator.modifier.x, 
                 tilePosition.y * LevelGenerator.modifier.y, 
                 tilePosition.z * LevelGenerator.modifier.z));
         }
 
-        return foundSpawns;
+        return foundFlags;
     }
-    
+
+    private List<Vector3> FindRoomEnemies(Vector2Int position)
+    {
+        return FindRoomFlags(position, FlagController.Instance.EnemySpawn.name);
+    }
+
+    private List<Vector3> FindRoomPowerups(Vector2Int position)
+    {
+        return FindRoomFlags(position, FlagController.Instance.PowerUpSpawn.name);
+    }
+
 }
