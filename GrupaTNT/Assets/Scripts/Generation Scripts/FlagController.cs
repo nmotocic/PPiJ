@@ -128,6 +128,14 @@ public class FlagController : Singleton<FlagController>
         return null;
     }
 
+    public bool IsDoorSprite(string str)
+    {
+        if (DoorDown.name == str || DoorUp.name == str || DoorLeft.name == str || DoorRight.name == str)
+            return true;
+
+        return false;
+    }
+
     // Start is called before the first frame update
     void Start()
     {

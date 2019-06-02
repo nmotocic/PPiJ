@@ -8,7 +8,7 @@ using Random = UnityEngine.Random;
 
 public class SpawnController : Singleton<SpawnController>
 {
-    [SerializeField] public int gridHeightWidth;
+    private int gridHeightWidth;
 
     private LevelGenerator.Room[,] roomGrid;
 
@@ -36,7 +36,8 @@ public class SpawnController : Singleton<SpawnController>
 
     public void Initialize()
     {
-        roomGrid = LevelGenerator.RoomGrid;   
+        roomGrid = LevelGenerator.RoomGrid;
+        gridHeightWidth = gameObject.GetComponent<LevelGenerator>().gridWidthHeight;
     }
     
     public void SpawnForAllRooms()

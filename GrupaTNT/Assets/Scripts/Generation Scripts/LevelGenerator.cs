@@ -46,10 +46,11 @@ public class LevelGenerator : MonoBehaviour
     {
         //Grid init
         RoomGrid = new Room[gridWidthHeight, gridWidthHeight];
-
+        
         roomsToGen = roomGenNumber;
 
         startingGridPostion = new Vector2Int(gridWidthHeight / 2, gridWidthHeight / 2);
+        Debug.Log("Starting grid location " + startingGridPostion.ToString());
         
         deltaVectors = FlagController.Instance.deltaVectors;
         directionsDelta = FlagController.Instance.directionsDelta;
@@ -117,7 +118,9 @@ public class LevelGenerator : MonoBehaviour
         
         this.gameObject.GetComponent<SpawnController>().Initialize();
         this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
-        
+
+        this.gameObject.GetComponent<LocationController>().Initialize(startingGridPostion, RoomGrid);
+
     }
 
     private void BakeNavMesh()
@@ -348,6 +351,9 @@ public class LevelGenerator : MonoBehaviour
         _gridGameObject = gridObject;
         
         room.roomGameObject.transform.Find("Flags").gameObject.tag = "Flag";
+        roomHolder.transform.Find("Flags").gameObject.AddComponent<LocationController>();
+        roomHolder.transform.Find("Flags").gameObject.AddComponent<TilemapCollider>();
+        //roomHolder.transform.Find("Flags").gameObject.GetComponent<TilemapCollider2D>().isTrigger = true;
         
         return room;
     }
@@ -377,6 +383,9 @@ public class LevelGenerator : MonoBehaviour
                                                                     filename.LastIndexOf(".")));
             GameObject createdRoom = Instantiate(loadedRoom);
             createdRoom.transform.Find("Flags").gameObject.tag = "Flag";
+            createdRoom.transform.Find("Flags").gameObject.AddComponent<LocationController>();
+            createdRoom.transform.Find("Flags").gameObject.AddComponent<TilemapCollider>();
+            //createdRoom.transform.Find("Flags").gameObject.GetComponent<TilemapCollider2D>().isTrigger = true;
             GameObject transformedRoom = new GameObject(loadedRoom.name);
             
             for (int i = createdRoom.transform.childCount - 1; i >= 0; i--)

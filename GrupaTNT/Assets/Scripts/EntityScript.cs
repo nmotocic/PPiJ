@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 
 public class EntityScript : MonoBehaviour
@@ -13,6 +14,9 @@ public class EntityScript : MonoBehaviour
     Rigidbody2D rb2d;
     public float speed=5;
     public string entityType;
+
+    private LocationController _locationController;
+    
     // Start is called before the first frame update
     public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
     {
@@ -30,6 +34,9 @@ public class EntityScript : MonoBehaviour
     public void Start()
     {
         if (!entityType.Equals("player")) { return; }
+        
+        _locationController = GameObject.Find("Manager").GetComponent<LocationController>();
+        
         controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
@@ -86,6 +93,17 @@ public class EntityScript : MonoBehaviour
         GameObject other = collision.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
         Debug.Log(gameObject);
+        
+        //collision.gameObject.tag
+
+        var tileMap = collision.gameObject.GetComponentInParent<Tilemap>();
+        if (tileMap != null)
+        {
+            Sprite flagSprite = tileMap.GetSprite(tileMap.WorldToCell(other.transform.position));
+            if (FlagController.Instance.IsDoorSprite(flagSprite.name))
+                _locationController.MovePosition(flagSprite.name);
+        }
+
         if (otherES == null) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             if (other.CompareTag(GameDefaults.Obstruction()) && gameObject.CompareTag(GameDefaults.Projectile()))

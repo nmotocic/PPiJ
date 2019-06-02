@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -6,22 +7,20 @@ using UnityEngine.Tilemaps;
 
 public class LocationTracker : MonoBehaviour
 {
-    [SerializeField] public int gridHeightWidth;
+    private Tilemap myTilemap;
+    private LocationController _controller;
 
-    private LevelGenerator.Room[,] roomGrid;
-    
-    
     // Start is called before the first frame update
     void Start()
     {
+        myTilemap = gameObject.GetComponent<Tilemap>();
+        _controller = GameObject.Find("Manager").GetComponent<LocationController>();
     }
 
-    public void Initialize()
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        roomGrid = LevelGenerator.RoomGrid;
-        gridHeightWidth = gameObject.GetComponent<LevelGenerator>().gridWidthHeight;
+        Sprite flagSprite = myTilemap.GetSprite(myTilemap.WorldToCell(other.transform.position));
+        _controller.MovePosition(flagSprite.name);
+        Debug.Log("TRIGGERED");
     }
-    
-    
-
 }

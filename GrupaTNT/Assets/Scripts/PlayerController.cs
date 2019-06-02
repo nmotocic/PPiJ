@@ -20,7 +20,7 @@ public class PlayerController : EntityControllerInterface
     // Update is called once per frame
     public void Update()
     {
-        Debug.Log(parentScript.stats["health"].getCompoundValue());
+        //Debug.Log(parentScript.stats["health"].getCompoundValue());
         float X = Input.GetAxis("Horizontal");
         float Y = Input.GetAxis("Vertical");
         direction = new Vector2(X, Y);
