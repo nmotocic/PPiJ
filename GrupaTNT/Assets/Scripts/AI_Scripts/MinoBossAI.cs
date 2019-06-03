@@ -31,11 +31,12 @@ public class MinoBossAI : AiScriptBase
     public GameObject slashProjectile;
     public float slashProjectileSpeed=3;
     [Header("Spin stats")]
-    public double spinWindup = 2; //Seconds before attack
-    public double spinDuration = 0.5; //Seconds attacking
+    public double spinWindup = 1.2; //Seconds before attack
+    public int spinProjectiles = 10; //Number of projectiles launched
+    public double spinInterval = 0.2; //Time between each projectile launch
     public double spinCooldown = 1;
     [Header("Slam stats")]
-    public double slamWindup = 2; //Seconds before attack
+    public double slamWindup = 1; //Seconds before attack
     public double slamDuration = 0.5; //Seconds attacking
     public double slamCooldown = 1;
     //Attack target
@@ -43,6 +44,8 @@ public class MinoBossAI : AiScriptBase
     public string targetObjectTag = GameDefaults.Player();
     public double autoTriggerAtackDist = 1;
     public double attackDelay = 2;
+    [Header("Perma buff?")]
+    public bool permaBuff = false;
 
     //Stats
     public int health = 60;
@@ -53,6 +56,7 @@ public class MinoBossAI : AiScriptBase
     private bool danger = false;
     private int attackType=0;
     private int attackCombo = 0;
+    private int attackCount = 1;
     private bool buff = false;
 
     private Vector2 targetDir, startPos;
@@ -88,6 +92,7 @@ public class MinoBossAI : AiScriptBase
     // Update is called once per frame
     void Update()
     {
+        if (permaBuff) buff = true;
         alarm.Update();
         aiTimer.Update();
         //Init
@@ -168,6 +173,7 @@ public class MinoBossAI : AiScriptBase
             //Attacks
             if (attackType > 0)
             {
+                //attackType = 4;
                 //Dash
                 if (attackType == 1) {
                     //Windup
@@ -183,8 +189,6 @@ public class MinoBossAI : AiScriptBase
                     else if (state == 1 && alarm.isActive())
                     {
                         state = 2;
-                        alarm.setMax(dashDuration);
-                        alarm.reset();
                         danger = true;
                         //Set agent speeds
                         if (buff)
@@ -194,6 +198,8 @@ public class MinoBossAI : AiScriptBase
                             agent.acceleration = dashAccel * 4f;
                             agent.destination = target;
                             buff = false;
+                            alarm.setMax(dashDuration/2);
+                            alarm.reset();
                         }
                         else
                         {
@@ -201,6 +207,8 @@ public class MinoBossAI : AiScriptBase
                             agent.angularSpeed = dashAngular;
                             agent.acceleration = dashAccel;
                             agent.destination = target;
+                            alarm.setMax(dashDuration);
+                            alarm.reset();
                         }
 
                     }
@@ -229,32 +237,34 @@ public class MinoBossAI : AiScriptBase
                         alarm.reset();
                         //Stop moving
                         agent.destination = my_pos;
-                    }
-                    //Start
-                    else if (state == 1 && alarm.isActive())
-                    {
-                        state = 2;
-                        anim.SetInteger("State", state);
-                        alarm.setMax(slashDuration);
-                        alarm.reset();
-                        var proj = eScript.DispenseObject(slashProjectile, my_pos, targetDir, slashProjectileSpeed);
-                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+
                         if (buff)
                         {
                             attackCombo = 2;
                             buff = false;
                         }
-                        else {
+                        else
+                        {
                             attackCombo = 0;
                         }
+                    }
+                    //Start
+                    else if (state == 1 && alarm.isActive())
+                    {
+                        state = 2;
+                        alarm.setMax(slashDuration);
+                        alarm.reset();
+                        var proj = eScript.DispenseObject(slashProjectile, my_pos, targetDir, slashProjectileSpeed);
+                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
                     }
                     //Swing
                     else if ((state == 2) && (alarm.isActive()))
                     {  
                         if (attackCombo > 0)
                         { //Moar swings
+                            attackCombo--;
                             state = 1;
-                            alarm.setMax(slashWindup / 4);
+                            alarm.setMax(slashWindup / 6);
                             alarm.reset();
                         }
                         else
@@ -267,11 +277,97 @@ public class MinoBossAI : AiScriptBase
                 }
                 //Spin
                 else if (attackType == 3) {
+                    if (state == 0)
+                    {
+                        state = 1;
+                        alarm.setMax(spinWindup);
+                        alarm.reset();
+                        //Stop moving
+                        agent.destination = my_pos;
+                    }
+                    //Start
+                    else if (state == 1 && alarm.isActive())
+                    {
+                        state = 2;
+                        alarm.setMax(spinInterval);
+                        alarm.reset();
 
+                        if (buff)
+                        {
+                            attackCombo = spinProjectiles;
+                            buff = false;
+                            attackCount = 4;
+                        }
+                        else
+                        {
+                            attackCombo = spinProjectiles;
+                            attackCount = 1;
+                        }
+                    }
+                    //Spin and launch
+                    else if ((state == 2) && (alarm.isActive()))
+                    {
+                        if (attackCombo > 0)
+                        { //Keep launching
+                            state = 2;
+                            alarm.setMax(spinInterval);
+                            alarm.reset();
+                            attackCombo--;
+                            for (int i = 0; i < attackCount; i++)
+                            {
+                                Vector2 randVector = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+                                randVector.Normalize();
+                                var proj = eScript.DispenseObject(slashProjectile, my_pos, randVector, slashProjectileSpeed);
+                                proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                            }
+                        }
+                        else
+                        { //Cooldown
+                            state = 3;
+                            alarm.setMax(spinCooldown / 3);
+                            alarm.reset();
+                        }
+                    }
+                    else if (state == 3 && alarm.isActive()) {
+                        state = 5;
+                        alarm.setMax(2*spinCooldown / 3);
+                        alarm.reset();
+                    }
                 }
                 //Buff
                 else if (attackType == 4){
-
+                    if (state == 0)
+                    {
+                        state = 1;
+                        alarm.setMax(slamWindup);
+                        alarm.reset();
+                        //Stop moving
+                        agent.destination = my_pos;
+                    }
+                    //Slam
+                    else if (state == 1 && alarm.isActive())
+                    {
+                        state = 2;
+                        alarm.setMax(slamDuration);
+                        alarm.reset();
+                        //Launch 4 projectiles
+                        var proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.down, slashProjectileSpeed);
+                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                        proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.up, slashProjectileSpeed);
+                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                        proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.left, slashProjectileSpeed);
+                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                        proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.right, slashProjectileSpeed);
+                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                        buff = true;
+                    }
+                    //Slam done
+                    else if ((state == 2) && (alarm.isActive()))
+                    {
+                            state = 5;
+                            alarm.setMax(slamCooldown);
+                            alarm.reset();
+                    }
                 }
 
             }

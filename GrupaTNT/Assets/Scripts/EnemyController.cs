@@ -61,19 +61,28 @@ public class EnemyController : EntityControllerInterface
     }
 
     public void damage(int dmg) {
-        dmg = Mathf.Max(dmg - armor, 1);
-        dmg = Mathf.Abs(dmg);
-        health -= dmg;
-        stun -= dmg;
-        if (health <= 0) { //Death
-            myAi.setState(-2);
-            parent.GetComponent<Collider2D>().enabled = false;
-            myAi.setDanger(false);
+        if (dmg < 0)//Healing
+        {
+            health -= dmg;
         }
-        else if (stun <= -1) { //Stunned
-            myAi.setState(-1);
-            myAi.setAlarm(-stun);
-            stun = poiseMax;
+        else //Real damage
+        {
+            dmg = Mathf.Max(dmg - armor, 1);
+            dmg = Mathf.Abs(dmg);
+            health -= dmg;
+            stun -= dmg;
+            if (health <= 0)
+            { //Death
+                myAi.setState(-2);
+                parent.GetComponent<Collider2D>().enabled = false;
+                myAi.setDanger(false);
+            }
+            else if (stun <= -1)
+            { //Stunned
+                myAi.setState(-1);
+                myAi.setAlarm(-stun);
+                stun = poiseMax;
+            }
         }
     }
 
