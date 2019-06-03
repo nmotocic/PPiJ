@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class EnemyController : EntityControllerInterface
 {
+    EntityScript parentScript;
     Vector2 direction;
     static float defSpeed = 0f; //Disabled
     float speed = defSpeed;
@@ -19,8 +20,14 @@ public class EnemyController : EntityControllerInterface
     public int stun { get; set; }
     private bool start = true;
 
-    public EnemyController(GameObject obj) {
-        parent = obj;
+    public EnemyController(EntityScript ps) {
+        parentScript = ps;
+        parent = ps.gameObject;
+        parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
+        parentScript.stats.Add("health", new FloatStat("health", (float)health));
+        parentScript.stats.Add("armor", new FloatStat("armor", (float)armor));
+        parentScript.stats.Add("damage", new FloatStat("damage", (float)meleeDamage));
+
     }
     public void Start()
     {
@@ -37,10 +44,16 @@ public class EnemyController : EntityControllerInterface
     // Update is called once per frame
     public void Update()
     {
+        health = (int)parentScript.stats["health"].getCompoundValue();
+        armor = (int)parentScript.stats["armor"].getCompoundValue();
+        FloatStat MD = parentScript.stats["damage"];
+        MD.removeFactor("isDangerous");
+        meleeDamage = (int)MD.getCompoundValue();
+        myAi = parent.GetComponent<AiScriptBase>();
+        MD.setFactor("isDangerous", myAi.isDangerous() ? 1 : 0);
         if (start) Start();
         //parent.GetComponent<Rigidbody2D>().GetVector();
         direction = direction.normalized;
-
     }
     public Vector2 getMovement() {
         return parent.GetComponent<Rigidbody2D>().velocity;
@@ -56,11 +69,10 @@ public class EnemyController : EntityControllerInterface
             Debug.Log("Udario nesto:" + col.gameObject);
             var es = col.gameObject.GetComponent<EntityScript>();
             myAi.setDanger(false);
-            es.controller.damage(meleeDamage);
         }
     }
 
-    public void damage(int dmg) {
+    public void temp(int dmg) {
         dmg = Mathf.Max(dmg - armor, 1);
         dmg = Mathf.Abs(dmg);
         health -= dmg;

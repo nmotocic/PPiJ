@@ -7,15 +7,13 @@ public class PlayerController : EntityControllerInterface
     EntityScript parentScript;
     Vector2 direction;
     float speed = 2f;
-    float health = 3f;
+    public float health = 3f;
     // Start is called before the first frame update
     public PlayerController(EntityScript ps,float speed) {
         parentScript = ps;
         this.speed = speed;
-        FloatStat FS = new FloatStat("health", 100);
-        parentScript.stats.Add("health",FS);
-        FloatStat FS2 = new FloatStat("ranged", 20);
-        parentScript.stats.Add("ranged", FS2);
+        parentScript.stats.Add("health", new FloatStat("health", health));
+        parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
     }
     // Update is called once per frame
     public void Update()
@@ -37,7 +35,7 @@ public class PlayerController : EntityControllerInterface
 
     public void damage(int dmg)
     {
-        health -= Mathf.Abs(dmg);
+        health -= 0;
         Debug.Log("Hp:"+health);
         if (health==0) { death(); }
     }

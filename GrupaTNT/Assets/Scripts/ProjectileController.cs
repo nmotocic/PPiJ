@@ -48,7 +48,6 @@ public class ProjectileController : EntityControllerInterface
     public void OnTriggerEnter2D(Collider2D col)
     {
         var es = col.gameObject.GetComponent<EntityScript>();
-        es.controller.damage(contactDamage);
         //Do stuff
     }
     public void death() { }

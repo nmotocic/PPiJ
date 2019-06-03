@@ -47,6 +47,7 @@ public class FloatStat
     }
     public void removeFactor(string name)
     {
+        if (!factors.ContainsKey(name)) { return; }
         if (factors[name] == 0f)
         {
             nullifiers -= 1;

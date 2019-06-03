@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-public struct FSQI
+public class FSQI
 {
     public FloatStat stat;
     public string modifier;
@@ -11,8 +11,11 @@ public struct FSQI
     public FSQI(FloatStat stat, string modifier, float value=0.0f, float time=0.0f, int mode=0) {
         this.stat = stat;this.modifier = modifier;this.value = value;this.time = time;this.mode = mode;
     }
+    public void ApplyTo(EntityScript ES){
+        string name = stat.getName();
+        ES.applyPowerup(ES.stats[name],name,value,time);
+        }
 }
-
 
 public class EntityScript : MonoBehaviour
 {
@@ -23,7 +26,7 @@ public class EntityScript : MonoBehaviour
     public GameObject parent;
     public EntityControllerInterface controller;
     public Dictionary<string, FloatStat> stats = new Dictionary<string, FloatStat>();
-    public Dictionary<string, FloatStat> impactEffects = new Dictionary<string, FloatStat>();
+    public Dictionary<string, FSQI> impactEffects = new Dictionary<string, FSQI>();
     public Dictionary<int, List<FSQI>> queue = new Dictionary<int, List<FSQI>>();
     int currentTimePeriod = 0;
     public Dictionary<FSQI, FSQI> directAccess = new Dictionary<FSQI, FSQI>();
@@ -52,13 +55,13 @@ public class EntityScript : MonoBehaviour
             if (entityType.Equals("player")) { controller = new PlayerController(this, speed); }
             else if (entityType.Equals("projectile")) { controller = new ProjectileController(this, direction, speed); }
             else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
-            else if (entityType.Equals("enemy")) { controller = new EnemyController(gameObject); }
+            else if (entityType.Equals("enemy")) { controller = new EnemyController(this); }
         }
         else {
             if (gameObject.CompareTag(GameDefaults.Player())) { controller = new PlayerController(this, speed); }
             else if (gameObject.CompareTag(GameDefaults.Projectile())) { controller = new ProjectileController(this, direction, speed); }
             else if (gameObject.CompareTag(GameDefaults.Powerup())) { controller = new PowerupController(this); }
-            else if (gameObject.CompareTag(GameDefaults.Enemy())) { controller = new EnemyController(gameObject);}
+            else if (gameObject.CompareTag(GameDefaults.Enemy())) { controller = new EnemyController(this);}
         }
     }
 
@@ -88,42 +91,6 @@ public class EntityScript : MonoBehaviour
         rb2d.velocity = movement;
         if (stats.ContainsKey("health")&&stats["health"].getCompoundValue()<=0.0f) { controller.death(); }
     }
-    void OnCollisionEnter2D(Collision2D col)
-    {
-        GameObject other = col.collider.gameObject;
-        EntityScript otherES = other.GetComponent<EntityScript>();
-        //Debug.Log(gameObject);
-        if (otherES == null) //Unity ima ugrađene tagove i layere, zašto si stvarao svoje?
-        {
-            if (other.CompareTag(GameDefaults.Obstruction()) && gameObject.CompareTag(GameDefaults.Projectile()))
-            {
-                GameObject.Destroy(gameObject);
-            }
-        }
-        else if (entityType == "projectile" && parent != other && parent != null)
-        {
-            if (otherES.entityType == "player")
-            {
-                FloatStat health = otherES.stats["health"];
-                float x = health.getFactor("current", 1f);
-                x -= 0.02f;
-                Debug.Log(x);
-                health.setFactor("current", (x > 0) ? x : 0f);
-            }
-            GameObject.Destroy(gameObject);
-        }
-        if (entityType == "powerup" && otherES.entityType == "player")
-        {
-            FloatStat health = otherES.stats["health"];
-            float x = health.getFactor("current", 1f);
-            x += 0.02f;
-            Debug.Log(x);
-            health.setFactor("current", (x > 0) ? x : 0f);
-            Vector2 V2 = new Vector2(Random.Range(-5f, 5f), Random.Range(-2f, 2f));
-            this.DispenseObject(gameObject, V2, new Vector2(), 0f);//za demonstraciju
-            GameObject.Destroy(gameObject);
-        }
-    }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
@@ -136,35 +103,29 @@ public class EntityScript : MonoBehaviour
             //Projectile collisions
             if (gameObject.CompareTag(GameDefaults.Projectile())){
                 //Obstruction
-                foreach (string effect in stats.Keys) {
-                    if (effect.Equals("damage"))
+                foreach (string effect in impactEffects.Keys) {
+                    if (effect.Equals("damage") && otherES.stats.ContainsKey("health"))
                     {
+                        float x = impactEffects["damage"].value;
+                        if (otherES.stats.ContainsKey("armor"))
+                        {
+                            FloatStat FSA = otherES.stats["armor"];
+                            x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
+                        }
                         FloatStat FSH = otherES.stats["health"];
-                        FSH.ChangeWithFactor("baseValue", 0 - stats["damage"].getCompoundValue());
-                    }
-                }
-                //Enemy
-                if (other.CompareTag(GameDefaults.Enemy()))
-                {
-                    var es = other.gameObject.GetComponent<EntityScript>();
-                    if (!parent.CompareTag(other.gameObject.tag))
-                    {
-                        controller.OnTriggerEnter2D(collision);
-                    }
 
-                }
-                //Projectile
-                else if (other.CompareTag(GameDefaults.Enemy()))
-                {
-                    return;
-                }
-                else if (other.CompareTag(GameDefaults.Player())) {
-                    var es = other.gameObject.GetComponent<EntityScript>();
-                    if (!parent.CompareTag(other.gameObject.tag)) {
-                        controller.OnTriggerEnter2D(collision);
+                        FSH.ChangeWithFactor("baseValue", 0 - x);
+                    }
+                    else {
+                        FSQI effectData = impactEffects[effect];
+                        effectData.ApplyTo(otherES);
                     }
                 }
-                GameObject.Destroy(gameObject);
+                if (!parent.CompareTag(other.gameObject.tag))
+                {
+                    controller.OnTriggerEnter2D(collision);
+                    GameObject.Destroy(gameObject);
+                }
             }
             //Enemy coll
             else if (gameObject.CompareTag(GameDefaults.Enemy()))
@@ -194,12 +155,17 @@ public class EntityScript : MonoBehaviour
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
         y.Init("projectile",location,direction,speed,gameObject);
-        y.impactEffects.Add("damage",new FloatStat("damage",stats["ranged"].getCompoundValue()));
+        float dmg = stats["ranged"].getCompoundValue();
+        FloatStat FS = new FloatStat("damage", dmg);
+        y.impactEffects.Add("damage",new FSQI(FS,"irrelevant",dmg,0,1));
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;
     }
-    public void applyPowerup(FloatStat stat,string powName, float value=1.0f, float duration=-0.1f){
+    public void applyPowerup(FSQI fSQI) {
+        applyPowerup(fSQI.stat, fSQI.modifier, fSQI.value, fSQI.time, fSQI.mode);
+    }
+    public void applyPowerup(FloatStat stat,string powName, float value=1.0f, float duration=-0.1f, int mode=0){
         float time = Time.time + duration;
         int timePeriod = time_period(time);
         FSQI powerup, template, existing;
