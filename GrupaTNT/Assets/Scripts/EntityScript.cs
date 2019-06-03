@@ -15,12 +15,14 @@ public struct FSQI
 
 public class EntityScript : MonoBehaviour
 {
+    public List<string> input;
     public const float TIMEBASE = 60f;
     public int time_period(float t, float period = TIMEBASE) { return (int)(t / TIMEBASE); }
     FSQI XX = new FSQI(null, "wasd", 1.0f);
     public GameObject parent;
     public EntityControllerInterface controller;
     public Dictionary<string, FloatStat> stats = new Dictionary<string, FloatStat>();
+    public Dictionary<string, FloatStat> impactEffects = new Dictionary<string, FloatStat>();
     public Dictionary<int, List<FSQI>> queue = new Dictionary<int, List<FSQI>>();
     int currentTimePeriod = 0;
     public Dictionary<FSQI, FSQI> directAccess = new Dictionary<FSQI, FSQI>();
@@ -126,40 +128,42 @@ public class EntityScript : MonoBehaviour
     {
         GameObject other = collision.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
+        
         //Debug.Log(gameObject);
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
             if (gameObject.CompareTag(GameDefaults.Projectile())){
                 //Obstruction
-                if (other.CompareTag(GameDefaults.Obstruction()))
-                {
-                    GameObject.Destroy(gameObject);
+                foreach (string effect in stats.Keys) {
+                    if (effect.Equals("damage"))
+                    {
+                        FloatStat FSH = otherES.stats["health"];
+                        FSH.ChangeWithFactor("baseValue", 0 - stats["damage"].getCompoundValue());
+                    }
                 }
                 //Enemy
-                else if (other.CompareTag(GameDefaults.Enemy()))
+                if (other.CompareTag(GameDefaults.Enemy()))
                 {
                     var es = other.gameObject.GetComponent<EntityScript>();
                     if (!parent.CompareTag(other.gameObject.tag))
                     {
                         controller.OnTriggerEnter2D(collision);
-                        GameObject.Destroy(gameObject);
                     }
 
                 }
                 //Projectile
                 else if (other.CompareTag(GameDefaults.Enemy()))
                 {
-                    //Nista?
-
+                    return;
                 }
                 else if (other.CompareTag(GameDefaults.Player())) {
                     var es = other.gameObject.GetComponent<EntityScript>();
                     if (!parent.CompareTag(other.gameObject.tag)) {
                         controller.OnTriggerEnter2D(collision);
-                        GameObject.Destroy(gameObject);
                     }
                 }
+                GameObject.Destroy(gameObject);
             }
             //Enemy coll
             else if (gameObject.CompareTag(GameDefaults.Enemy()))
@@ -189,6 +193,7 @@ public class EntityScript : MonoBehaviour
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
         y.Init("projectile",location,direction,speed,gameObject);
+        y.stats.Add("damage",new FloatStat("damage",stats["ranged"].getCompoundValue()));
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;
