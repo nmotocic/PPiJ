@@ -7,8 +7,9 @@ public struct FSQI
     public string modifier;
     public float value;
     public float time;
-    public FSQI(FloatStat stat, string modifier, float value=0.0f, float time=0.0f) {
-        this.stat = stat;this.modifier = modifier;this.value = value;this.time = time;
+    public int mode;
+    public FSQI(FloatStat stat, string modifier, float value=0.0f, float time=0.0f, int mode=0) {
+        this.stat = stat;this.modifier = modifier;this.value = value;this.time = time;this.mode = mode;
     }
 }
 
@@ -193,7 +194,7 @@ public class EntityScript : MonoBehaviour
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
         y.Init("projectile",location,direction,speed,gameObject);
-        y.stats.Add("damage",new FloatStat("damage",stats["ranged"].getCompoundValue()));
+        y.impactEffects.Add("damage",new FloatStat("damage",stats["ranged"].getCompoundValue()));
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;
