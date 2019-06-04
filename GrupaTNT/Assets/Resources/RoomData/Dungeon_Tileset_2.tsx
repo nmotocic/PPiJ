@@ -392,23 +392,6 @@
    <object id="2" x="7" y="5" width="18.0625" height="4.99306"/>
   </objectgroup>
  </tile>
- <tile id="240">
-  <objectgroup draworder="index">
-   <object id="1" x="8.93333" y="10.9556" width="7.06667" height="6.06667"/>
-   <object id="2" x="16" y="17.9556" width="7.97778" height="3.02222"/>
-  </objectgroup>
- </tile>
- <tile id="241">
-  <objectgroup draworder="index">
-   <object id="1" x="8.97778" y="14.9556" width="5.04444" height="4.02222"/>
-   <object id="2" x="16.0222" y="10.9333" width="7.97778" height="6.06667"/>
-  </objectgroup>
- </tile>
- <tile id="242">
-  <objectgroup draworder="index">
-   <object id="1" x="7" y="10.9333" width="18.0333" height="9.13333"/>
-  </objectgroup>
- </tile>
  <tile id="256">
   <objectgroup draworder="index">
    <object id="1" x="4" y="25.9565" width="20.913" height="5.95652"/>
