@@ -69,6 +69,6 @@ public class FloatStat
         }
         if (nullifiers > 0) { return; }
         float otherCompoundValue = compoundValue / v;
-        setFactor(name, v-otherCompoundValue);
+        setFactor(name, v+compoundValueDiff/otherCompoundValue);
     }
 }

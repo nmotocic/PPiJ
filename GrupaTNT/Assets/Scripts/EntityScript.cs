@@ -20,7 +20,7 @@ public class FSQI
         }
         catch (System.Exception e)
         {
-            Debug.Log(ES.stats[name]+name);
+            Debug.Log("NOT FOUND:"+name);
             throw e;
         }
         finally { };
@@ -138,8 +138,10 @@ public class EntityScript : MonoBehaviour
         foreach (string effect in impactEffects.Keys)
         {
             //Debug.Log(gameObject.tag+other.tag);
-            if (effect.Equals("damage") && otherES.stats.ContainsKey("health"))
+            Debug.Log(effect);
+            if (effect.Equals("damage"))
             {
+                if (!otherES.stats.ContainsKey("health")) { continue; }
                 float x = impactEffects["damage"].value;
                 if (otherES.stats.ContainsKey("armor"))
                 {
@@ -147,14 +149,15 @@ public class EntityScript : MonoBehaviour
                     x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
                 }
                 FloatStat FSH = otherES.stats["health"];
-
+                
                 FSH.ChangeWithFactor("baseValue", 0 - x);
             }
-            else if (effect.Equals("health") && otherES.stats.ContainsKey("health"))
+            else if (effect.Equals("health"))
             {
+                if (!otherES.stats.ContainsKey("health")) { continue; }
                 float x = impactEffects["health"].value;
                 FloatStat FSH = otherES.stats["health"];
-
+                
                 FSH.ChangeWithFactor("baseValue", x);
             }
             else
@@ -163,7 +166,6 @@ public class EntityScript : MonoBehaviour
                 effectData.ApplyTo(otherES);
             }
         }
-        Debug.Log("HESSS");
         if (gameObject.CompareTag(GameDefaults.Powerup()))
         {
             Destroy(gameObject);

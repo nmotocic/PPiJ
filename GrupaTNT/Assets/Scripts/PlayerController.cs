@@ -9,12 +9,17 @@ public class PlayerController : EntityControllerInterface
     float speed = 2f;
     public float health = 100f;
     // Start is called before the first frame update
-    public PlayerController(EntityScript ps,float speed) {
+    public PlayerController(EntityScript ps,float speed=0f) {
         parentScript = ps;
-        this.speed = speed;
+        if (speed == 0f) { speed = this.speed; }
         parentScript.stats.Add("health", new FloatStat("health", health));
-        parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
+        parentScript.stats.Add("ranged", new FloatStat("ranged", 1));
         parentScript.stats.Add("damage", new FloatStat("ranged", 1));
+        parentScript.stats.Add("gold", new FloatStat("gold", 0));
+        parentScript.stats.Add("experience", new FloatStat("experience", 0));
+        parentScript.stats.Add("armor", new FloatStat("armor", 5));
+        parentScript.stats.Add("speed", new FloatStat("speed", speed));
+        Debug.Log(parentScript.stats["speed"].getCompoundValue());
     }
     // Update is called once per frame
     public void Update()
@@ -30,7 +35,7 @@ public class PlayerController : EntityControllerInterface
             parentScript.DispenseObject(parentScript.projectileOptions[0], position, (target-position).normalized,20f);
         }
     }
-    public Vector2 getMovement() { return direction*speed; }
+    public Vector2 getMovement() { return direction*parentScript.stats["speed"].getCompoundValue(); }
     public void OnCollisionEnter2D(Collision2D col) {
     }
 
