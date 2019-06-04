@@ -11,10 +11,20 @@ public class FSQI
     public FSQI(FloatStat stat, string modifier, float value=0.0f, float time=0.0f, int mode=0) {
         this.stat = stat;this.modifier = modifier;this.value = value;this.time = time;this.mode = mode;
     }
-    public void ApplyTo(EntityScript ES){
+    public void ApplyTo(EntityScript ES)
+    {
         string name = stat.getName();
-        ES.applyPowerup(ES.stats[name],name,value,time);
+        try
+        {
+            ES.applyPowerup(ES.stats[name], name, value, time);
         }
+        catch (System.Exception e)
+        {
+            Debug.Log(ES.stats[name]+name);
+            throw e;
+        }
+        finally { };
+    }
 }
 
 public class EntityScript : MonoBehaviour
@@ -44,7 +54,14 @@ public class EntityScript : MonoBehaviour
         this.entityType = entityType;
         getController(entityType,direction,speed);
     }
-
+    public void InitLite(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
+    {
+        this.parent = parent;
+        gameObject.transform.position = location;
+        gameObject.SetActive(true);
+        this.entityType = entityType;
+        getController(entityType, direction, speed);
+    }
     public void getController(string entityType, Vector2 direction, float speed = 0)
     {
         if (direction == null) direction = Vector2.zero;
@@ -67,8 +84,14 @@ public class EntityScript : MonoBehaviour
 
     public void Start()
     {
-
-        if (!entityType.Equals("player")) { return; }
+        if (entityType.Equals("powerup"))
+        {
+            Init(entityType, transform.position, new Vector2(), 0f, null);
+        }
+        if (!entityType.Equals("player"))
+        {
+            return;
+        }
         controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
@@ -100,7 +123,52 @@ public class EntityScript : MonoBehaviour
     {
         GameObject other = collision.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
-        //Debug.Log(gameObject);
+        //Debug.Log(gameObject + "-->" + other);
+        if (gameObject.CompareTag(GameDefaults.Projectile())&&(other.CompareTag(GameDefaults.Obstruction())))
+        {
+            Destroy(gameObject);
+            return;
+        }
+        if (other.CompareTag(GameDefaults.Obstruction()))
+        {
+            return;
+        }
+        
+        if (other.Equals(parent) || otherES.parent!=null&&otherES.parent.Equals(gameObject)) { return; }
+        foreach (string effect in impactEffects.Keys)
+        {
+            //Debug.Log(gameObject.tag+other.tag);
+            if (effect.Equals("damage") && otherES.stats.ContainsKey("health"))
+            {
+                float x = impactEffects["damage"].value;
+                if (otherES.stats.ContainsKey("armor"))
+                {
+                    FloatStat FSA = otherES.stats["armor"];
+                    x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
+                }
+                FloatStat FSH = otherES.stats["health"];
+
+                FSH.ChangeWithFactor("baseValue", 0 - x);
+            }
+            else if (effect.Equals("health") && otherES.stats.ContainsKey("health"))
+            {
+                float x = impactEffects["health"].value;
+                FloatStat FSH = otherES.stats["health"];
+
+                FSH.ChangeWithFactor("baseValue", x);
+            }
+            else
+            {
+                FSQI effectData = impactEffects[effect];
+                effectData.ApplyTo(otherES);
+            }
+        }
+        Debug.Log("HESSS");
+        if (gameObject.CompareTag(GameDefaults.Powerup()))
+        {
+            Destroy(gameObject);
+            return;
+        }
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
@@ -110,31 +178,6 @@ public class EntityScript : MonoBehaviour
                 {
                     Destroy(gameObject);
                     return;
-                }
-                foreach (string effect in impactEffects.Keys) {
-                    if (effect.Equals("damage") && otherES.stats.ContainsKey("health"))
-                    {
-                        float x = impactEffects["damage"].value;
-                        if (otherES.stats.ContainsKey("armor"))
-                        {
-                            FloatStat FSA = otherES.stats["armor"];
-                            x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
-                        }
-                        FloatStat FSH = otherES.stats["health"];
-
-                        FSH.ChangeWithFactor("baseValue", 0 - x);
-                    }
-                    else if (effect.Equals("health") && otherES.stats.ContainsKey("health"))
-                    {
-                        float x = impactEffects["health"].value;
-                        FloatStat FSH = otherES.stats["health"];
-
-                        FSH.ChangeWithFactor("baseValue", x);
-                    }
-                    else {
-                        FSQI effectData = impactEffects[effect];
-                        effectData.ApplyTo(otherES);
-                    }
                 }
                 if (!parent.CompareTag(other.gameObject.tag))
                 {
@@ -164,6 +207,9 @@ public class EntityScript : MonoBehaviour
             }
         }
     }
+    private void OnTriggerEnter2D(Collider2D collision) {
+        OnTriggerStay2D(collision);
+    }
 
     public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
     {
@@ -190,8 +236,9 @@ public class EntityScript : MonoBehaviour
             existing = directAccess[template];
             queue[time_period(existing.time)].Remove(existing);
             directAccess.Remove(template);
-        }
+        } else { queue[timePeriod] = new List<FSQI>(); }
         stat.setFactor(powName, value);
+
         if (duration > 0) {
             queue[timePeriod].Add(powerup);
             directAccess[template] = powerup;

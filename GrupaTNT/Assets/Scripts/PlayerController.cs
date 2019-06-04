@@ -14,6 +14,7 @@ public class PlayerController : EntityControllerInterface
         this.speed = speed;
         parentScript.stats.Add("health", new FloatStat("health", health));
         parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
+        parentScript.stats.Add("damage", new FloatStat("ranged", 1));
     }
     // Update is called once per frame
     public void Update()
