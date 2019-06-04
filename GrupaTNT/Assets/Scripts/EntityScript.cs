@@ -43,16 +43,17 @@ public class EntityScript : MonoBehaviour
     public List<GameObject> projectileOptions = new List<GameObject>();
     List<GameObject> firedProjectiles = new List<GameObject>();
     Rigidbody2D rb2d;
-    public float speed=5;
+    public float speed = 5;
     public string entityType;
+
     // Start is called before the first frame update
-    public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
+    public void Init(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {
         this.parent = parent;
         gameObject.transform.position = location;
         gameObject.SetActive(true);
         this.entityType = entityType;
-        getController(entityType,direction,speed);
+        getController(entityType, direction, speed);
     }
     public void InitLite(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {
@@ -74,7 +75,8 @@ public class EntityScript : MonoBehaviour
             else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
             else if (entityType.Equals("enemy")) { controller = new EnemyController(this); }
         }
-        else {
+        else
+        {
             if (gameObject.CompareTag(GameDefaults.Player())) { controller = new PlayerController(this, speed); }
             else if (gameObject.CompareTag(GameDefaults.Projectile())) { controller = new ProjectileController(this, direction, speed); }
             else if (gameObject.CompareTag(GameDefaults.Powerup())) { controller = new PowerupController(this); }
@@ -95,7 +97,7 @@ public class EntityScript : MonoBehaviour
         controller = this.gameObject.GetComponent<EntityControllerInterface>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
-        controller = new PlayerController(this,speed);
+        controller = new PlayerController(this, speed);
     }
 
     // Update is called once per frame
@@ -174,7 +176,8 @@ public class EntityScript : MonoBehaviour
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
-            if (gameObject.CompareTag(GameDefaults.Projectile())){
+            if (gameObject.CompareTag(GameDefaults.Projectile()))
+            {
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
@@ -190,7 +193,7 @@ public class EntityScript : MonoBehaviour
             //Enemy coll
             else if (gameObject.CompareTag(GameDefaults.Enemy()))
             {
-                
+
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
@@ -213,7 +216,7 @@ public class EntityScript : MonoBehaviour
         OnTriggerStay2D(collision);
     }
 
-    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
+    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed = 0.2f)
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
@@ -222,7 +225,8 @@ public class EntityScript : MonoBehaviour
         FloatStat FS = new FloatStat("damage", dmg);
         y.impactEffects.Add("damage",new FSQI(FS,"irrelevant",dmg,0,1));
     }
-    Vector2 GetLocation() {
+    Vector2 GetLocation()
+    {
         return gameObject.transform.position;
     }
     public void applyPowerup(FSQI fSQI) {
