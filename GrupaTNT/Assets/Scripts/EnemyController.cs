@@ -12,7 +12,7 @@ public class EnemyController : EntityControllerInterface
     GameObject parent;
     private AiScriptBase myAi;
     //Enemy stats
-    private int health;
+    private int health=20;
     public int armor;
     public int poiseMax;
     public int meleeDamage;

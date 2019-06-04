@@ -7,7 +7,7 @@ public class PlayerController : EntityControllerInterface
     EntityScript parentScript;
     Vector2 direction;
     float speed = 2f;
-    public float health = 3f;
+    public float health = 100f;
     // Start is called before the first frame update
     public PlayerController(EntityScript ps,float speed) {
         parentScript = ps;

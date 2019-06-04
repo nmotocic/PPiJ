@@ -87,6 +87,10 @@ public class EntityScript : MonoBehaviour
         }*/
         controller.Update();
         //DEBUG REMOVE AFTER TESTIIIING
+        if (stats.ContainsKey("health")&&CompareTag(GameDefaults.Player()))
+        {
+            Debug.Log("Hp:" + stats["health"].getCompoundValue());
+        }
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
         if (stats.ContainsKey("health")&&stats["health"].getCompoundValue()<=0.0f) { controller.death(); }
@@ -96,13 +100,17 @@ public class EntityScript : MonoBehaviour
     {
         GameObject other = collision.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
-        
         //Debug.Log(gameObject);
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
             if (gameObject.CompareTag(GameDefaults.Projectile())){
                 //Obstruction
+                if (other.CompareTag(GameDefaults.Obstruction()))
+                {
+                    Destroy(gameObject);
+                    return;
+                }
                 foreach (string effect in impactEffects.Keys) {
                     if (effect.Equals("damage") && otherES.stats.ContainsKey("health"))
                     {
@@ -115,6 +123,13 @@ public class EntityScript : MonoBehaviour
                         FloatStat FSH = otherES.stats["health"];
 
                         FSH.ChangeWithFactor("baseValue", 0 - x);
+                    }
+                    else if (effect.Equals("health") && otherES.stats.ContainsKey("health"))
+                    {
+                        float x = impactEffects["health"].value;
+                        FloatStat FSH = otherES.stats["health"];
+
+                        FSH.ChangeWithFactor("baseValue", x);
                     }
                     else {
                         FSQI effectData = impactEffects[effect];
