@@ -21,6 +21,7 @@ public class PlayerController : EntityControllerInterface
         parentScript.stats.Add("speed", new FloatStat("speed", speed));
         Debug.Log(parentScript.stats["speed"].getCompoundValue());
     }
+    
     // Update is called once per frame
     public void Update()
     {
@@ -49,6 +50,11 @@ public class PlayerController : EntityControllerInterface
     public void OnTriggerEnter2D(Collider2D col)
     {
         Debug.Log(col.gameObject);
+        if (col.gameObject.tag.Equals("LevelExit"))
+        {
+            LevelManager.Instance.GoToNextLevel();
+        }
+
         //Do stuff
     }
     public void death() {

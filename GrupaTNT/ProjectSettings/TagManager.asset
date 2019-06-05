@@ -10,6 +10,8 @@ TagManager:
   - Projectile
   - Enemy
   - Powerup
+  - LevelExit
+  - Manager
   layers:
   - Default
   - TransparentFX

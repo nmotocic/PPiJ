@@ -10,13 +10,17 @@ public class LevelManager : Singleton<LevelManager>
 {
     private const int MainSceneIndex = 0;
     private int level = 1;
+    public bool levelProcessing = false;
 
     public void GoToNextLevel()
     {
-        var playerGameObject = GameObject.Find("Player");
-        DontDestroyOnLoad(playerGameObject);
-        SceneManager.LoadSceneAsync(MainSceneIndex);
-        level++;
+        if (levelProcessing == false)
+        {
+            var playerGameObject = GameObject.FindWithTag("Player");
+            DontDestroyOnLoad(playerGameObject);
+            SceneManager.LoadScene(MainSceneIndex);
+            level++;
+            levelProcessing = true;
+        }
     }
-    
 }
