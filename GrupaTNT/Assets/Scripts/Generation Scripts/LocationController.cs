@@ -9,15 +9,17 @@ public class LocationController : MonoBehaviour
     private LevelGenerator.Room[,] roomGrid;
     private Dictionary<LevelGenerator.Room, Bounds> boundsDict;
 
-    [SerializeField] public GameObject playerObject;
+    private GameObject playerObject;
 
     private string lastDirectionName;
     private bool isInitalized = false;
 
-    public void Initialize(Vector2Int locationOnRoomGrid, LevelGenerator.Room[,] roomGrid)
+    public void Initialize(Vector2Int locationOnRoomGrid, LevelGenerator.Room[,] roomGrid, GameObject player)
     {
         this.locationOnRoomGrid = locationOnRoomGrid;
         this.roomGrid = roomGrid;
+
+        playerObject = player;
         
         boundsDict = new Dictionary<LevelGenerator.Room, Bounds>();
         foreach (var room in roomGrid)

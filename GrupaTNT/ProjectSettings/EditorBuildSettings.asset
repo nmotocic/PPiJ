@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/TiledTest.unity
+    guid: 8b79881bb2d4d31d88721243b5f8d610
   m_configObjects: {}

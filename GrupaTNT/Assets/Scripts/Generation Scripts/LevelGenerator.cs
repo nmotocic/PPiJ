@@ -37,10 +37,16 @@ public class LevelGenerator : MonoBehaviour
     private Sprite[] directionsDelta;
 
     private bool madeBossRoom = false;
-    
+
+    private FlagController _controller;
+    private SpawnController _spawnController;
+
     // Start is called before the first frame update
     void Start()
     {
+        _controller = GetComponent<FlagController>();
+        _spawnController = GetComponent<SpawnController>();
+        
         //Grid init
         RoomGrid = new Room[gridWidthHeight, gridWidthHeight];
         
@@ -49,11 +55,22 @@ public class LevelGenerator : MonoBehaviour
         startingGridPostion = new Vector2Int(gridWidthHeight / 2, gridWidthHeight / 2);
         Debug.Log("Starting grid location " + startingGridPostion.ToString());
         
-        deltaVectors = FlagController.Instance.deltaVectors;
-        directionsDelta = FlagController.Instance.directionsDelta;
+        deltaVectors = _controller.deltaVectors;
+        directionsDelta = _controller.directionsDelta;
         
         //Create main room on grid
         var homeRoom = SetupMainRoom();
+        
+        var playerGameObject = GameObject.FindWithTag("Player");
+
+        if (playerGameObject == null)
+        {
+            playerGameObject = _spawnController.SpawnPlayerInRoomCenter(homeRoom);
+        }
+        else
+        {
+            SpawnController.MoveObjectToRoomCenter(playerGameObject, homeRoom);   
+        }
 
         //We get the modifier that we have to multiply delta movement by because of how Tiler scales things
         modifier = _gridGameObject.GetComponent<Grid>().cellSize;
@@ -118,7 +135,7 @@ public class LevelGenerator : MonoBehaviour
         this.gameObject.GetComponent<SpawnController>().Initialize();
         this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
 
-        this.gameObject.GetComponent<LocationController>().Initialize(startingGridPostion, RoomGrid);
+        this.gameObject.GetComponent<LocationController>().Initialize(startingGridPostion, RoomGrid, playerGameObject);
 
         RemoveFlagRendering();
 
@@ -193,7 +210,7 @@ public class LevelGenerator : MonoBehaviour
 
                 foreach (var direction in directionsDelta)
                 {
-                    var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+                    var deltaVector = _controller.DirectionToDeltaGridVector(direction.name);
                     positionDict[direction.name] = new Vector2Int(i + deltaVector.x, j + deltaVector.y);
                 }
 
@@ -216,7 +233,7 @@ public class LevelGenerator : MonoBehaviour
                     
                     connectRoom = RoomGrid[connectedRoomLocation.y, connectedRoomLocation.x];
                     oldConnectionDoor = FindConnectionDoor(connectRoom.Doors, 
-                        FlagController.Instance.GetOppositeDirection(unconnectedNeighbors[0]));
+                        _controller.GetOppositeDirection(unconnectedNeighbors[0]));
 
                 }
                 catch (Exception e)
@@ -231,12 +248,12 @@ public class LevelGenerator : MonoBehaviour
                 clonedRoom.transform.Translate(ReverseRoomMove);
 
                 var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
-                var oppositeSprite = FlagController.Instance.FindSpriteWithString(unconnectedNeighbors[0]);
+                var oppositeSprite = _controller.FindSpriteWithString(unconnectedNeighbors[0]);
                 
                 Door newConnectionDoor = null;
                 try
                 {
-                    newConnectionDoor = FindConnectionDoor(newDoors, FlagController.Instance.FindSpriteWithString(unconnectedNeighbors[0]));
+                    newConnectionDoor = FindConnectionDoor(newDoors, _controller.FindSpriteWithString(unconnectedNeighbors[0]));
                 }
                 catch
                 {
@@ -260,9 +277,13 @@ public class LevelGenerator : MonoBehaviour
                 bool bossRoom = false;
                 if (madeBossRoom == false)
                 {
-                    bossRoom = true;
-                    Debug.Log("Made boss room");
-                    madeBossRoom = true;
+                    //Is it a hallway?
+                    if (!pickedRoom.name.EndsWith("_2"))
+                    {
+                        bossRoom = true;
+                        Debug.Log("Made boss room");
+                        madeBossRoom = true;
+                    }
                 }
                 
                 var newRoom = new Room(newDoors, clonedRoom, new Vector2Int(i, j), bossRoom);
@@ -305,7 +326,7 @@ public class LevelGenerator : MonoBehaviour
 
         foreach (var direction in directionsDelta)
         {
-            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            var deltaVector = _controller.DirectionToDeltaGridVector(direction.name);
             positionDict[direction.name] = new Vector2Int(selfPosition.x + deltaVector.x, selfPosition.y + deltaVector.y);
         }
 
@@ -535,7 +556,7 @@ public class LevelGenerator : MonoBehaviour
             clonedRoom.transform.Translate(ReverseRoomMove);
 
             var newDoors = DoorSearch(clonedRoom.transform.Find("Flags").GetComponent<Tilemap>());
-            var oppositeSprite = FlagController.Instance.GetOppositeDirection(direction.name);
+            var oppositeSprite = _controller.GetOppositeDirection(direction.name);
             
             Door newConnectionDoor;
             try
@@ -564,11 +585,15 @@ public class LevelGenerator : MonoBehaviour
                 modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
 
             bool makeBossRoom = false;
-            if ((roomsToGen == 1 || n == 1) && (madeBossRoom == false))
+            if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
             {
-                makeBossRoom = true;
-                Debug.Log("MADE BOSS");
-                madeBossRoom = true;
+                //Is it a hallway?
+                if (!pickedRoom.name.EndsWith("_2"))
+                {
+                    makeBossRoom = true;
+                    Debug.Log("MADE BOSS");
+                    madeBossRoom = true;
+                }
             }
             
             //Connect new room with old room 
@@ -591,23 +616,23 @@ public class LevelGenerator : MonoBehaviour
         {
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorRight.name]) 
-                    GenerateRoomsNew(gridX + 1, gridY, FlagController.Instance.DoorRight, newRoom,n - 1);
+                if(newRoom.HasDoor[_controller.DoorRight.name]) 
+                    GenerateRoomsNew(gridX + 1, gridY, _controller.DoorRight, newRoom,n - 1);
             }),
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorLeft.name])
-                    GenerateRoomsNew(gridX - 1, gridY, FlagController.Instance.DoorLeft, newRoom, n - 1);
+                if(newRoom.HasDoor[_controller.DoorLeft.name])
+                    GenerateRoomsNew(gridX - 1, gridY, _controller.DoorLeft, newRoom, n - 1);
             }),
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorUp.name])
-                    GenerateRoomsNew(gridX, gridY - 1, FlagController.Instance.DoorUp, newRoom, n - 1);
+                if(newRoom.HasDoor[_controller.DoorUp.name])
+                    GenerateRoomsNew(gridX, gridY - 1, _controller.DoorUp, newRoom, n - 1);
             }),
             new Action( () =>
             {
-                if(newRoom.HasDoor[FlagController.Instance.DoorDown.name])
-                    GenerateRoomsNew(gridX, gridY + 1, FlagController.Instance.DoorDown, newRoom, n - 1);
+                if(newRoom.HasDoor[_controller.DoorDown.name])
+                    GenerateRoomsNew(gridX, gridY + 1, _controller.DoorDown, newRoom, n - 1);
             })
         }.ToList();
 
@@ -617,6 +642,8 @@ public class LevelGenerator : MonoBehaviour
             var action = actionList[i];
                 action();
         }
+
+        LevelManager.Instance.levelProcessing = false;
     }
 
     private int FindRequiredExits(Vector2Int gridPosition)
@@ -625,7 +652,7 @@ public class LevelGenerator : MonoBehaviour
 
         foreach (var direction in directionsDelta)
         {
-            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            var deltaVector = _controller.DirectionToDeltaGridVector(direction.name);
             positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, gridPosition.y + deltaVector.y);
         }
 
@@ -664,7 +691,7 @@ public class LevelGenerator : MonoBehaviour
         foreach (var direction in directionsDelta)
         {
             
-            var deltaVector = FlagController.Instance.DirectionToDeltaGridVector(direction.name);
+            var deltaVector = _controller.DirectionToDeltaGridVector(direction.name);
             positionDict[direction.name] = new Vector2Int(gridPosition.x + deltaVector.x, 
                 gridPosition.y + deltaVector.y);
         }
@@ -726,7 +753,7 @@ public class LevelGenerator : MonoBehaviour
 
     bool RoomHasOppositeDirection(string original, GameObject roomCompare)
     {
-        var oppositeSprite = FlagController.Instance.GetOppositeDirection(original);
+        var oppositeSprite = _controller.GetOppositeDirection(original);
         return RoomHasDirection(roomCompare, oppositeSprite.name);
     }
 
@@ -790,6 +817,7 @@ public class LevelGenerator : MonoBehaviour
         public GameObject roomGameObject { get; set; }
         private Dictionary<string, Room> ConnectedRoomDictionary;
         public bool bossRoom = false;
+        private FlagController _controller;
         
         public Room(List<Door> doors, GameObject container, Vector2Int gridPosition, bool bossRoom)
         {
@@ -799,16 +827,17 @@ public class LevelGenerator : MonoBehaviour
             roomGameObject = container;
             ConnectedRoomDictionary = new Dictionary<string, Room>(4);
             HasDoor = new Dictionary<string, bool>(4);
+            _controller = GameObject.FindWithTag("Manager").GetComponent<FlagController>();
 
             //Ugly manual setting for each type of entrance
-            ConnectedRoomDictionary[FlagController.Instance.DoorUp.name] = null;
-            HasDoor[FlagController.Instance.DoorUp.name] = false;
-            ConnectedRoomDictionary[FlagController.Instance.DoorDown.name] = null;
-            HasDoor[FlagController.Instance.DoorDown.name] = false;
-            ConnectedRoomDictionary[FlagController.Instance.DoorLeft.name] = null;
-            HasDoor[FlagController.Instance.DoorLeft.name] = false;
-            ConnectedRoomDictionary[FlagController.Instance.DoorRight.name] = null;
-            HasDoor[FlagController.Instance.DoorRight.name] = false;
+            ConnectedRoomDictionary[_controller.DoorUp.name] = null;
+            HasDoor[_controller.DoorUp.name] = false;
+            ConnectedRoomDictionary[_controller.DoorDown.name] = null;
+            HasDoor[_controller.DoorDown.name] = false;
+            ConnectedRoomDictionary[_controller.DoorLeft.name] = null;
+            HasDoor[_controller.DoorLeft.name] = false;
+            ConnectedRoomDictionary[_controller.DoorRight.name] = null;
+            HasDoor[_controller.DoorRight.name] = false;
             
             foreach (var door in doors)
             {
@@ -869,7 +898,7 @@ public class LevelGenerator : MonoBehaviour
             var sprite = tilemap.GetSprite(tilePosition);
 
             // Check if the sprite is actually a door.
-            if (!FlagController.Instance.directionsDelta.Contains(sprite))
+            if (!_controller.directionsDelta.Contains(sprite))
                 continue;
 
             var spriteName = sprite.name;
@@ -890,7 +919,7 @@ public class LevelGenerator : MonoBehaviour
 
         foreach (var door in doors)
         {
-            Door DoorHolder = new Door(door.Value, FlagController.Instance.FindSpriteWithString(door.Key));
+            Door DoorHolder = new Door(door.Value, _controller.FindSpriteWithString(door.Key));
             doorList.Add(DoorHolder);
         }
 

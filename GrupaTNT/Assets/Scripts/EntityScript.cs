@@ -46,6 +46,20 @@ public class EntityScript : MonoBehaviour
     Rigidbody2D rb2d;
     public float speed = 20f;
     public string entityType = null;
+
+    public void Awake()
+    {
+        if (entityType=="player")
+        {
+            DontDestroyOnLoad(this);
+
+            if (FindObjectsOfType(GetType()).Length > 1)
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+
     // Start is called before the first frame update
     public void Init(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {
@@ -141,40 +155,57 @@ public class EntityScript : MonoBehaviour
         {
             return;
         }
-        
-        if (other.Equals(parent) || otherES.parent!=null&&otherES.parent.Equals(gameObject)) { return; }
-        foreach (string effect in impactEffects.Keys)
-        {
-            //Debug.Log(gameObject.tag+other.tag);
-            Debug.Log(effect);
-            if (effect.Equals("damage"))
-            {
-                if (!otherES.stats.ContainsKey("health")) { continue; }
-                float x = impactEffects["damage"].value;
-                if (otherES.stats.ContainsKey("armor"))
-                {
-                    FloatStat FSA = otherES.stats["armor"];
-                    x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
-                }
-                FloatStat FSH = otherES.stats["health"];
-                otherES.controller.damage((int)x);
-                FSH.ChangeWithFactor("baseValue", 0 - x);
-            }
-            else if (effect.Equals("health"))
-            {
-                if (!otherES.stats.ContainsKey("health")) { continue; }
-                float x = impactEffects["health"].value;
-                FloatStat FSH = otherES.stats["health"];
-                
-                FSH.ChangeWithFactor("baseValue", x);
-            }
-            else
-            {
-                FSQI effectData = impactEffects[effect];
 
-                effectData.ApplyTo(otherES);
+        if (otherES != null)
+        {
+            if (other.Equals(parent) || otherES.parent != null && otherES.parent.Equals(gameObject))
+            {
+                return;
+            }
+
+            foreach (string effect in impactEffects.Keys)
+            {
+                //Debug.Log(gameObject.tag+other.tag);
+                Debug.Log(effect);
+                if (effect.Equals("damage"))
+                {
+                    if (!otherES.stats.ContainsKey("health"))
+                    {
+                        continue;
+                    }
+
+                    float x = impactEffects["damage"].value;
+                    if (otherES.stats.ContainsKey("armor"))
+                    {
+                        FloatStat FSA = otherES.stats["armor"];
+                        x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
+                    }
+
+                    FloatStat FSH = otherES.stats["health"];
+                    otherES.controller.damage((int) x);
+                    FSH.ChangeWithFactor("baseValue", 0 - x);
+                }
+                else if (effect.Equals("health"))
+                {
+                    if (!otherES.stats.ContainsKey("health"))
+                    {
+                        continue;
+                    }
+
+                    float x = impactEffects["health"].value;
+                    FloatStat FSH = otherES.stats["health"];
+
+                    FSH.ChangeWithFactor("baseValue", x);
+                }
+                else
+                {
+                    FSQI effectData = impactEffects[effect];
+
+                    effectData.ApplyTo(otherES);
+                }
             }
         }
+
         if (gameObject.CompareTag(GameDefaults.Powerup()))
         {
             Destroy(gameObject);
@@ -213,6 +244,13 @@ public class EntityScript : MonoBehaviour
                 }
                 //Player
                 else if (other.gameObject.CompareTag(GameDefaults.Player()))
+                {
+                    controller.OnTriggerEnter2D(collision);
+                }
+            }
+            else if (gameObject.CompareTag(GameDefaults.Player()))
+            {
+                if (other.gameObject.CompareTag(GameDefaults.LevelExit()))
                 {
                     controller.OnTriggerEnter2D(collision);
                 }

@@ -91,6 +91,6 @@ public class EnemyController : EntityControllerInterface
         Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 position = parentScript.gameObject.transform.position;
         string[] rawInput = { "EFFECT damage boop 1 -1 1" };
-        //parentScript.DispenseObject(parentScript., position, (target - position).normalized, 20f, rawInput);
+        //parentScript.DispenseObject(parentScript.drop, position, (target - position).normalized, 20f, rawInput);
     }
 }

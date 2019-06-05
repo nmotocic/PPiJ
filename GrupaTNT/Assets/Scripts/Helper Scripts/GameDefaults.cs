@@ -24,6 +24,10 @@ public abstract class GameDefaults
     {
         return "Powerup";
     }
+    public static string LevelExit()
+    {
+        return "LevelExit";
+    }
     //Layers
     public static int layerWall()
     {
