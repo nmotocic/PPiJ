@@ -123,7 +123,10 @@ public class EntityScript : MonoBehaviour
             GameObject.Destroy(gameObject);
         }
     }
-
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        OnTriggerStay2D(collision);
+    }
     private void OnTriggerStay2D(Collider2D collision)
     {
         GameObject other = collision.gameObject;
@@ -134,6 +137,7 @@ public class EntityScript : MonoBehaviour
             //Projectile collisions
             if (gameObject.CompareTag(GameDefaults.Projectile()))
             {
+                Debug.Log("Projektil collision sa:" + other.tag);
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
