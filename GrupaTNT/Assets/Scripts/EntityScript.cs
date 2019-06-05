@@ -163,6 +163,7 @@ public class EntityScript : MonoBehaviour
             else
             {
                 FSQI effectData = impactEffects[effect];
+
                 effectData.ApplyTo(otherES);
             }
         }
@@ -239,9 +240,16 @@ public class EntityScript : MonoBehaviour
             queue[time_period(existing.time)].Remove(existing);
             directAccess.Remove(template);
         } else { queue[timePeriod] = new List<FSQI>(); }
-        stat.setFactor(powName, value);
+        if (mode == 0)
+        {
+            stat.setFactor(powName, value);
+        }
+        else
+        {
+            stat.ChangeWithFactor(powName, value);
+        }
 
-        if (duration > 0) {
+        if (duration > 0 && mode==0) {
             queue[timePeriod].Add(powerup);
             directAccess[template] = powerup;
         }
