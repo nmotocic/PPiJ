@@ -109,12 +109,14 @@ public class SpawnController : Singleton<SpawnController>
 
     private void SpawnRoomEnemies(Vector2Int position)
     {
-        var enemyWorldPositions = FindRoomEnemies(position);
-
-        if (enemyWorldPositions == null) return;
-
+        if (roomGrid[position.y, position.x] == null) return;
+        
         if (!roomGrid[position.y, position.x].bossRoom)
         {
+
+            var enemyWorldPositions = FindRoomEnemies(position);
+
+            if (enemyWorldPositions == null) return;
 
             List<GameObject> enemies = new List<GameObject>();
 
