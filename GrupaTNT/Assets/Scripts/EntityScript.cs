@@ -47,14 +47,14 @@ public class EntityScript : MonoBehaviour
     public float speed = 20f;
     public string entityType = null;
     // Start is called before the first frame update
-    public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
+    public void Init(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {
         if (this.parent != null && parent == null) { return; }
         this.parent = parent;
         gameObject.transform.position = location;
         gameObject.SetActive(true);
         this.entityType = entityType;
-        getController(entityType,direction,speed);
+        getController(entityType, direction, speed);
     }
     public void Input() {
         foreach (string line in rawInput) {
@@ -89,7 +89,8 @@ public class EntityScript : MonoBehaviour
             else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
             else if (entityType.Equals("enemy")) { controller = new EnemyController(this); }
         }
-        else {
+        else
+        {
             if (gameObject.CompareTag(GameDefaults.Player())) { controller = new PlayerController(this, speed); }
             else if (gameObject.CompareTag(GameDefaults.Projectile())) { controller = new ProjectileController(this, direction, speed); }
             else if (gameObject.CompareTag(GameDefaults.Powerup())) { controller = new PowerupController(this); }
@@ -182,7 +183,8 @@ public class EntityScript : MonoBehaviour
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
-            if (gameObject.CompareTag(GameDefaults.Projectile())){
+            if (gameObject.CompareTag(GameDefaults.Projectile()))
+            {
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
@@ -198,7 +200,7 @@ public class EntityScript : MonoBehaviour
             //Enemy coll
             else if (gameObject.CompareTag(GameDefaults.Enemy()))
             {
-                
+
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
@@ -232,7 +234,8 @@ public class EntityScript : MonoBehaviour
         y.Init("projectile",location,direction,speed,gameObject);
         return;
     }
-    Vector2 GetLocation() {
+    Vector2 GetLocation()
+    {
         return gameObject.transform.position;
     }
     public void applyPowerup(FSQI fSQI) {
