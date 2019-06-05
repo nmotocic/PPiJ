@@ -44,12 +44,11 @@ public class EntityScript : MonoBehaviour
     public List<GameObject> projectileOptions = new List<GameObject>();
     List<GameObject> firedProjectiles = new List<GameObject>();
     Rigidbody2D rb2d;
-    public float speed = 0f;
+    public float speed = 20f;
     public string entityType = null;
     // Start is called before the first frame update
     public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
     {
-        Debug.Log(Time.time);
         if (this.parent != null && parent == null) { return; }
         this.parent = parent;
         gameObject.transform.position = location;
@@ -67,12 +66,12 @@ public class EntityScript : MonoBehaviour
             }
             else if (split[0].Equals("EFFECT")) {
                 FloatStat dfl = new FloatStat(split[1]);
-                impactEffects.Add(split[1],new FSQI(dfl,
+                impactEffects[split[1]]=new FSQI(dfl,
                     split[2],
                     float.Parse(split[3]),
                     float.Parse(split[4]),
                     int.Parse(split[5])
-                    ));
+                    );
             }
         }
     }
@@ -82,6 +81,7 @@ public class EntityScript : MonoBehaviour
         if (direction == null) direction = Vector2.zero;
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
+        Debug.Log(entityType+"<----------------------------------------------------");
         if (entityType != null)
         {
             if (entityType.Equals("player")) { controller = new PlayerController(this, speed); }
@@ -99,20 +99,14 @@ public class EntityScript : MonoBehaviour
 
     public void Start()
     {
-        if (entityType == null) { return; }
-        Debug.Log(entityType);
-        Init(entityType, transform.position, new Vector2(), 0f, null);
+        if (Time.time>0) { return; }
+        Init(entityType, transform.position, new Vector2(0.0f,0.0f), 0f, null);
     }
 
     // Update is called once per frame
     public void Update()
     {
         if (controller == null) { return; }
-        /*if (Input.GetMouseButtonDown(0) && gameObject.CompareTag(GameDefaults.Enemy()))
-        {
-            controller.damage(2);
-            Debug.LogWarning("Napravio 2 dmga objektu:" + parent.GetInstanceID().ToString());
-        }*/
         controller.Update();
         //DEBUG REMOVE AFTER TESTIIIING
         if (stats.ContainsKey("health"))
@@ -234,6 +228,7 @@ public class EntityScript : MonoBehaviour
         }
         y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
         y.Input();
+        Debug.Log(speed);
         y.Init("projectile",location,direction,speed,gameObject);
         return;
     }

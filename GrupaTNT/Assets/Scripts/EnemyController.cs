@@ -25,10 +25,10 @@ public class EnemyController : EntityControllerInterface
         parent = ps.gameObject;
         myAi = parent.GetComponent<AiScriptBase>();
         myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage);
-        parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
-        parentScript.stats.Add("health", new FloatStat("health", (float)health));
-        parentScript.stats.Add("armor", new FloatStat("armor", (float)armor));
-        parentScript.stats.Add("damage", new FloatStat("damage", (float)meleeDamage));
+        parentScript.stats["ranged"] = new FloatStat("ranged", (float) health);
+        parentScript.stats["health"] = new FloatStat("health", (float)health);
+        parentScript.stats["armor"] = new FloatStat("armor", (float)armor);
+        parentScript.stats["damage"] = new FloatStat("damage", (float)meleeDamage);
 
     }
     public void Start()
@@ -88,5 +88,9 @@ public class EnemyController : EntityControllerInterface
         myAi.setState(-2);
         parent.GetComponent<Collider2D>().enabled = false;
         myAi.setDanger(false);
+        Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 position = parentScript.gameObject.transform.position;
+        string[] rawInput = { "EFFECT damage boop 1 -1 1" };
+        parentScript.DispenseObject(parentScript.drop, position, (target - position).normalized, 20f, rawInput);
     }
 }
