@@ -55,6 +55,9 @@ public class LevelGenerator : MonoBehaviour
         //Create main room on grid
         var homeRoom = SetupMainRoom();
 
+        var playerGameObject = GameObject.Find("Player");
+        SpawnController.MoveObjectToRoomCenter(playerGameObject, homeRoom);
+
         //We get the modifier that we have to multiply delta movement by because of how Tiler scales things
         modifier = _gridGameObject.GetComponent<Grid>().cellSize;
 

@@ -67,6 +67,11 @@ public class SpawnController : Singleton<SpawnController>
         roomGrid = LevelGenerator.RoomGrid;
         gridHeightWidth = gameObject.GetComponent<LevelGenerator>().gridWidthHeight;
     }
+
+    public static void MoveObjectToRoomCenter(GameObject player, LevelGenerator.Room room)
+    {
+        player.transform.position = room.roomGameObject.GetComponent<Tilemap>().localBounds.center;
+    }
     
     public void SpawnForAllRooms()
     {
