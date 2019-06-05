@@ -142,8 +142,8 @@ public class SpawnController : Singleton<SpawnController>
         
         if (roomGrid[position.y, position.x].bossRoom)
         {
-
-            var enemyWorldPositions = roomGrid[position.y, position.x].roomGameObject.transform.Find("Floor")
+            var RoomGameObject = roomGrid[position.y, position.x].roomGameObject;
+            var enemyWorldPositions = RoomGameObject.transform.Find("Floor")
                 .GetComponent<Tilemap>().localBounds.center;
 
             GameObject boss;

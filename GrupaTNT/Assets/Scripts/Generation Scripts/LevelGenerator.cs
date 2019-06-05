@@ -260,9 +260,13 @@ public class LevelGenerator : MonoBehaviour
                 bool bossRoom = false;
                 if (madeBossRoom == false)
                 {
-                    bossRoom = true;
-                    Debug.Log("Made boss room");
-                    madeBossRoom = true;
+                    //Is it a hallway?
+                    if (!pickedRoom.name.EndsWith("_2"))
+                    {
+                        bossRoom = true;
+                        Debug.Log("Made boss room");
+                        madeBossRoom = true;
+                    }
                 }
                 
                 var newRoom = new Room(newDoors, clonedRoom, new Vector2Int(i, j), bossRoom);
@@ -564,11 +568,15 @@ public class LevelGenerator : MonoBehaviour
                 modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
 
             bool makeBossRoom = false;
-            if ((roomsToGen == 1 || n == 1) && (madeBossRoom == false))
+            if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
             {
-                makeBossRoom = true;
-                Debug.Log("MADE BOSS");
-                madeBossRoom = true;
+                //Is it a hallway?
+                if (!pickedRoom.name.EndsWith("_2"))
+                {
+                    makeBossRoom = true;
+                    Debug.Log("MADE BOSS");
+                    madeBossRoom = true;
+                }
             }
             
             //Connect new room with old room 
