@@ -5,6 +5,7 @@ using UnityEngine;
 public class PowerupController : EntityControllerInterface
 {
     EntityScript parentScript;
+    public void damage(int dmg) {; }
     public PowerupController(EntityScript ps)
     {
         this.parentScript = ps;

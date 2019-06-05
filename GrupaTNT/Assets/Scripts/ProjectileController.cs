@@ -8,6 +8,7 @@ public class ProjectileController : EntityControllerInterface
     Vector2 direction;
 
     float speed;
+    public void damage(int dmg) {; }
     // Start is called before the first frame update
     public ProjectileController(EntityScript ps, Vector2 direction, float speed)
     {

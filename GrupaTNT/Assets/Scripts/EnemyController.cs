@@ -12,7 +12,7 @@ public class EnemyController : EntityControllerInterface
     GameObject parent;
     private AiScriptBase myAi;
     //Enemy stats
-    private int health=20;
+    private int health;
     public int armor;
     public int poiseMax;
     public int meleeDamage;
@@ -23,6 +23,7 @@ public class EnemyController : EntityControllerInterface
     public EnemyController(EntityScript ps) {
         parentScript = ps;
         parent = ps.gameObject;
+        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage);
         parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
         parentScript.stats.Add("health", new FloatStat("health", (float)health));
         parentScript.stats.Add("armor", new FloatStat("armor", (float)armor));
@@ -72,15 +73,10 @@ public class EnemyController : EntityControllerInterface
         }
     }
 
-    public void temp(int dmg) {
-        dmg = Mathf.Max(dmg - armor, 1);
-        dmg = Mathf.Abs(dmg);
-        health -= dmg;
+    public void damage(int dmg) {
+        health = (int)parentScript.stats["health"].getCompoundValue();
         stun -= dmg;
-        if (health <= 0) {
-            death();
-        }
-        else if (stun <= -1) { //Stunned
+        if (stun <= -1 && health>0) { //Stunned
             myAi.setState(-1);
             myAi.setAlarm(-stun);
             stun = poiseMax;
