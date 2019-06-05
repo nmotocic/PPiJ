@@ -29,7 +29,8 @@ public class FSQI
 
 public class EntityScript : MonoBehaviour
 {
-    public List<string> input;
+    public bool initFromStart = false;
+    public List<string> rawInput = new List<string>();
     public const float TIMEBASE = 60f;
     public int time_period(float t, float period = TIMEBASE) { return (int)(t / TIMEBASE); }
     FSQI XX = new FSQI(null, "wasd", 1.0f);
@@ -43,8 +44,8 @@ public class EntityScript : MonoBehaviour
     public List<GameObject> projectileOptions = new List<GameObject>();
     List<GameObject> firedProjectiles = new List<GameObject>();
     Rigidbody2D rb2d;
-    public float speed = 0f;
-    public string entityType;
+    public float speed = 20f;
+    public string entityType = null;
 
     public void Awake()
     {
@@ -60,31 +61,31 @@ public class EntityScript : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
+    public void Init(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {
         if (this.parent != null && parent == null) { return; }
         this.parent = parent;
         gameObject.transform.position = location;
         gameObject.SetActive(true);
         this.entityType = entityType;
-        getController(entityType,direction,speed);
-        gameObject.SetActive(true);
+        getController(entityType, direction, speed);
     }
     public void Input() {
-        foreach (string line in input) {
+        foreach (string line in rawInput) {
             string[] split = line.Split(' ');
+            Debug.Log(line+split.Length.ToString());
             if (split.Length == 0) { continue; }
             if (split[0].Equals("STAT")) {
                 stats.Add(split[1],new FloatStat(split[1],float.Parse(split[2])));
             }
-            else if (split[0].Equals("EFFECT")&& split.Length == 0) {
+            else if (split[0].Equals("EFFECT")) {
                 FloatStat dfl = new FloatStat(split[1]);
-                impactEffects.Add(split[1],new FSQI(dfl,
+                impactEffects[split[1]]=new FSQI(dfl,
                     split[2],
                     float.Parse(split[3]),
                     float.Parse(split[4]),
                     int.Parse(split[5])
-                    ));
+                    );
             }
         }
     }
@@ -94,6 +95,7 @@ public class EntityScript : MonoBehaviour
         if (direction == null) direction = Vector2.zero;
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
+        Debug.Log(entityType+"<----------------------------------------------------");
         if (entityType != null)
         {
             if (entityType.Equals("player")) { controller = new PlayerController(this, speed); }
@@ -101,7 +103,8 @@ public class EntityScript : MonoBehaviour
             else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
             else if (entityType.Equals("enemy")) { controller = new EnemyController(this); }
         }
-        else {
+        else
+        {
             if (gameObject.CompareTag(GameDefaults.Player())) { controller = new PlayerController(this, speed); }
             else if (gameObject.CompareTag(GameDefaults.Projectile())) { controller = new ProjectileController(this, direction, speed); }
             else if (gameObject.CompareTag(GameDefaults.Powerup())) { controller = new PowerupController(this); }
@@ -111,28 +114,23 @@ public class EntityScript : MonoBehaviour
 
     public void Start()
     {
-        gameObject.SetActive(true);
-        Init(entityType, transform.position, new Vector2(), 0f, null);
+        if (Time.time>0) { return; }
+        Init(entityType, transform.position, new Vector2(0.0f,0.0f), 0f, null);
     }
 
     // Update is called once per frame
     public void Update()
     {
-        if (!gameObject.activeSelf)
-        {
-            Init(entityType, transform.position, new Vector2(), 0f, null);
-        }
         if (controller == null) { return; }
-        /*if (Input.GetMouseButtonDown(0) && gameObject.CompareTag(GameDefaults.Enemy()))
-        {
-            controller.damage(2);
-            Debug.LogWarning("Napravio 2 dmga objektu:" + parent.GetInstanceID().ToString());
-        }*/
         controller.Update();
         //DEBUG REMOVE AFTER TESTIIIING
-        if (stats.ContainsKey("health")&&CompareTag(GameDefaults.Player()))
+        if (stats.ContainsKey("health"))
         {
-            Debug.Log("Hp:" + stats["health"].getCompoundValue());
+            //Debug.Log(tag+" Hp:" + stats["health"].getCompoundValue());
+        }
+        if (stats.ContainsKey("damage"))
+        {
+            //Debug.Log(tag + " DMG:" + stats["damage"].getCompoundValue());
         }
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
@@ -213,11 +211,11 @@ public class EntityScript : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
-            if (gameObject.CompareTag(GameDefaults.Projectile())){
+            if (gameObject.CompareTag(GameDefaults.Projectile()))
+            {
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
@@ -233,7 +231,7 @@ public class EntityScript : MonoBehaviour
             //Enemy coll
             else if (gameObject.CompareTag(GameDefaults.Enemy()))
             {
-                
+
                 //Obstruction
                 if (other.CompareTag(GameDefaults.Obstruction()))
                 {
@@ -259,21 +257,23 @@ public class EntityScript : MonoBehaviour
             }
         }
     }
-    //private void OnTriggerEnter2D(Collider2D collision) {
-    //    OnTriggerStay2D(collision);
-    //}
 
-    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
+    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed = 0.2f, string[] input=null)
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
-        y.Init("projectile",location,direction,speed,gameObject);
-        Debug.Log(gameObject);
         float dmg = stats["ranged"].getCompoundValue();
-        FloatStat FS = new FloatStat("damage", dmg);
-        y.impactEffects.Add("damage",new FSQI(FS,"irrelevant",dmg,0,1));
+        if (input != null) {
+            y.rawInput.AddRange(input);
+        }
+        y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
+        y.Input();
+        Debug.Log(speed);
+        y.Init("projectile",location,direction,speed,gameObject);
+        return;
     }
-    Vector2 GetLocation() {
+    Vector2 GetLocation()
+    {
         return gameObject.transform.position;
     }
     public void applyPowerup(FSQI fSQI) {

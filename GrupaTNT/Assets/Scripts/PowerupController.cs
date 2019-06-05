@@ -9,6 +9,7 @@ public class PowerupController : EntityControllerInterface
     public PowerupController(EntityScript ps)
     {
         this.parentScript = ps;
+        return;
         parentScript.impactEffects.Add("health", new FSQI(new FloatStat("health",10f),"baseValue",1000,-2,1));
         parentScript.impactEffects.Add("ranged", new FSQI(new FloatStat("ranged", 10f), "POWAH", 9001f, 9001));
     }

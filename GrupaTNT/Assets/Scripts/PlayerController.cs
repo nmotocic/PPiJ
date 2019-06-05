@@ -19,7 +19,6 @@ public class PlayerController : EntityControllerInterface
         parentScript.stats.Add("experience", new FloatStat("experience", 0));
         parentScript.stats.Add("armor", new FloatStat("armor", 5));
         parentScript.stats.Add("speed", new FloatStat("speed", speed));
-        Debug.Log(parentScript.stats["speed"].getCompoundValue());
     }
     
     // Update is called once per frame
@@ -33,7 +32,8 @@ public class PlayerController : EntityControllerInterface
         {
             Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2 position = parentScript.gameObject.transform.position;
-            parentScript.DispenseObject(parentScript.projectileOptions[0], position, (target-position).normalized,20f);
+            string[] rawInput= {"EFFECT damage boop 1 -1 1"};
+            parentScript.DispenseObject(parentScript.projectileOptions[0], position, (target-position).normalized,20f,rawInput);
         }
     }
     public Vector2 getMovement() { return direction*parentScript.stats["speed"].getCompoundValue(); }
