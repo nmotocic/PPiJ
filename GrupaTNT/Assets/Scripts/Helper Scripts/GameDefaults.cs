@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class GameDefaults
 {
+    //Tags
     public static string Obstruction() {
         return "Obstruction";
     }
@@ -11,9 +12,32 @@ public abstract class GameDefaults
     {
         return "Projectile";
     }
-
+    public static string Enemy()
+    {
+        return "Enemy";
+    }
+    public static string Player()
+    {
+        return "Player";
+    }
+    public static string Powerup()
+    {
+        return "Powerup";
+    }
+    //Layers
     public static int layerWall()
     {
         return (1 << LayerMask.NameToLayer("Wall"));
+    }
+
+
+    //States
+    public static int deatState()
+    {
+        return -2;
+    }
+    public static int hitState()
+    {
+        return -1;
     }
 }

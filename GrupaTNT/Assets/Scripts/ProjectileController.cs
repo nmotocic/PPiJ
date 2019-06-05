@@ -6,7 +6,9 @@ public class ProjectileController : EntityControllerInterface
 {
     EntityScript parentScript;
     Vector2 direction;
+
     float speed;
+    public void damage(int dmg) {; }
     // Start is called before the first frame update
     public ProjectileController(EntityScript ps, Vector2 direction, float speed)
     {
@@ -36,4 +38,12 @@ public class ProjectileController : EntityControllerInterface
             }
         }
     }
+
+
+    public void OnTriggerEnter2D(Collider2D col)
+    {
+        var es = col.gameObject.GetComponent<EntityScript>();
+        //Do stuff
+    }
+    public void death() { }
 }

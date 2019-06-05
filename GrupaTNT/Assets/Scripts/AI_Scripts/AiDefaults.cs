@@ -43,4 +43,7 @@ public abstract class AiDefaults
         var targetDir = (target - my_pos).normalized;
         return (Physics2D.CircleCast(my_pos, radius, targetDir, distance, GameDefaults.layerWall()));
     }
+
+
+
 }

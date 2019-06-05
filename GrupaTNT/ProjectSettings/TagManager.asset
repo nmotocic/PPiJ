@@ -8,6 +8,8 @@ TagManager:
   - Flag
   - Obstruction
   - Projectile
+  - Enemy
+  - Powerup
   layers:
   - Default
   - TransparentFX
