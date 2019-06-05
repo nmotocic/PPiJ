@@ -29,7 +29,8 @@ public class FSQI
 
 public class EntityScript : MonoBehaviour
 {
-    public List<string> input;
+    public bool initFromStart = false;
+    public List<string> rawInput = new List<string>();
     public const float TIMEBASE = 60f;
     public int time_period(float t, float period = TIMEBASE) { return (int)(t / TIMEBASE); }
     FSQI XX = new FSQI(null, "wasd", 1.0f);
@@ -44,26 +45,27 @@ public class EntityScript : MonoBehaviour
     List<GameObject> firedProjectiles = new List<GameObject>();
     Rigidbody2D rb2d;
     public float speed = 0f;
-    public string entityType;
+    public string entityType = null;
     // Start is called before the first frame update
     public void Init(string entityType,Vector2 location,Vector2 direction,float speed,GameObject parent=null)
     {
+        Debug.Log(Time.time);
         if (this.parent != null && parent == null) { return; }
         this.parent = parent;
         gameObject.transform.position = location;
         gameObject.SetActive(true);
         this.entityType = entityType;
         getController(entityType,direction,speed);
-        gameObject.SetActive(true);
     }
     public void Input() {
-        foreach (string line in input) {
+        foreach (string line in rawInput) {
             string[] split = line.Split(' ');
+            Debug.Log(line+split.Length.ToString());
             if (split.Length == 0) { continue; }
             if (split[0].Equals("STAT")) {
                 stats.Add(split[1],new FloatStat(split[1],float.Parse(split[2])));
             }
-            else if (split[0].Equals("EFFECT")&& split.Length == 0) {
+            else if (split[0].Equals("EFFECT")) {
                 FloatStat dfl = new FloatStat(split[1]);
                 impactEffects.Add(split[1],new FSQI(dfl,
                     split[2],
@@ -97,17 +99,14 @@ public class EntityScript : MonoBehaviour
 
     public void Start()
     {
-        gameObject.SetActive(true);
+        if (entityType == null) { return; }
+        Debug.Log(entityType);
         Init(entityType, transform.position, new Vector2(), 0f, null);
     }
 
     // Update is called once per frame
     public void Update()
     {
-        if (!gameObject.activeSelf)
-        {
-            Init(entityType, transform.position, new Vector2(), 0f, null);
-        }
         if (controller == null) { return; }
         /*if (Input.GetMouseButtonDown(0) && gameObject.CompareTag(GameDefaults.Enemy()))
         {
@@ -116,9 +115,13 @@ public class EntityScript : MonoBehaviour
         }*/
         controller.Update();
         //DEBUG REMOVE AFTER TESTIIIING
-        if (stats.ContainsKey("health")&&CompareTag(GameDefaults.Player()))
+        if (stats.ContainsKey("health"))
         {
-            Debug.Log("Hp:" + stats["health"].getCompoundValue());
+            //Debug.Log(tag+" Hp:" + stats["health"].getCompoundValue());
+        }
+        if (stats.ContainsKey("damage"))
+        {
+            //Debug.Log(tag + " DMG:" + stats["damage"].getCompoundValue());
         }
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
@@ -220,19 +223,19 @@ public class EntityScript : MonoBehaviour
             }
         }
     }
-    private void OnTriggerEnter2D(Collider2D collision) {
-        OnTriggerStay2D(collision);
-    }
 
-    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed=0.2f)
+    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed = 0.2f, string[] input=null)
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
-        y.Init("projectile",location,direction,speed,gameObject);
-        Debug.Log(gameObject);
         float dmg = stats["ranged"].getCompoundValue();
-        FloatStat FS = new FloatStat("damage", dmg);
-        y.impactEffects.Add("damage",new FSQI(FS,"irrelevant",dmg,0,1));
+        if (input != null) {
+            y.rawInput.AddRange(input);
+        }
+        y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
+        y.Input();
+        y.Init("projectile",location,direction,speed,gameObject);
+        return;
     }
     Vector2 GetLocation() {
         return gameObject.transform.position;

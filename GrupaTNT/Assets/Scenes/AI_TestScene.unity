@@ -1241,7 +1241,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  input: []
+  initFromStart: 1
+  rawInput:
+  - EFFECT health . 9001 -1 1
   parent: {fileID: 0}
   projectileOptions: []
   speed: 5
@@ -1381,6 +1383,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4547538877460868112, guid: bf8bbec0a55625c4982d7ba45e62f54d,
         type: 3}
+    - target: {fileID: 8880811790055780133, guid: 3329a8c8a91850a4f91b4f54f901248b,
+        type: 3}
+      propertyPath: initFromStart
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8880811790055780153, guid: 3329a8c8a91850a4f91b4f54f901248b,
         type: 3}
       propertyPath: m_Size.x
@@ -1469,6 +1476,11 @@ PrefabInstance:
         type: 3}
       propertyPath: input.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8932913874426895906, guid: ff9a1cd65b5c75a4bb7008d4baa5569e,
+        type: 3}
+      propertyPath: initFromStart
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff9a1cd65b5c75a4bb7008d4baa5569e, type: 3}

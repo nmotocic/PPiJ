@@ -23,6 +23,7 @@ public class EnemyController : EntityControllerInterface
     public EnemyController(EntityScript ps) {
         parentScript = ps;
         parent = ps.gameObject;
+        myAi = parent.GetComponent<AiScriptBase>();
         myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage);
         parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
         parentScript.stats.Add("health", new FloatStat("health", (float)health));
