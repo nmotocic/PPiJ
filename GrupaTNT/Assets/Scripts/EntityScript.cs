@@ -29,7 +29,8 @@ public class FSQI
 
 public class EntityScript : MonoBehaviour
 {
-    public List<string> input;
+    public bool initFromStart = false;
+    public List<string> rawInput = new List<string>();
     public const float TIMEBASE = 60f;
     public int time_period(float t, float period = TIMEBASE) { return (int)(t / TIMEBASE); }
     FSQI XX = new FSQI(null, "wasd", 1.0f);
@@ -54,6 +55,29 @@ public class EntityScript : MonoBehaviour
         gameObject.SetActive(true);
         this.entityType = entityType;
         getController(entityType, direction, speed);
+    }
+    public void Input()
+    {
+        foreach (string line in rawInput)
+        {
+            string[] split = line.Split(' ');
+            Debug.Log(line + split.Length.ToString());
+            if (split.Length == 0) { continue; }
+            if (split[0].Equals("STAT"))
+            {
+                stats.Add(split[1], new FloatStat(split[1], float.Parse(split[2])));
+            }
+            else if (split[0].Equals("EFFECT"))
+            {
+                FloatStat dfl = new FloatStat(split[1]);
+                impactEffects[split[1]] = new FSQI(dfl,
+                    split[2],
+                    float.Parse(split[3]),
+                    float.Parse(split[4]),
+                    int.Parse(split[5])
+                    );
+            }
+        }
     }
     public void InitLite(string entityType, Vector2 location, Vector2 direction, float speed, GameObject parent = null)
     {
@@ -126,17 +150,20 @@ public class EntityScript : MonoBehaviour
         GameObject other = collision.gameObject;
         EntityScript otherES = other.GetComponent<EntityScript>();
         //Debug.Log(gameObject + "-->" + other);
-        if (gameObject.CompareTag(GameDefaults.Projectile())&&(other.CompareTag(GameDefaults.Obstruction())))
+        if (gameObject.CompareTag(GameDefaults.Projectile()) && (other.CompareTag(GameDefaults.Obstruction())))
         {
             Destroy(gameObject);
+            return;
+        }
+        if (gameObject.CompareTag(GameDefaults.Projectile()) && (other.CompareTag(GameDefaults.Projectile())))
+        {
             return;
         }
         if (other.CompareTag(GameDefaults.Obstruction()))
         {
             return;
         }
-        
-        if (other.gameObject.CompareTag(parent.tag)) { return; }
+
         if (otherES != null)
         {
             if (other.gameObject.CompareTag(parent.tag) || otherES.parent != null && otherES.parent.gameObject.CompareTag(gameObject.tag))
@@ -241,14 +268,20 @@ public class EntityScript : MonoBehaviour
         OnTriggerStay2D(collision);
     }
 
-    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed = 0.2f)
+    public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed = 0.2f, string[] input = null)
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
-        y.Init("projectile",location,direction,speed,gameObject);
+        y.Init("projectile", location, direction, speed, gameObject);
         float dmg = stats["ranged"].getCompoundValue();
-        FloatStat FS = new FloatStat("damage", dmg);
-        y.impactEffects.Add("damage",new FSQI(FS,"irrelevant",dmg,0,1));
+        if (input != null)
+        {
+            y.rawInput.AddRange(input);
+        }
+        y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
+        y.Input();
+        Debug.Log(speed);
+        
     }
     Vector2 GetLocation()
     {
