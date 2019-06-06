@@ -16,7 +16,7 @@ public class EnemyController : EntityControllerInterface
     public int armor;
     public int poiseMax;
     public int meleeDamage;
-    public int rangeDamage { get; set; }
+    public int rangeDamage;
     public int stun { get; set; }
     private bool start = true;
 
@@ -24,23 +24,12 @@ public class EnemyController : EntityControllerInterface
         parentScript = ps;
         parent = ps.gameObject;
         myAi = parent.GetComponent<AiScriptBase>();
-        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage);
-        parentScript.stats["ranged"] = new FloatStat("ranged", (float) health);
+        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage, ref rangeDamage);
+        parentScript.stats["ranged"] = new FloatStat("ranged", (float) rangeDamage);
         parentScript.stats["health"] = new FloatStat("health", (float)health);
         parentScript.stats["armor"] = new FloatStat("armor", (float)armor);
         parentScript.stats["damage"] = new FloatStat("damage", (float)meleeDamage);
 
-    }
-    public void Start()
-    {
-        myAi = parent.GetComponent<AiScriptBase>();
-        if (myAi == null) {
-            Debug.LogError("Nemam AI!Gasim se!");
-            parent.SetActive(false);
-        }
-        myAi.getStats(ref health,ref armor,ref poiseMax, ref meleeDamage);
-        stun = poiseMax;
-        start = false;
     }
 
     // Update is called once per frame
@@ -53,7 +42,7 @@ public class EnemyController : EntityControllerInterface
         meleeDamage = (int)MD.getCompoundValue();
         myAi = parent.GetComponent<AiScriptBase>();
         MD.setFactor("isDangerous", myAi.isDangerous() ? 1 : 0);
-        if (start) Start();
+        //if (start) Start();
         //parent.GetComponent<Rigidbody2D>().GetVector();
         direction = direction.normalized;
     }
