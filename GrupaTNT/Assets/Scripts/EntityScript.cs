@@ -165,7 +165,6 @@ public class EntityScript : MonoBehaviour
 
             foreach (string effect in impactEffects.Keys)
             {
-                //Debug.Log(gameObject.tag+other.tag);
                 Debug.Log(effect);
                 if (effect.Equals("damage"))
                 {
