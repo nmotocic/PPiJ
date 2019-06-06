@@ -65,7 +65,10 @@ public class MinoBossAI : AiScriptBase
     private Rigidbody2D rbody2d;
     private Animator anim;
     private EntityScript eScript;
-
+    //Buff Icon
+    [Header("Buff icon")]
+    public GameObject buffIcon;
+    private GameObject myBuff;
 
     // Start is called before the first frame update
     void Start()
@@ -86,6 +89,9 @@ public class MinoBossAI : AiScriptBase
         agentSpeed = agent.speed;
         agentAngleSpeed = agent.angularSpeed;
         agentAccel = agent.acceleration;
+        //Startup buffIcon
+        myBuff = Instantiate(buffIcon);
+        myBuff.GetComponent<AI_Effect>().setParent(gameObject);
     }
 
 
@@ -153,6 +159,8 @@ public class MinoBossAI : AiScriptBase
             {
                 //Drop stuff, get removed
                 danger = false;
+                GameObject.Destroy(myBuff);
+                myBuff = null;
             }
 
             //--------------------------Attacking
@@ -198,6 +206,7 @@ public class MinoBossAI : AiScriptBase
                             agent.acceleration = dashAccel * 4f;
                             agent.destination = target;
                             buff = false;
+                            if( myBuff!=null ) myBuff.GetComponent<AI_Effect>().deActivate();
                             alarm.setMax(dashDuration/2);
                             alarm.reset();
                         }
@@ -242,6 +251,7 @@ public class MinoBossAI : AiScriptBase
                         {
                             attackCombo = 2;
                             buff = false;
+                            if (myBuff != null) myBuff.GetComponent<AI_Effect>().deActivate();
                         }
                         else
                         {
@@ -295,6 +305,7 @@ public class MinoBossAI : AiScriptBase
                         {
                             attackCombo = spinProjectiles;
                             buff = false;
+                            if (myBuff != null) myBuff.GetComponent<AI_Effect>().deActivate();
                             attackCount = 4;
                         }
                         else
@@ -354,6 +365,7 @@ public class MinoBossAI : AiScriptBase
                         eScript.DispenseObject(slashProjectile, my_pos, Vector2.left, slashProjectileSpeed);
                         eScript.DispenseObject(slashProjectile, my_pos, Vector2.right, slashProjectileSpeed);
                         buff = true;
+                        if (myBuff != null) myBuff.GetComponent<AI_Effect>().activate();
                     }
                     //Slam done
                     else if ((state == 2) && (alarm.isActive()))

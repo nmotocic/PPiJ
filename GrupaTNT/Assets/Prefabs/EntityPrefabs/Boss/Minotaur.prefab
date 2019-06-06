@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initFromStart: 0
+  rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
   speed: 5
@@ -162,6 +164,8 @@ MonoBehaviour:
   poise: 0
   armor: 0
   stunMod: 1
+  buffIcon: {fileID: 8930232900598471318, guid: b280019f602ca3c4ba8d60cf0250c654,
+    type: 3}
 --- !u!1001 &6634064865985624616
 PrefabInstance:
   m_ObjectHideFlags: 0
