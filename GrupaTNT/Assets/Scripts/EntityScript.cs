@@ -158,7 +158,7 @@ public class EntityScript : MonoBehaviour
 
         if (otherES != null)
         {
-            if (other.Equals(parent) || otherES.parent != null && otherES.parent.Equals(gameObject))
+            if (other.gameObject.CompareTag(parent.tag) || otherES.parent != null && otherES.parent.gameObject.CompareTag(gameObject.tag))
             {
                 return;
             }
