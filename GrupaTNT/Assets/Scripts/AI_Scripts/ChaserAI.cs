@@ -165,12 +165,13 @@ public class ChaserAI : AiScriptBase
         alarm.setMax(Mathf.Abs(duration));
     }
 
-    public override void getStats(ref int health,ref int armor,ref int poise,ref int meleeDamage)
+    public override void getStats(ref int health,ref int armor,ref int poise,ref int meleeDamage, ref int rangeDamage)
     {
         health = this.health;
         armor = this.armor;
         poise = this.poise;
         meleeDamage = contactDamage;
+        rangeDamage = 0;
     }
 
     public override bool isDangerous()

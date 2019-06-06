@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input: []
   parent: {fileID: 0}
   projectileOptions: []
   speed: 5
@@ -89,7 +90,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -144,11 +145,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8932913874426895933}
     m_Modifications:
-    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
-        type: 3}
-      propertyPath: m_Name
-      value: ImpSprite
-      objectReference: {fileID: 0}
     - target: {fileID: 5613109189211214858, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -213,6 +209,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
+        type: 3}
+      propertyPath: m_Name
+      value: ImpSprite
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ae38f0fbdda665418fc264e9c8db396, type: 3}
