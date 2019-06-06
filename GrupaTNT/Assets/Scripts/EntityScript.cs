@@ -136,7 +136,8 @@ public class EntityScript : MonoBehaviour
             return;
         }
         
-        if (other.Equals(parent) || otherES.parent!=null&&otherES.parent.Equals(gameObject)) { return; }
+        if (other.Equals(parent) || otherES.parent!=null && otherES.parent.Equals(gameObject)) { return; }
+        if (other.gameObject.CompareTag(parent.tag)) { return; }
         foreach (string effect in impactEffects.Keys)
         {
             //Debug.Log(gameObject.tag+other.tag);

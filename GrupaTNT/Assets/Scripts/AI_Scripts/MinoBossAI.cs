@@ -254,8 +254,7 @@ public class MinoBossAI : AiScriptBase
                         state = 2;
                         alarm.setMax(slashDuration);
                         alarm.reset();
-                        var proj = eScript.DispenseObject(slashProjectile, my_pos, targetDir, slashProjectileSpeed);
-                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                        eScript.DispenseObject(slashProjectile, my_pos, targetDir, slashProjectileSpeed);
                     }
                     //Swing
                     else if ((state == 2) && (alarm.isActive()))
@@ -317,8 +316,7 @@ public class MinoBossAI : AiScriptBase
                             {
                                 Vector2 randVector = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
                                 randVector.Normalize();
-                                var proj = eScript.DispenseObject(slashProjectile, my_pos, randVector, slashProjectileSpeed);
-                                proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                                eScript.DispenseObject(slashProjectile, my_pos, randVector, slashProjectileSpeed);
                             }
                         }
                         else
@@ -351,14 +349,10 @@ public class MinoBossAI : AiScriptBase
                         alarm.setMax(slamDuration);
                         alarm.reset();
                         //Launch 4 projectiles
-                        var proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.down, slashProjectileSpeed);
-                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
-                        proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.up, slashProjectileSpeed);
-                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
-                        proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.left, slashProjectileSpeed);
-                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
-                        proj = eScript.DispenseObject(slashProjectile, my_pos, Vector2.right, slashProjectileSpeed);
-                        proj.GetComponent<EntityScript>().controller.damage(slashDamage);
+                        eScript.DispenseObject(slashProjectile, my_pos, Vector2.down, slashProjectileSpeed);
+                        eScript.DispenseObject(slashProjectile, my_pos, Vector2.up, slashProjectileSpeed);
+                        eScript.DispenseObject(slashProjectile, my_pos, Vector2.left, slashProjectileSpeed);
+                        eScript.DispenseObject(slashProjectile, my_pos, Vector2.right, slashProjectileSpeed);
                         buff = true;
                     }
                     //Slam done
@@ -432,7 +426,7 @@ public class MinoBossAI : AiScriptBase
         alarm.setMax(Mathf.Abs(duration));
     }
 
-    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage)
+    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage, ref int rangeDamage)
     {
         health = this.health;
         armor = this.armor;

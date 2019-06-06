@@ -260,6 +260,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input: []
   parent: {fileID: 0}
   projectileOptions: []
   speed: 5
@@ -349,7 +350,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &1248042134
@@ -428,7 +429,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &1470293808
 GameObject:
@@ -577,7 +578,7 @@ PrefabInstance:
     - target: {fileID: 5460718823308968243, guid: f964e71971d74211eb3bebdf171b408d,
         type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5460718823308968243, guid: f964e71971d74211eb3bebdf171b408d,
         type: 3}

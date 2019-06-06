@@ -16,14 +16,15 @@ public class EnemyController : EntityControllerInterface
     public int armor;
     public int poiseMax;
     public int meleeDamage;
-    public int rangeDamage { get; set; }
+    public int rangeDamage;
     public int stun { get; set; }
     private bool start = true;
 
     public EnemyController(EntityScript ps) {
         parentScript = ps;
         parent = ps.gameObject;
-        parentScript.stats.Add("ranged", new FloatStat("ranged", 20));
+        Start();
+        parentScript.stats.Add("ranged", new FloatStat("ranged", rangeDamage));
         parentScript.stats.Add("health", new FloatStat("health", (float)health));
         parentScript.stats.Add("armor", new FloatStat("armor", (float)armor));
         parentScript.stats.Add("damage", new FloatStat("damage", (float)meleeDamage));
@@ -36,7 +37,7 @@ public class EnemyController : EntityControllerInterface
             Debug.LogError("Nemam AI!Gasim se!");
             parent.SetActive(false);
         }
-        myAi.getStats(ref health,ref armor,ref poiseMax, ref meleeDamage);
+        myAi.getStats(ref health,ref armor,ref poiseMax,ref meleeDamage, ref rangeDamage);
         stun = poiseMax;
         start = false;
     }

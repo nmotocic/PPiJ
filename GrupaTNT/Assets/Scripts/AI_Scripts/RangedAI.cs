@@ -25,6 +25,7 @@ public class RangedAI : AiScriptBase
     public string targetObjectTag = GameDefaults.Player();
     //Projectile
     public GameObject projectileObject;
+    public int projectileDamage = 1;
 
     //Stats
     public int health = 0;
@@ -171,12 +172,13 @@ public class RangedAI : AiScriptBase
         alarm.setMax(Mathf.Abs(duration));
     }
 
-    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage)
+    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage, ref int rangeDamage)
     {
         health = this.health;
         armor = this.armor;
         poise = this.poise;
         meleeDamage = contactDamage;
+        rangeDamage = projectileDamage;
     }
 
     public override bool isDangerous()
