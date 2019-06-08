@@ -67,10 +67,6 @@ ScriptedImporter:
     100124: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (53)
     100126: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (54)
     100128: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (55)
-    100130: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (56)
-    100132: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (57)
-    100134: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (58)
-    100136: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (59)
     400000: _MapPrfab/ROOM_3_NSW_2/Transform
     400002: _MapPrfab/ROOM_3_NSW_2/Candles/Transform
     400004: _MapPrfab/ROOM_3_NSW_2/Debris/Transform
@@ -136,10 +132,6 @@ ScriptedImporter:
     400124: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (53)/Transform
     400126: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (54)/Transform
     400128: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (55)/Transform
-    400130: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (56)/Transform
-    400132: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (57)/Transform
-    400134: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (58)/Transform
-    400136: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (59)/Transform
     5000000: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Rigidbody2D
     6000000: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon/PolygonCollider2D
     6000002: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (1)/PolygonCollider2D
@@ -197,10 +189,6 @@ ScriptedImporter:
     6000106: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (53)/PolygonCollider2D
     6000108: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (54)/PolygonCollider2D
     6000110: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (55)/PolygonCollider2D
-    6000112: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (56)/PolygonCollider2D
-    6000114: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (57)/PolygonCollider2D
-    6000116: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (58)/PolygonCollider2D
-    6000118: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (59)/PolygonCollider2D
     6600000: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/CompositeCollider2D
     11400000: _MapPrfab/ROOM_3_NSW_2/MonoBehaviour-SuperTiled2Unity.SuperMap
     11400002: _MapPrfab/ROOM_3_NSW_2/MonoBehaviour-SuperTiled2Unity.SuperCustomProperties
@@ -281,10 +269,6 @@ ScriptedImporter:
     11400152: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (53)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
     11400154: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (54)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
     11400156: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (55)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
-    11400158: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (56)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
-    11400160: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (57)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
-    11400162: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (58)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
-    11400164: _MapPrfab/ROOM_3_NSW_2/Walls/Collision_Default/Polygon (59)/MonoBehaviour-SuperTiled2Unity.SuperColliderComponent
     11400166: _superAsset
     100100000: _MapPrfab
     2569400265252428796: _MapPrfab/ROOM_3_NSW_2/Grid

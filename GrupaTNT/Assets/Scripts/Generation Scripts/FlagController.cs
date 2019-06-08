@@ -7,7 +7,7 @@ using UnityEditor.VersionControl;
 using UnityEngine;
 using Random = System.Random;
 
-public class FlagController : Singleton<FlagController>
+public class FlagController : MonoBehaviour
 {
     /// <summary>
     /// We manually set the sprites in the inspector
@@ -39,19 +39,13 @@ public class FlagController : Singleton<FlagController>
     /// </summary>
     private void Awake()
     {
-        Instance.DoorDown = DoorDown;
-        Instance.DoorUp = DoorUp;
-        Instance.DoorLeft = DoorLeft;
-        Instance.DoorRight = DoorRight;
-        Instance.EnemySpawn = EnemySpawn;
-        Instance.PowerUpSpawn = PowerUpSpawn; 
-        
+
         directionsDelta = new[]
         {
-            FlagController.Instance.DoorRight,
-            FlagController.Instance.DoorLeft,
-            FlagController.Instance.DoorUp,
-            FlagController.Instance.DoorDown
+        DoorRight,
+        DoorLeft,
+        DoorUp,
+        DoorDown
         };
         
         deltaVectors = new[]

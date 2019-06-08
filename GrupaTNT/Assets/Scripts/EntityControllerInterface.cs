@@ -9,5 +9,5 @@ public interface EntityControllerInterface
     void OnCollisionEnter2D(Collision2D col);
     void OnTriggerEnter2D(Collider2D col);
     void damage(int dmg);
-
+    void death();
 }

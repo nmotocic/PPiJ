@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
-public class SpawnController : Singleton<SpawnController>
+public class SpawnController : MonoBehaviour
 {
     private int gridHeightWidth;
 
@@ -13,6 +13,9 @@ public class SpawnController : Singleton<SpawnController>
     private List<string> enemyNames;
     private List<string> powerUpNames;
     private List<string> bossNames;
+    private string playerName;
+
+    private FlagController _controller;
 
     // Start is called before the first frame update
     void Start()
@@ -60,13 +63,48 @@ public class SpawnController : Singleton<SpawnController>
                 bossNames.Add(filename.Name);
             }
         }
+        
+        DirectoryInfo directoryInfoPlayer = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/PlayerData"));
+        FileInfo[] filenamesPlayer = directoryInfoPlayer.GetFiles();
+
+        playerName = filenamesPlayer[0].Name;
     }
 
     public void Initialize()
     {
         roomGrid = LevelGenerator.RoomGrid;
         gridHeightWidth = gameObject.GetComponent<LevelGenerator>().gridWidthHeight;
+        _controller = GameObject.FindWithTag("Manager").GetComponent<FlagController>();
     }
+
+    public static void MoveObjectToRoomCenter(GameObject player, LevelGenerator.Room room)
+    {
+        player.transform.position = new Vector3(room.roomGameObject.transform
+            .Find("Floor").GetComponent<Tilemap>().localBounds.center.x, room.roomGameObject.transform
+            .Find("Floor").GetComponent<Tilemap>().localBounds.center.y, 0);
+
+    }
+    
+    public GameObject SpawnPlayerInRoomCenter(LevelGenerator.Room room)
+    {
+        string room_prefix = "PlayerData/";
+        
+            string pickedFile = playerName;
+
+            GameObject loadedPlayer = Resources.Load<GameObject>(room_prefix +
+                                                                  pickedFile.Substring(0,
+                                                                      pickedFile.LastIndexOf(".")));
+
+            loadedPlayer.transform.position = new Vector3(room.roomGameObject.transform
+                .Find("Floor").GetComponent<Tilemap>().localBounds.center.x, room.roomGameObject.transform
+                .Find("Floor").GetComponent<Tilemap>().localBounds.center.y, 0);
+
+
+            var spawnedPlayer = Instantiate(loadedPlayer);
+
+            return spawnedPlayer;
+    }
+
     
     public void SpawnForAllRooms()
     {
@@ -109,12 +147,14 @@ public class SpawnController : Singleton<SpawnController>
 
     private void SpawnRoomEnemies(Vector2Int position)
     {
-        var enemyWorldPositions = FindRoomEnemies(position);
-
-        if (enemyWorldPositions == null) return;
+        if (roomGrid[position.y, position.x] == null) return;
 
         if (!roomGrid[position.y, position.x].bossRoom)
         {
+
+            var enemyWorldPositions = FindRoomEnemies(position);
+
+            if (enemyWorldPositions == null) return;
 
             List<GameObject> enemies = new List<GameObject>();
 
@@ -135,15 +175,15 @@ public class SpawnController : Singleton<SpawnController>
             }
         }
     }
-    
+
     private void SpawnBoss(Vector2Int position)
     {
         if (roomGrid[position.y, position.x] == null) return;
         
         if (roomGrid[position.y, position.x].bossRoom)
         {
-
-            var enemyWorldPositions = roomGrid[position.y, position.x].roomGameObject.transform.Find("Floor")
+            var RoomGameObject = roomGrid[position.y, position.x].roomGameObject;
+            var enemyWorldPositions = RoomGameObject.transform.Find("Floor")
                 .GetComponent<Tilemap>().localBounds.center;
 
             GameObject boss;
@@ -204,12 +244,12 @@ public class SpawnController : Singleton<SpawnController>
 
     private List<Vector3> FindRoomEnemies(Vector2Int position)
     {
-        return FindRoomFlags(position, FlagController.Instance.EnemySpawn.name);
+        return FindRoomFlags(position, _controller.EnemySpawn.name);
     }
 
     private List<Vector3> FindRoomPowerups(Vector2Int position)
     {
-        return FindRoomFlags(position, FlagController.Instance.PowerUpSpawn.name);
+        return FindRoomFlags(position, _controller.PowerUpSpawn.name);
     }
 
 }
