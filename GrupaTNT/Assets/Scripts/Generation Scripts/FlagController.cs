@@ -34,9 +34,7 @@ public class FlagController : MonoBehaviour
     };
 
     public Sprite[] directionsDelta;
-    /// <summary>
-    /// Probably not needed
-    /// </summary>
+    
     private void Awake()
     {
 
@@ -128,17 +126,5 @@ public class FlagController : MonoBehaviour
             return true;
 
         return false;
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

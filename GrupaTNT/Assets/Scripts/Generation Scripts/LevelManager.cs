@@ -8,19 +8,33 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : Singleton<LevelManager>
 {
-    private const int MainSceneIndex = 0;
-    private int level = 1;
+    private int difficultyLevel = 1;
     public bool levelProcessing = false;
+    
+    private const int loadingScene = 0;
+    private const int generationScene = 2;
 
-    public void GoToNextLevel()
+    private int nextScene = generationScene;
+
+    public IEnumerator GoToNextLevel()
     {
         if (levelProcessing == false)
         {
+
             var playerGameObject = GameObject.FindWithTag("Player");
             DontDestroyOnLoad(playerGameObject);
-            SceneManager.LoadScene(MainSceneIndex);
-            level++;
+
+            AsyncOperation operation = SceneManager.LoadSceneAsync(loadingScene);
+
+            while (!operation.isDone)
+            {
+                yield return null;
+            }
+
+            difficultyLevel++;
             levelProcessing = true;
+            
+            nextScene = nextScene == loadingScene ? generationScene : loadingScene;
         }
     }
 }

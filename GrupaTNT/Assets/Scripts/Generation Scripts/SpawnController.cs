@@ -185,7 +185,10 @@ public class SpawnController : MonoBehaviour
             var RoomGameObject = roomGrid[position.y, position.x].roomGameObject;
             var enemyWorldPositions = RoomGameObject.transform.Find("Floor")
                 .GetComponent<Tilemap>().localBounds.center;
-
+            
+            Debug.LogWarning("Spawned boss in room:" + position.y.ToString() + " " + position.x.ToString() 
+                      + " " + roomGrid[position.y, position.x].roomGameObject.name);
+            
             GameObject boss;
 
             string room_prefix = "BossData/";

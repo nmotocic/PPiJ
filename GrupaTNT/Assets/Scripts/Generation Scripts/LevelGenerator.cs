@@ -129,7 +129,9 @@ public class LevelGenerator : MonoBehaviour
         **/
 
         AddNavMeshModifierToWalls();
+        AddNavMeshModifierToPillars();
         AddTagToEveryRoomWall();
+        AddTagToEveryRoomPillar();
         BakeNavMesh();
         
         this.gameObject.GetComponent<SpawnController>().Initialize();
@@ -154,6 +156,11 @@ public class LevelGenerator : MonoBehaviour
     {
         AddComponentToRooms(typeof(NavMeshModifier), "Walls", SetUnwalkableOverride);
     }
+    
+    private void AddNavMeshModifierToPillars()
+    {
+        AddComponentToRooms(typeof(NavMeshModifier), "Pillars", SetUnwalkableOverride);
+    }
     private void SetUnwalkableOverride(Component component)
     {
         var Modcomponent = component as NavMeshModifier;
@@ -164,6 +171,11 @@ public class LevelGenerator : MonoBehaviour
     private void AddTagToEveryRoomWall()
     {
         AddLayerTagToEveryRoomObject("Obstruction", "Walls");
+    }
+
+    private void AddTagToEveryRoomPillar()
+    {
+        AddLayerTagToEveryRoomObject("Obstruction", "Pillars");
     }
 
     private void RemoveFlagRendering()
@@ -587,7 +599,7 @@ public class LevelGenerator : MonoBehaviour
             bool makeBossRoom = false;
             if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
             {
-                //Is it a hallway?
+                //Is it not a hallway?
                 if (!pickedRoom.name.EndsWith("_2"))
                 {
                     makeBossRoom = true;

@@ -52,9 +52,9 @@ public class PlayerController : EntityControllerInterface
         Debug.Log(col.gameObject);
         if (col.gameObject.tag.Equals("LevelExit"))
         {
-            LevelManager.Instance.GoToNextLevel();
+            parentScript.StartCoroutine(LevelManager.Instance.GoToNextLevel());
         }
-
+    
         //Do stuff
     }
     public void death() {
