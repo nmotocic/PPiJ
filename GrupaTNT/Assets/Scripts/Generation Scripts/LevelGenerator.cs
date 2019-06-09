@@ -141,6 +141,7 @@ public class LevelGenerator : MonoBehaviour
             .Initialize(startingGridPostion, RoomGrid, playerGameObject, gameObject.GetComponent<SpawnController>());
 
         RemoveFlagRendering();
+        _spawnController.SpawnForAllRooms();
 
         Debug.Assert(madeBossRoom);
     }

@@ -90,7 +90,6 @@ public class SpawnController : MonoBehaviour
             return spawnedPlayer;
     }
 
-    // DEPRECATED
     public void SpawnForAllRooms()
     {
         for (int i = 0; i < gridHeightWidth; i++)
@@ -105,6 +104,7 @@ public class SpawnController : MonoBehaviour
         }
     }
     
+    // Not going to be used
     public void SpawnForSingleRoom(Vector2Int gridPosition)
     {
         SpawnRoomEnemies(gridPosition);

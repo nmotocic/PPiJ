@@ -67,16 +67,6 @@ public class LocationController : MonoBehaviour
                     if (bounds.Contains(playerObject.transform.position))
                     {
                         locationOnRoomGrid = tuple.Key.GridPosition;
-
-                        CheckSpawn(
-                            new Vector2Int(locationOnRoomGrid.x + 1, locationOnRoomGrid.y));
-                        CheckSpawn(
-                            new Vector2Int(locationOnRoomGrid.x - 1, locationOnRoomGrid.y));
-                        CheckSpawn(
-                            new Vector2Int(locationOnRoomGrid.x, locationOnRoomGrid.y + 1));
-                        CheckSpawn(
-                            new Vector2Int(locationOnRoomGrid.x, locationOnRoomGrid.y - 1));
-                        
                         break;
                     }
                 }
