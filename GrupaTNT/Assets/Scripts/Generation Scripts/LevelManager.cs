@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : Singleton<LevelManager>
 {
-    private int difficultyLevel = 1;
+    public int difficultyLevel = 1;
     public bool levelProcessing = false;
     
     private const int loadingScene = 0;

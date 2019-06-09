@@ -64,7 +64,7 @@ public class LocationController : MonoBehaviour
                 foreach (var tuple in boundsDict)
                 {
                     var bounds = tuple.Value;
-                    if (tuple.Value.Contains(playerObject.transform.position))
+                    if (bounds.Contains(playerObject.transform.position))
                     {
                         locationOnRoomGrid = tuple.Key.GridPosition;
 
@@ -76,6 +76,7 @@ public class LocationController : MonoBehaviour
                             new Vector2Int(locationOnRoomGrid.x, locationOnRoomGrid.y + 1));
                         CheckSpawn(
                             new Vector2Int(locationOnRoomGrid.x, locationOnRoomGrid.y - 1));
+                        
                         break;
                     }
                 }

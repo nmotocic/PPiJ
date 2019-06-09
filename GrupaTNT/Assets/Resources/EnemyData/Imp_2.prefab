@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8932913874426895905}
   - component: {fileID: 8932913874426895910}
   m_Layer: 0
-  m_Name: Imp
+  m_Name: Imp_2
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -61,7 +61,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8932913874426895911}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: -1372625422
   m_Radius: 0.2
   m_Speed: 3.5

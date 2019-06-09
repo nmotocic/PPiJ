@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
@@ -82,14 +84,13 @@ public class SpawnController : MonoBehaviour
             loadedPlayer.transform.position = new Vector3(room.roomGameObject.transform
                 .Find("Floor").GetComponent<Tilemap>().localBounds.center.x, room.roomGameObject.transform
                 .Find("Floor").GetComponent<Tilemap>().localBounds.center.y, 0);
-
-
+            
             var spawnedPlayer = Instantiate(loadedPlayer);
 
             return spawnedPlayer;
     }
 
-    // TODO REPLACE WITH PER ROOM SPAWNING
+    // DEPRECATED
     public void SpawnForAllRooms()
     {
         for (int i = 0; i < gridHeightWidth; i++)
@@ -153,15 +154,33 @@ public class SpawnController : MonoBehaviour
 
             foreach (var realPosition in enemyWorldPositions)
             {
-                string pickedFile = enemyNames[Random.Range(0, enemyNames.Count)];
-
+                //find all needed difficulty enemies
+                var difficultyEnemies = enemyNames.FindAll(
+                    new Predicate<string>(s => s.Split('.')[0].EndsWith(
+                        _levelManager.difficultyLevel.ToString())));
+                
+                string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count)];
+                
                 GameObject loadedEnemy = Resources.Load<GameObject>(room_prefix +
                                                                     pickedFile.Substring(0,
                                                                         pickedFile.LastIndexOf(".")));
                 GameObject createdEnemy = Instantiate(loadedEnemy);
+                NavMeshHit hit;
+            
+                /*var closesPositionOnNavmesh =
+                    NavMesh.SamplePosition(realPosition +
+                                           roomGrid[position.y, position.x].roomGameObject.transform.position,
+                        out hit, 0.5f, NavMesh.AllAreas);
+                */
                 createdEnemy.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
                 createdEnemy.transform.Translate(realPosition);
 
+                var agentScript = createdEnemy.GetComponent<NavMeshAgent>();
+                if (agentScript != null)
+                {
+                    agentScript.enabled = true;
+                }
+                
                 enemies.Add(createdEnemy);
             }
         }
@@ -174,7 +193,7 @@ public class SpawnController : MonoBehaviour
         if (roomGrid[position.y, position.x].bossRoom)
         {
             var RoomGameObject = roomGrid[position.y, position.x].roomGameObject;
-            var enemyWorldPositions = RoomGameObject.transform.Find("Floor")
+            var center = RoomGameObject.transform.Find("Floor")
                 .GetComponent<Tilemap>().localBounds.center;
             
             Debug.LogWarning("Spawned boss in room:" + position.y.ToString() + " " + position.x.ToString() 
@@ -190,9 +209,16 @@ public class SpawnController : MonoBehaviour
                                                                pickedFile.Substring(0,
                                                                    pickedFile.LastIndexOf(".")));
             GameObject createdBoss = Instantiate(loadedBoss);
-            createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
-            createdBoss.transform.Translate(enemyWorldPositions);
 
+            createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
+            createdBoss.transform.Translate(center);
+            
+            var agentScript = createdBoss.GetComponent<NavMeshAgent>();
+            if (agentScript != null)
+            {
+                agentScript.enabled = true;
+            }
+            
             boss = createdBoss;
         }
     }
