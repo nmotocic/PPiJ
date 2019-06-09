@@ -62,7 +62,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8932913874426895911}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -1372625422
   m_Radius: 0.2
   m_Speed: 3.5
   m_Acceleration: 8
@@ -146,6 +146,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 8932913874426895933}
     m_Modifications:
+    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
+        type: 3}
+      propertyPath: m_Name
+      value: ImpSprite
+      objectReference: {fileID: 0}
     - target: {fileID: 5613109189211214858, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -210,11 +215,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
-        type: 3}
-      propertyPath: m_Name
-      value: ImpSprite
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ae38f0fbdda665418fc264e9c8db396, type: 3}
