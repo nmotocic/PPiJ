@@ -135,9 +135,10 @@ public class LevelGenerator : MonoBehaviour
         BakeNavMesh();
         
         this.gameObject.GetComponent<SpawnController>().Initialize();
-        this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
+        //this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
 
-        this.gameObject.GetComponent<LocationController>().Initialize(startingGridPostion, RoomGrid, playerGameObject);
+        this.gameObject.GetComponent<LocationController>()
+            .Initialize(startingGridPostion, RoomGrid, playerGameObject, gameObject.GetComponent<SpawnController>());
 
         RemoveFlagRendering();
 

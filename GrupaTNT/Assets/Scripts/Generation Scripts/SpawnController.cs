@@ -11,11 +11,12 @@ public class SpawnController : MonoBehaviour
     private LevelGenerator.Room[,] roomGrid;
 
     private List<string> enemyNames;
-    private List<string> powerUpNames;
+    private List<string> powerupNames;
     private List<string> bossNames;
     private string playerName;
 
     private FlagController _controller;
+    private LevelManager _levelManager;
 
     // Start is called before the first frame update
     void Start()
@@ -24,50 +25,32 @@ public class SpawnController : MonoBehaviour
 
     private void Awake()
     {
-        DirectoryInfo directoryInfoEnemy = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
-        FileInfo[] filenamesEnemy = directoryInfoEnemy.GetFiles();
+        enemyNames = GetPrefabsNames("EnemyData");
+        bossNames = GetPrefabsNames("BossData");
+        powerupNames = GetPrefabsNames("PowerupData");
 
-        //There could be other metafiles in the directory so we check how many room files we have.
-        enemyNames = new List<string>();
-        foreach (FileInfo filename in filenamesEnemy)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-            {
-                enemyNames.Add(filename.Name);
-            }
-        }
-
-        DirectoryInfo directoryInfoPowerup = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/PowerupData"));
-        FileInfo[] filenamesPowerup = directoryInfoPowerup.GetFiles();
-
-        //There could be other metafiles in the directory so we check how many room files we have.
-        powerUpNames = new List<string>();
-        foreach (FileInfo filename in filenamesPowerup)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-            {
-                powerUpNames.Add(filename.Name);
-            }
-        }
-        
-        
-        DirectoryInfo directoryInfoBoss = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/BossData"));
-        FileInfo[] filenamesBoss = directoryInfoBoss.GetFiles();
-
-        //There could be other metafiles in the directory so we check how many room files we have.
-        bossNames = new List<string>();
-        foreach (FileInfo filename in filenamesBoss)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-            {
-                bossNames.Add(filename.Name);
-            }
-        }
-        
         DirectoryInfo directoryInfoPlayer = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/PlayerData"));
         FileInfo[] filenamesPlayer = directoryInfoPlayer.GetFiles();
 
         playerName = filenamesPlayer[0].Name;
+    }
+
+    private List<string> GetPrefabsNames(string folderName)
+    {
+        DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/" + folderName));
+        FileInfo[] filenames = directoryInfo.GetFiles();
+
+        //There could be other metafiles in the directory so we check how many room files we have.
+        var names = new List<string>();
+        foreach (FileInfo filename in filenames)
+        {
+            if (filename.Name.EndsWith(".prefab"))
+            {
+                names.Add(filename.Name);
+            }
+        }
+
+        return names;
     }
 
     public void Initialize()
@@ -75,6 +58,7 @@ public class SpawnController : MonoBehaviour
         roomGrid = LevelGenerator.RoomGrid;
         gridHeightWidth = gameObject.GetComponent<LevelGenerator>().gridWidthHeight;
         _controller = GameObject.FindWithTag("Manager").GetComponent<FlagController>();
+        _levelManager = LevelManager.Instance;
     }
 
     public static void MoveObjectToRoomCenter(GameObject player, LevelGenerator.Room room)
@@ -105,7 +89,7 @@ public class SpawnController : MonoBehaviour
             return spawnedPlayer;
     }
 
-    
+    // TODO REPLACE WITH PER ROOM SPAWNING
     public void SpawnForAllRooms()
     {
         for (int i = 0; i < gridHeightWidth; i++)
@@ -118,6 +102,13 @@ public class SpawnController : MonoBehaviour
                 SpawnBoss(vec);
             }
         }
+    }
+    
+    public void SpawnForSingleRoom(Vector2Int gridPosition)
+    {
+        SpawnRoomEnemies(gridPosition);
+        SpawnRoomPowerUps(gridPosition);
+        SpawnBoss(gridPosition);
     }
 
     private void SpawnRoomPowerUps(Vector2Int position)
@@ -132,7 +123,7 @@ public class SpawnController : MonoBehaviour
 
         foreach (var realPosition in flagWorldPositions)
         {
-            string pickedFile = powerUpNames[Random.Range(0, powerUpNames.Count)];
+            string pickedFile = powerupNames[Random.Range(0, powerupNames.Count)];
 
             GameObject loadedPowerup = Resources.Load<GameObject>(room_prefix +
                                                                 pickedFile.Substring(0,
@@ -205,7 +196,7 @@ public class SpawnController : MonoBehaviour
             boss = createdBoss;
         }
     }
-    
+
     private List<Vector3> FindRoomFlags(Vector2Int position, string flagName)
     {
         LevelGenerator.Room room;
