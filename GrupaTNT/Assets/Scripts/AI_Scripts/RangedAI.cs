@@ -25,6 +25,7 @@ public class RangedAI : AiScriptBase
     public string targetObjectTag = GameDefaults.Player();
     //Projectile
     public GameObject projectileObject;
+    public int projectileDamage = 1;
 
     //Stats
     public int health = 0;
@@ -81,7 +82,7 @@ public class RangedAI : AiScriptBase
 
         if (AiDefaults.getCircleSight(my_pos,projectileObject.GetComponent<CircleCollider2D>().radius, target, true) && state == 0)
         {   //Target obstructed
-            agent.destination = target;
+            setDestination(target, agent);
             rbody2d.velocity = new Vector2(0, 0);
         }
         else
@@ -90,11 +91,11 @@ public class RangedAI : AiScriptBase
             //Pick state
             if (state != 0) // Stop moving if winding up an attack
             {
-                agent.destination = my_pos;
+                setDestination(my_pos, agent);
             }
             else //Move
             {
-                agent.destination = target;
+                setDestination(target, agent);
                 rbody2d.velocity = new Vector2(0, 0);
             }
             //Hurt
@@ -113,7 +114,7 @@ public class RangedAI : AiScriptBase
             //--------------------------Attacking
             if (Vector2.Distance(my_pos, target) <= attackTriggerRange && state == 0)
             { //Prep attack
-                agent.destination = my_pos;
+                setDestination(my_pos, agent);
                 state = 1;
                 targetDir = -(my_pos - target);
                 targetDir.Normalize();
@@ -171,12 +172,13 @@ public class RangedAI : AiScriptBase
         alarm.setMax(Mathf.Abs(duration));
     }
 
-    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage)
+    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage, ref int rangeDamage)
     {
         health = this.health;
         armor = this.armor;
         poise = this.poise;
         meleeDamage = contactDamage;
+        rangeDamage = projectileDamage;
     }
 
     public override bool isDangerous()
@@ -189,4 +191,12 @@ public class RangedAI : AiScriptBase
         danger = level;
     }
 
+    public void setDestination(Vector2 pos, NavMeshAgent agent)
+    {
+        if (agent.isOnNavMesh) agent.SetDestination(pos);
+        else
+        {
+            //Do stuff
+        }
+    }
 }

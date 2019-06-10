@@ -43,7 +43,7 @@ namespace UnityEngine.AI
             builder.useMeshPrefab = useMeshPrefab;
             builder.overrideByGrid = overrideByGrid;
             builder.compressBounds = compressBounds;
-           var grid = GameObject.FindWithTag("Grid");
+            var grid = GameObject.FindWithTag("Grid");
             foreach (var tilemap in grid.GetComponentsInChildren<Tilemap>())
             {
                 if (((0x1 << tilemap.gameObject.layer) & layerMask) == 0)
