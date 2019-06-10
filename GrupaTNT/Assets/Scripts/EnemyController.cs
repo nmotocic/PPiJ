@@ -19,6 +19,7 @@ public class EnemyController : EntityControllerInterface
     public int rangeDamage;
     public int stun { get; set; }
     private bool start = true;
+    private bool dropped = false;
 
     public EnemyController(EntityScript ps) {
         parentScript = ps;
@@ -78,9 +79,12 @@ public class EnemyController : EntityControllerInterface
         myAi.setState(-2);
         parent.GetComponent<Collider2D>().enabled = false;
         myAi.setDanger(false);
-        Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (!dropped) { lootDrop(); dropped = true; }
+    }
+    public void lootDrop()
+    {
         Vector2 position = parentScript.gameObject.transform.position;
-        string[] rawInput = { "EFFECT damage boop 1 -1 1" };
-        //parentScript.DispenseObject(parentScript.drop, position, (target - position).normalized, 20f, rawInput);
+        string[] rawInput = { "EFFECT gold boop 1 -1 1", "EFFECT xp boop 1 -1 1" };
+        parentScript.DispenseObject(parentScript.drop, position, new Vector3(), 0f, rawInput, "powerup");
     }
 }
