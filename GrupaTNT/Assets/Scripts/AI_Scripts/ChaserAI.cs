@@ -77,19 +77,19 @@ public class ChaserAI : AiScriptBase
 
         if (state==0 && AiDefaults.getLineSight(my_pos, target))
         {   //Target obstructed
-            agent.destination = target;
+            setDestination(target,agent);
             rbody2d.velocity = new Vector2(0, 0);
         }
         else { //State machine
             //Pick state
             if (state != 0) // Stop moving if winding up an attack
             {
-                agent.destination = my_pos;
+                setDestination(my_pos, agent);
                 //rbody2d.velocity = new Vector2(0, 0);
             }
             else //Move
             {
-                agent.destination = target;
+                setDestination(target, agent);
                 rbody2d.velocity = new Vector2(0, 0);
             }
 
@@ -107,7 +107,7 @@ public class ChaserAI : AiScriptBase
             //--------------------------Attacking
             else if (Vector2.Distance(my_pos, target) <= attackTriggerRange && state == 0)
             { //Prep attack
-                agent.destination = my_pos;
+                setDestination(my_pos, agent);
                 state = 1;
                 targetDir = target-my_pos;
                 targetDir.Normalize();
@@ -165,12 +165,13 @@ public class ChaserAI : AiScriptBase
         alarm.setMax(Mathf.Abs(duration));
     }
 
-    public override void getStats(ref int health,ref int armor,ref int poise,ref int meleeDamage)
+    public override void getStats(ref int health,ref int armor,ref int poise,ref int meleeDamage, ref int rangeDamage)
     {
         health = this.health;
         armor = this.armor;
         poise = this.poise;
         meleeDamage = contactDamage;
+        rangeDamage = 0;
     }
 
     public override bool isDangerous()
@@ -181,5 +182,12 @@ public class ChaserAI : AiScriptBase
     public override void setDanger(bool level)
     {
         danger = level;
+    }
+
+    public void setDestination(Vector2 pos,NavMeshAgent agent) {
+        if (agent.isOnNavMesh) agent.SetDestination(pos);
+        else {
+            //Do stuff
+        }
     }
 }

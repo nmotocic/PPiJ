@@ -4,6 +4,7 @@ using System.Net;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 
 public class LocationController : MonoBehaviour
@@ -67,12 +68,46 @@ public class LocationController : MonoBehaviour
                     if (bounds.Contains(playerObject.transform.position))
                     {
                         locationOnRoomGrid = tuple.Key.GridPosition;
+
+                        TurnOnMovementScriptsForEnemies(locationOnRoomGrid);
+                        TurnOnMovementScriptsForBoss(locationOnRoomGrid);
                         break;
                     }
                 }
 
                 Debug.Log("Location of new room" + locationOnRoomGrid.ToString());
             }
+        }
+    }
+    
+    // Enemies and boss are split because of difference in the original implementation, can be combined now
+    void TurnOnMovementScriptsForEnemies(Vector2Int position)
+    {
+        if (roomGrid[position.y, position.x] == null)
+            return;
+
+        if (!alreadySpawned[position.y, position.x] && !roomGrid[position.y, position.x].bossRoom)
+        {
+            foreach (var enemyGameObject in roomGrid[position.y, position.x].enemies)
+            {
+                enemyGameObject.GetComponent<NavMeshAgent>().enabled = true;
+                enemyGameObject.GetComponent<EntityScript>().enabled = true;
+            }
+            alreadySpawned[position.y, position.x] = true;
+        }
+    }
+    
+    void TurnOnMovementScriptsForBoss(Vector2Int position)
+    {
+        if (roomGrid[position.y, position.x] == null)
+            return;
+
+        if (!alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
+        {
+            var BossGameObject = roomGrid[position.y, position.x].boss[0];
+            BossGameObject.GetComponent<NavMeshAgent>().enabled = true;
+            BossGameObject.GetComponent<EntityScript>().enabled = true;
+            alreadySpawned[position.y, position.x] = true;
         }
     }
 

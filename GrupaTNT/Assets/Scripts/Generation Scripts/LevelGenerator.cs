@@ -135,14 +135,13 @@ public class LevelGenerator : MonoBehaviour
         AddTagToEveryRoomPillar();
         BakeNavMesh();
         
-        this.gameObject.GetComponent<SpawnController>().Initialize();
-        //this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
+        gameObject.GetComponent<SpawnController>().Initialize();
+        gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
 
-        this.gameObject.GetComponent<LocationController>()
+        gameObject.GetComponent<LocationController>()
             .Initialize(startingGridPostion, RoomGrid, playerGameObject, gameObject.GetComponent<SpawnController>());
 
         RemoveFlagRendering();
-        _spawnController.SpawnForAllRooms();
 
         Debug.Assert(madeBossRoom);
     }
@@ -408,8 +407,8 @@ public class LevelGenerator : MonoBehaviour
         _gridGameObject = gridObject;
         
         room.roomGameObject.transform.Find("Flags").gameObject.tag = "Flag";
-        roomHolder.transform.Find("Flags").gameObject.AddComponent<LocationController>();
-        roomHolder.transform.Find("Flags").gameObject.AddComponent<TilemapCollider>();
+        //roomHolder.transform.Find("Flags").gameObject.AddComponent<LocationController>();
+        //roomHolder.transform.Find("Flags").gameObject.AddComponent<TilemapCollider>();
         //roomHolder.transform.Find("Flags").gameObject.GetComponent<TilemapCollider2D>().isTrigger = true;
         
         return room;
@@ -440,8 +439,8 @@ public class LevelGenerator : MonoBehaviour
                                                                     filename.LastIndexOf(".")));
             GameObject createdRoom = Instantiate(loadedRoom);
             createdRoom.transform.Find("Flags").gameObject.tag = "Flag";
-            createdRoom.transform.Find("Flags").gameObject.AddComponent<LocationController>();
-            createdRoom.transform.Find("Flags").gameObject.AddComponent<TilemapCollider>();
+            //createdRoom.transform.Find("Flags").gameObject.AddComponent<LocationController>();
+            //createdRoom.transform.Find("Flags").gameObject.AddComponent<TilemapCollider>();
             //createdRoom.transform.Find("Flags").gameObject.GetComponent<TilemapCollider2D>().isTrigger = true;
             GameObject transformedRoom = new GameObject(loadedRoom.name);
             
@@ -833,6 +832,8 @@ public class LevelGenerator : MonoBehaviour
         private Dictionary<string, Room> ConnectedRoomDictionary;
         public bool bossRoom = false;
         private FlagController _controller;
+        public List<GameObject> enemies;
+        public List<GameObject> boss;
         
         public Room(List<Door> doors, GameObject container, Vector2Int gridPosition, bool bossRoom)
         {
@@ -843,6 +844,10 @@ public class LevelGenerator : MonoBehaviour
             ConnectedRoomDictionary = new Dictionary<string, Room>(4);
             HasDoor = new Dictionary<string, bool>(4);
             _controller = GameObject.FindWithTag("Manager").GetComponent<FlagController>();
+            if (!bossRoom)
+                enemies = new List<GameObject>();
+            else
+                boss = new List<GameObject>();
 
             //Ugly manual setting for each type of entrance
             ConnectedRoomDictionary[_controller.DoorUp.name] = null;

@@ -148,8 +148,6 @@ public class SpawnController : MonoBehaviour
 
             if (enemyWorldPositions == null) return;
 
-            List<GameObject> enemies = new List<GameObject>();
-
             string room_prefix = "EnemyData/";
 
             foreach (var realPosition in enemyWorldPositions)
@@ -159,6 +157,8 @@ public class SpawnController : MonoBehaviour
                     new Predicate<string>(s => 
                         s.Substring(0, s.LastIndexOf(".prefab")).
                             EndsWith(_levelManager.DifficultyLevel.ToString())));
+                
+                Debug.LogWarning("different difficulties: " + difficultyEnemies.Count.ToString());
                 
                 string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count - 1)];
                 
@@ -170,13 +170,7 @@ public class SpawnController : MonoBehaviour
                 createdEnemy.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
                 createdEnemy.transform.Translate(realPosition);
 
-                var agentScript = createdEnemy.GetComponent<NavMeshAgent>();
-                if (agentScript != null)
-                {
-                    agentScript.enabled = true;
-                }
-                
-                enemies.Add(createdEnemy);
+                roomGrid[position.y, position.x].enemies.Add(createdEnemy);
             }
         }
     }
@@ -194,11 +188,15 @@ public class SpawnController : MonoBehaviour
             Debug.LogWarning("Spawned boss in room:" + position.y.ToString() + " " + position.x.ToString() 
                       + " " + roomGrid[position.y, position.x].roomGameObject.name);
             
-            GameObject boss;
-
             string room_prefix = "BossData/";
 
-            string pickedFile = bossNames[Random.Range(0, bossNames.Count - 1)];
+            //find all needed difficulty enemies
+            var difficultyBoss = bossNames.FindAll(
+                new Predicate<string>(s => 
+                    s.Substring(0, s.LastIndexOf(".prefab")).
+                        EndsWith(_levelManager.DifficultyLevel.ToString())));
+            
+            string pickedFile = difficultyBoss[Random.Range(0, difficultyBoss.Count - 1)];
 
             GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
                                                                pickedFile.Substring(0,
@@ -207,14 +205,8 @@ public class SpawnController : MonoBehaviour
 
             createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
             createdBoss.transform.Translate(center);
-            
-            var agentScript = createdBoss.GetComponent<NavMeshAgent>();
-            if (agentScript != null)
-            {
-                agentScript.enabled = true;
-            }
-            
-            boss = createdBoss;
+
+            roomGrid[position.y, position.x].boss.Add(createdBoss);
         }
     }
 

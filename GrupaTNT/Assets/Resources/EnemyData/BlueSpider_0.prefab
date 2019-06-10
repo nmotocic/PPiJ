@@ -43,7 +43,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6800536775554594655}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
@@ -52,6 +52,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 0}
   speed: 5
   entityType: enemy
 --- !u!195 &6800536775554594642
@@ -157,7 +158,7 @@ PrefabInstance:
     - target: {fileID: 1105195850964201608, guid: 993194b8ed3372648b8fa86c3a0e4af3,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.05
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1105195850964201608, guid: 993194b8ed3372648b8fa86c3a0e4af3,
         type: 3}
@@ -222,7 +223,7 @@ PrefabInstance:
     - target: {fileID: 2665726241571951069, guid: 993194b8ed3372648b8fa86c3a0e4af3,
         type: 3}
       propertyPath: m_SortingOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 993194b8ed3372648b8fa86c3a0e4af3, type: 3}

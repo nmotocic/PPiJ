@@ -16,31 +16,22 @@ public class EnemyController : EntityControllerInterface
     public int armor;
     public int poiseMax;
     public int meleeDamage;
-    public int rangeDamage { get; set; }
+    public int rangeDamage;
     public int stun { get; set; }
     private bool start = true;
+    private bool dropped = false;
 
     public EnemyController(EntityScript ps) {
         parentScript = ps;
         parent = ps.gameObject;
         myAi = parent.GetComponent<AiScriptBase>();
-        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage);
-        parentScript.stats["ranged"] = new FloatStat("ranged", (float) health);
+        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage, ref rangeDamage);
+        stun = poiseMax;
+        parentScript.stats["ranged"] = new FloatStat("ranged", (float) rangeDamage);
         parentScript.stats["health"] = new FloatStat("health", (float)health);
         parentScript.stats["armor"] = new FloatStat("armor", (float)armor);
         parentScript.stats["damage"] = new FloatStat("damage", (float)meleeDamage);
 
-    }
-    public void Start()
-    {
-        myAi = parent.GetComponent<AiScriptBase>();
-        if (myAi == null) {
-            Debug.LogError("Nemam AI!Gasim se!");
-            parent.SetActive(false);
-        }
-        myAi.getStats(ref health,ref armor,ref poiseMax, ref meleeDamage);
-        stun = poiseMax;
-        start = false;
     }
 
     // Update is called once per frame
@@ -53,7 +44,7 @@ public class EnemyController : EntityControllerInterface
         meleeDamage = (int)MD.getCompoundValue();
         myAi = parent.GetComponent<AiScriptBase>();
         MD.setFactor("isDangerous", myAi.isDangerous() ? 1 : 0);
-        if (start) Start();
+        //if (start) Start();
         //parent.GetComponent<Rigidbody2D>().GetVector();
         direction = direction.normalized;
     }
@@ -88,9 +79,12 @@ public class EnemyController : EntityControllerInterface
         myAi.setState(-2);
         parent.GetComponent<Collider2D>().enabled = false;
         myAi.setDanger(false);
-        Vector2 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (!dropped) { lootDrop(); dropped = true; }
+    }
+    public void lootDrop()
+    {
         Vector2 position = parentScript.gameObject.transform.position;
-        string[] rawInput = { "EFFECT damage boop 1 -1 1" };
-        //parentScript.DispenseObject(parentScript.drop, position, (target - position).normalized, 20f, rawInput);
+        string[] rawInput = { "EFFECT gold boop 1 -1 1", "EFFECT xp boop 1 -1 1" };
+        parentScript.DispenseObject(parentScript.drop, position, new Vector3(), 0f, rawInput, "powerup");
     }
 }
