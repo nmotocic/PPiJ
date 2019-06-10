@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6800536775554594654}
   - component: {fileID: 6800536775554594652}
   m_Layer: 0
-  m_Name: BlueSpider_1
+  m_Name: BlueSpider_0
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -218,6 +218,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_FlipX
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2665726241571951069, guid: 993194b8ed3372648b8fa86c3a0e4af3,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 993194b8ed3372648b8fa86c3a0e4af3, type: 3}

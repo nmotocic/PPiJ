@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8932913874426895905}
   - component: {fileID: 8932913874426895910}
   m_Layer: 0
-  m_Name: Imp_2
+  m_Name: Imp_1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -215,6 +215,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4812096706188906537, guid: 2ae38f0fbdda665418fc264e9c8db396,
+        type: 3}
+      propertyPath: m_SortingOrder
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ae38f0fbdda665418fc264e9c8db396, type: 3}

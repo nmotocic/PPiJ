@@ -8,7 +8,14 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : Singleton<LevelManager>
 {
-    public int difficultyLevel = 1;
+    private int _difficultyLevel = 0;
+
+    public int DifficultyLevel
+    {
+        get => _difficultyLevel / 2;
+        set => _difficultyLevel = value;
+    }
+
     public bool levelProcessing = false;
     
     private const int loadingScene = 0;
@@ -31,7 +38,7 @@ public class LevelManager : Singleton<LevelManager>
                 yield return null;
             }
 
-            difficultyLevel++;
+            _difficultyLevel++;
             levelProcessing = true;
             
             nextScene = nextScene == loadingScene ? generationScene : loadingScene;

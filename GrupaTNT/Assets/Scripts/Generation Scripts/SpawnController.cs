@@ -124,7 +124,7 @@ public class SpawnController : MonoBehaviour
 
         foreach (var realPosition in flagWorldPositions)
         {
-            string pickedFile = powerupNames[Random.Range(0, powerupNames.Count)];
+            string pickedFile = powerupNames[Random.Range(0, powerupNames.Count - 1)];
 
             GameObject loadedPowerup = Resources.Load<GameObject>(room_prefix +
                                                                 pickedFile.Substring(0,
@@ -156,22 +156,17 @@ public class SpawnController : MonoBehaviour
             {
                 //find all needed difficulty enemies
                 var difficultyEnemies = enemyNames.FindAll(
-                    new Predicate<string>(s => s.Split('.')[0].EndsWith(
-                        _levelManager.difficultyLevel.ToString())));
+                    new Predicate<string>(s => 
+                        s.Substring(0, s.LastIndexOf(".prefab")).
+                            EndsWith(_levelManager.DifficultyLevel.ToString())));
                 
-                string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count)];
+                string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count - 1)];
                 
                 GameObject loadedEnemy = Resources.Load<GameObject>(room_prefix +
                                                                     pickedFile.Substring(0,
                                                                         pickedFile.LastIndexOf(".")));
                 GameObject createdEnemy = Instantiate(loadedEnemy);
-                NavMeshHit hit;
-            
-                /*var closesPositionOnNavmesh =
-                    NavMesh.SamplePosition(realPosition +
-                                           roomGrid[position.y, position.x].roomGameObject.transform.position,
-                        out hit, 0.5f, NavMesh.AllAreas);
-                */
+                
                 createdEnemy.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
                 createdEnemy.transform.Translate(realPosition);
 
@@ -203,7 +198,7 @@ public class SpawnController : MonoBehaviour
 
             string room_prefix = "BossData/";
 
-            string pickedFile = bossNames[Random.Range(0, bossNames.Count)];
+            string pickedFile = bossNames[Random.Range(0, bossNames.Count - 1)];
 
             GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
                                                                pickedFile.Substring(0,
