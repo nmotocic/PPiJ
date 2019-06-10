@@ -95,6 +95,6 @@ public class EnemyController : EntityControllerInterface
     {
         Vector2 position = parentScript.gameObject.transform.position;
         string[] rawInput = { "EFFECT gold boop 1 -1 1", "EFFECT xp boop 1 -1 1" };
-        parentScript.DispenseObject(parentScript.drop, position, new Vector3(), 0f, rawInput);
+        parentScript.DispenseObject(parentScript.drop, position, new Vector3(), 0f, rawInput, "powerup");
     }
 }
