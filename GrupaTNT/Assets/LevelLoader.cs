@@ -10,9 +10,8 @@ public class LevelLoader : MonoBehaviour
     public Text progressText;
 
     public void LoadLevel(int sceneID) {
-
         StartCoroutine(LoadAsynchronously(sceneID));
-       
+        LevelManager.Instance.DifficultyLevel++;
     }
 
     IEnumerator LoadAsynchronously(int sceneID) {

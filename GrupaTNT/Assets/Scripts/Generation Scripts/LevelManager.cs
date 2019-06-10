@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : Singleton<LevelManager>
 {
-    private int _difficultyLevel = 0;
+    private int _difficultyLevel = -1;
 
     public int DifficultyLevel
     {
@@ -23,25 +23,30 @@ public class LevelManager : Singleton<LevelManager>
 
     private int nextScene = generationScene;
 
-    public IEnumerator GoToNextLevel()
+    private IEnumerator GoToNextLevel()
+    {
+        var playerGameObject = GameObject.FindWithTag("Player");
+            DontDestroyOnLoad(playerGameObject);
+
+        AsyncOperation operation = SceneManager.LoadSceneAsync(loadingScene);
+
+        while (!operation.isDone)
+        {
+            yield return null;
+        }
+    
+    }
+    
+    public void LoadLevel()
     {
         if (levelProcessing == false)
         {
-
-            var playerGameObject = GameObject.FindWithTag("Player");
-            DontDestroyOnLoad(playerGameObject);
-
-            AsyncOperation operation = SceneManager.LoadSceneAsync(loadingScene);
-
-            while (!operation.isDone)
-            {
-                yield return null;
-            }
-
+            StartCoroutine(GoToNextLevel());
             _difficultyLevel++;
-            levelProcessing = true;
-            
+            Debug.Log("diff level :" + _difficultyLevel);
+                
             nextScene = nextScene == loadingScene ? generationScene : loadingScene;
+            levelProcessing = true;
         }
     }
 }
