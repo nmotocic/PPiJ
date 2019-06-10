@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6800536775554594654}
   - component: {fileID: 6800536775554594652}
   m_Layer: 0
-  m_Name: BlueSpider
+  m_Name: BlueSpider_1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,6 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  initFromStart: 0
+  rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
   speed: 5
@@ -130,7 +132,7 @@ MonoBehaviour:
   attackDuration: 0.5
   attackCooldown: 0.8
   targetObjectTag: Player
-  health: 3
+  health: 4
   poise: 0
   armor: 0
   stunMod: 1

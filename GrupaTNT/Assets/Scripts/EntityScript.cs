@@ -110,6 +110,7 @@ public class EntityScript : MonoBehaviour
 
     public void Start()
     {
+        if (parent == null) parent = gameObject;
         if (entityType.Equals("powerup"))
         {
             Init(entityType, transform.position, new Vector2(), 0f, null);

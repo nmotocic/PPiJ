@@ -132,15 +132,15 @@ public class MinoBossAI : AiScriptBase
         //LoS
         if (state == 0 && AiDefaults.getLineSight(my_pos, target))
         {   //Target obstructed
-            agent.destination = target;
+            setDestination(target, agent);
             rbody2d.velocity = new Vector2(0, 0);
         }
         else
         { //State machine
             //Pick state
-            if (state == 0) // Stop moving if winding up an attack
+            if (state == 0) // Move
             {
-                agent.destination = target;
+                setDestination(target, agent);
                 rbody2d.velocity = new Vector2(0, 0);
             }
             else //Move
@@ -191,7 +191,7 @@ public class MinoBossAI : AiScriptBase
                         alarm.setMax(dashWindup);
                         alarm.reset();
                         //Stop moving
-                        agent.destination = my_pos;
+                        setDestination(my_pos, agent);
                     }
                     //Start
                     else if (state == 1 && alarm.isActive())
@@ -245,7 +245,7 @@ public class MinoBossAI : AiScriptBase
                         alarm.setMax(slashWindup);
                         alarm.reset();
                         //Stop moving
-                        agent.destination = my_pos;
+                        setDestination(my_pos, agent);
 
                         if (buff)
                         {
@@ -292,7 +292,7 @@ public class MinoBossAI : AiScriptBase
                         alarm.setMax(spinWindup);
                         alarm.reset();
                         //Stop moving
-                        agent.destination = my_pos;
+                        setDestination(my_pos, agent);
                     }
                     //Start
                     else if (state == 1 && alarm.isActive())
@@ -351,7 +351,7 @@ public class MinoBossAI : AiScriptBase
                         alarm.setMax(slamWindup);
                         alarm.reset();
                         //Stop moving
-                        agent.destination = my_pos;
+                        setDestination(my_pos, agent);
                     }
                     //Slam
                     else if (state == 1 && alarm.isActive())
@@ -454,5 +454,14 @@ public class MinoBossAI : AiScriptBase
     public override void setDanger(bool level)
     {
         danger = level;
+    }
+
+    public void setDestination(Vector2 pos, NavMeshAgent agent)
+    {
+        if (agent.isOnNavMesh) agent.SetDestination(pos);
+        else
+        {
+            //Do stuff
+        }
     }
 }
