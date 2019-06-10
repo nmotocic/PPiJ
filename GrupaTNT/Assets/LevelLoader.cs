@@ -19,6 +19,7 @@ public class LevelLoader : MonoBehaviour
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneID);
 
         loadingScreen.SetActive(true);
+        //operation.allowSceneActivation = false;
 
         while (!operation.isDone) {
 
@@ -28,7 +29,9 @@ public class LevelLoader : MonoBehaviour
             slider.value = progress;
             progressText.text = progress * 100f + "%";
             //wait a frame
-            yield return null;
+            yield return operation;
         }
+        
+        operation.allowSceneActivation = true;
     }
 }
