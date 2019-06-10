@@ -114,7 +114,7 @@ public class EntityScript : MonoBehaviour
 
     public void Start()
     {
-        if (Time.time>0) { return; }
+        // if (Time.time>0) { return; }
         Init(entityType, transform.position, new Vector2(0.0f,0.0f), 0f, null);
     }
 
