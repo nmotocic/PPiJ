@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
@@ -11,11 +13,12 @@ public class SpawnController : MonoBehaviour
     private LevelGenerator.Room[,] roomGrid;
 
     private List<string> enemyNames;
-    private List<string> powerUpNames;
+    private List<string> powerupNames;
     private List<string> bossNames;
     private string playerName;
 
     private FlagController _controller;
+    private LevelManager _levelManager;
 
     // Start is called before the first frame update
     void Start()
@@ -24,50 +27,32 @@ public class SpawnController : MonoBehaviour
 
     private void Awake()
     {
-        DirectoryInfo directoryInfoEnemy = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/EnemyData"));
-        FileInfo[] filenamesEnemy = directoryInfoEnemy.GetFiles();
+        enemyNames = GetPrefabsNames("EnemyData");
+        bossNames = GetPrefabsNames("BossData");
+        powerupNames = GetPrefabsNames("PowerupData");
 
-        //There could be other metafiles in the directory so we check how many room files we have.
-        enemyNames = new List<string>();
-        foreach (FileInfo filename in filenamesEnemy)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-            {
-                enemyNames.Add(filename.Name);
-            }
-        }
-
-        DirectoryInfo directoryInfoPowerup = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/PowerupData"));
-        FileInfo[] filenamesPowerup = directoryInfoPowerup.GetFiles();
-
-        //There could be other metafiles in the directory so we check how many room files we have.
-        powerUpNames = new List<string>();
-        foreach (FileInfo filename in filenamesPowerup)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-            {
-                powerUpNames.Add(filename.Name);
-            }
-        }
-        
-        
-        DirectoryInfo directoryInfoBoss = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/BossData"));
-        FileInfo[] filenamesBoss = directoryInfoBoss.GetFiles();
-
-        //There could be other metafiles in the directory so we check how many room files we have.
-        bossNames = new List<string>();
-        foreach (FileInfo filename in filenamesBoss)
-        {
-            if (filename.Name.EndsWith(".prefab"))
-            {
-                bossNames.Add(filename.Name);
-            }
-        }
-        
         DirectoryInfo directoryInfoPlayer = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/PlayerData"));
         FileInfo[] filenamesPlayer = directoryInfoPlayer.GetFiles();
 
         playerName = filenamesPlayer[0].Name;
+    }
+
+    private List<string> GetPrefabsNames(string folderName)
+    {
+        DirectoryInfo directoryInfo = new DirectoryInfo(Path.Combine(Application.dataPath, "Resources/" + folderName));
+        FileInfo[] filenames = directoryInfo.GetFiles();
+
+        //There could be other metafiles in the directory so we check how many room files we have.
+        var names = new List<string>();
+        foreach (FileInfo filename in filenames)
+        {
+            if (filename.Name.EndsWith(".prefab"))
+            {
+                names.Add(filename.Name);
+            }
+        }
+
+        return names;
     }
 
     public void Initialize()
@@ -75,6 +60,7 @@ public class SpawnController : MonoBehaviour
         roomGrid = LevelGenerator.RoomGrid;
         gridHeightWidth = gameObject.GetComponent<LevelGenerator>().gridWidthHeight;
         _controller = GameObject.FindWithTag("Manager").GetComponent<FlagController>();
+        _levelManager = LevelManager.Instance;
     }
 
     public static void MoveObjectToRoomCenter(GameObject player, LevelGenerator.Room room)
@@ -98,14 +84,12 @@ public class SpawnController : MonoBehaviour
             loadedPlayer.transform.position = new Vector3(room.roomGameObject.transform
                 .Find("Floor").GetComponent<Tilemap>().localBounds.center.x, room.roomGameObject.transform
                 .Find("Floor").GetComponent<Tilemap>().localBounds.center.y, 0);
-
-
+            
             var spawnedPlayer = Instantiate(loadedPlayer);
 
             return spawnedPlayer;
     }
 
-    
     public void SpawnForAllRooms()
     {
         for (int i = 0; i < gridHeightWidth; i++)
@@ -118,6 +102,14 @@ public class SpawnController : MonoBehaviour
                 SpawnBoss(vec);
             }
         }
+    }
+    
+    // Not going to be used
+    public void SpawnForSingleRoom(Vector2Int gridPosition)
+    {
+        SpawnRoomEnemies(gridPosition);
+        SpawnRoomPowerUps(gridPosition);
+        SpawnBoss(gridPosition);
     }
 
     private void SpawnRoomPowerUps(Vector2Int position)
@@ -132,7 +124,7 @@ public class SpawnController : MonoBehaviour
 
         foreach (var realPosition in flagWorldPositions)
         {
-            string pickedFile = powerUpNames[Random.Range(0, powerUpNames.Count)];
+            string pickedFile = powerupNames[Random.Range(0, powerupNames.Count - 1)];
 
             GameObject loadedPowerup = Resources.Load<GameObject>(room_prefix +
                                                                 pickedFile.Substring(0,
@@ -162,15 +154,28 @@ public class SpawnController : MonoBehaviour
 
             foreach (var realPosition in enemyWorldPositions)
             {
-                string pickedFile = enemyNames[Random.Range(0, enemyNames.Count)];
-
+                //find all needed difficulty enemies
+                var difficultyEnemies = enemyNames.FindAll(
+                    new Predicate<string>(s => 
+                        s.Substring(0, s.LastIndexOf(".prefab")).
+                            EndsWith(_levelManager.DifficultyLevel.ToString())));
+                
+                string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count - 1)];
+                
                 GameObject loadedEnemy = Resources.Load<GameObject>(room_prefix +
                                                                     pickedFile.Substring(0,
                                                                         pickedFile.LastIndexOf(".")));
                 GameObject createdEnemy = Instantiate(loadedEnemy);
+                
                 createdEnemy.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
                 createdEnemy.transform.Translate(realPosition);
 
+                var agentScript = createdEnemy.GetComponent<NavMeshAgent>();
+                if (agentScript != null)
+                {
+                    agentScript.enabled = true;
+                }
+                
                 enemies.Add(createdEnemy);
             }
         }
@@ -183,26 +188,36 @@ public class SpawnController : MonoBehaviour
         if (roomGrid[position.y, position.x].bossRoom)
         {
             var RoomGameObject = roomGrid[position.y, position.x].roomGameObject;
-            var enemyWorldPositions = RoomGameObject.transform.Find("Floor")
+            var center = RoomGameObject.transform.Find("Floor")
                 .GetComponent<Tilemap>().localBounds.center;
-
+            
+            Debug.LogWarning("Spawned boss in room:" + position.y.ToString() + " " + position.x.ToString() 
+                      + " " + roomGrid[position.y, position.x].roomGameObject.name);
+            
             GameObject boss;
 
             string room_prefix = "BossData/";
 
-            string pickedFile = bossNames[Random.Range(0, bossNames.Count)];
+            string pickedFile = bossNames[Random.Range(0, bossNames.Count - 1)];
 
             GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
                                                                pickedFile.Substring(0,
                                                                    pickedFile.LastIndexOf(".")));
             GameObject createdBoss = Instantiate(loadedBoss);
-            createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
-            createdBoss.transform.Translate(enemyWorldPositions);
 
+            createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
+            createdBoss.transform.Translate(center);
+            
+            var agentScript = createdBoss.GetComponent<NavMeshAgent>();
+            if (agentScript != null)
+            {
+                agentScript.enabled = true;
+            }
+            
             boss = createdBoss;
         }
     }
-    
+
     private List<Vector3> FindRoomFlags(Vector2Int position, string flagName)
     {
         LevelGenerator.Room room;

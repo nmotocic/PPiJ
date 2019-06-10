@@ -44,6 +44,7 @@ public class LevelGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1;
         _controller = GetComponent<FlagController>();
         _spawnController = GetComponent<SpawnController>();
         
@@ -129,15 +130,19 @@ public class LevelGenerator : MonoBehaviour
         **/
 
         AddNavMeshModifierToWalls();
+        AddNavMeshModifierToPillars();
         AddTagToEveryRoomWall();
+        AddTagToEveryRoomPillar();
         BakeNavMesh();
         
         this.gameObject.GetComponent<SpawnController>().Initialize();
-        this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
+        //this.gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
 
-        this.gameObject.GetComponent<LocationController>().Initialize(startingGridPostion, RoomGrid, playerGameObject);
+        this.gameObject.GetComponent<LocationController>()
+            .Initialize(startingGridPostion, RoomGrid, playerGameObject, gameObject.GetComponent<SpawnController>());
 
         RemoveFlagRendering();
+        _spawnController.SpawnForAllRooms();
 
         Debug.Assert(madeBossRoom);
     }
@@ -154,6 +159,11 @@ public class LevelGenerator : MonoBehaviour
     {
         AddComponentToRooms(typeof(NavMeshModifier), "Walls", SetUnwalkableOverride);
     }
+    
+    private void AddNavMeshModifierToPillars()
+    {
+        AddComponentToRooms(typeof(NavMeshModifier), "Pillars", SetUnwalkableOverride);
+    }
     private void SetUnwalkableOverride(Component component)
     {
         var Modcomponent = component as NavMeshModifier;
@@ -164,6 +174,11 @@ public class LevelGenerator : MonoBehaviour
     private void AddTagToEveryRoomWall()
     {
         AddLayerTagToEveryRoomObject("Obstruction", "Walls");
+    }
+
+    private void AddTagToEveryRoomPillar()
+    {
+        AddLayerTagToEveryRoomObject("Obstruction", "Pillars");
     }
 
     private void RemoveFlagRendering()
@@ -587,7 +602,7 @@ public class LevelGenerator : MonoBehaviour
             bool makeBossRoom = false;
             if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
             {
-                //Is it a hallway?
+                //Is it not a hallway?
                 if (!pickedRoom.name.EndsWith("_2"))
                 {
                     makeBossRoom = true;
