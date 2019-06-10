@@ -43,6 +43,7 @@ public class EntityScript : MonoBehaviour
     public Dictionary<FSQI, FSQI> directAccess = new Dictionary<FSQI, FSQI>();
     public List<GameObject> projectileOptions = new List<GameObject>();
     List<GameObject> firedProjectiles = new List<GameObject>();
+    public GameObject drop;
     Rigidbody2D rb2d;
     public float speed = 20f;
     public string entityType = null;
@@ -53,10 +54,10 @@ public class EntityScript : MonoBehaviour
         {
             DontDestroyOnLoad(this);
 
-            if (FindObjectsOfType(GetType()).Length > 1)
+            /*if (FindObjectsOfType(GetType()).Length > 1)
             {
                 Destroy(gameObject);
-            }
+            }*/
         }
     }
 
@@ -158,9 +159,12 @@ public class EntityScript : MonoBehaviour
 
         if (otherES != null)
         {
-            if (other.gameObject.CompareTag(parent.tag) || otherES.parent != null && otherES.parent.gameObject.CompareTag(gameObject.tag))
+            if (parent!=null)
             {
-                return;
+                if (other.gameObject.CompareTag(parent.tag) || otherES.parent != null && otherES.parent.gameObject.CompareTag(gameObject.tag))
+                {
+                    return;
+                }
             }
 
             foreach (string effect in impactEffects.Keys)
