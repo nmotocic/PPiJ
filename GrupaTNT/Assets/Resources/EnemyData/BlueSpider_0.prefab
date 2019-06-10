@@ -52,6 +52,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 0}
   speed: 5
   entityType: enemy
 --- !u!195 &6800536775554594642
@@ -222,7 +223,7 @@ PrefabInstance:
     - target: {fileID: 2665726241571951069, guid: 993194b8ed3372648b8fa86c3a0e4af3,
         type: 3}
       propertyPath: m_SortingOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 993194b8ed3372648b8fa86c3a0e4af3, type: 3}

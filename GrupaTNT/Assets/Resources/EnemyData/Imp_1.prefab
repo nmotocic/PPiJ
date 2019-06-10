@@ -52,6 +52,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 0}
   speed: 5
   entityType: enemy
 --- !u!195 &8932913874426895907
@@ -118,6 +119,7 @@ MonoBehaviour:
   targetObjectTag: Player
   projectileObject: {fileID: 4547538877460868112, guid: bf8bbec0a55625c4982d7ba45e62f54d,
     type: 3}
+  projectileDamage: 1
   health: 6
   poise: 0
   armor: 0
@@ -219,7 +221,7 @@ PrefabInstance:
     - target: {fileID: 4812096706188906537, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}
       propertyPath: m_SortingOrder
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ae38f0fbdda665418fc264e9c8db396, type: 3}
