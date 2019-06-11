@@ -6,12 +6,15 @@ public class ProjectileController : EntityControllerInterface
 {
     EntityScript parentScript;
     Vector2 direction;
-
+    Vector2 lastLocation;
+    float range;
     float speed;
     public void damage(int dmg) {; }
     // Start is called before the first frame update
-    public ProjectileController(EntityScript ps, Vector2 direction, float speed)
+    public ProjectileController(EntityScript ps, Vector2 direction, float speed, float range)
     {
+        this.range = range;
+        this.lastLocation = ps.transform.position;
         this.direction = direction;
         this.parentScript = ps;
         this.speed = speed;
@@ -19,6 +22,10 @@ public class ProjectileController : EntityControllerInterface
     // Update is called once per frame
     public void Update()
     {
+        Vector2 location = parentScript.transform.position;
+        range -= (location - lastLocation).magnitude;
+        if (range <= 0) { death(); }
+        lastLocation = location;
     }
     public Vector2 getMovement() { return direction * speed; }
     public void OnCollisionEnter2D(Collision2D col)
@@ -45,5 +52,7 @@ public class ProjectileController : EntityControllerInterface
         var es = col.gameObject.GetComponent<EntityScript>();
         //Do stuff
     }
-    public void death() { }
+    public void death() {
+        GameObject.Destroy(parentScript.gameObject);
+    }
 }

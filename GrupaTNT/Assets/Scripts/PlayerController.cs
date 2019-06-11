@@ -14,6 +14,7 @@ public class PlayerController : EntityControllerInterface
         if (speed == 0f) { speed = this.speed; }
         parentScript.stats.Add("health", new FloatStat("health", health));
         parentScript.stats.Add("ranged", new FloatStat("ranged", 1));
+        parentScript.stats.Add("projectileRange", new FloatStat("projectileRange", 5));
         parentScript.stats.Add("damage", new FloatStat("ranged", 1));
         parentScript.stats.Add("gold", new FloatStat("gold", 0.01f));
         parentScript.stats.Add("experience", new FloatStat("experience", 0));

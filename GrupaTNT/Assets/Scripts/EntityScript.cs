@@ -103,20 +103,21 @@ public class EntityScript : MonoBehaviour
     }
     public void getController(string entityType, Vector2 direction, float speed = 0)
     {
+        float range = stats.ContainsKey("range") ? stats["range"].getCompoundValue() : 0.01f;
         if (direction == null) direction = Vector2.zero;
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         if (rb2d == null) { rb2d = gameObject.AddComponent<Rigidbody2D>(); }
         if (entityType != null)
         {
             if (entityType.Equals("player")) { controller = new PlayerController(this, speed); }
-            else if (entityType.Equals("projectile")) { controller = new ProjectileController(this, direction, speed); }
+            else if (entityType.Equals("projectile")) { controller = new ProjectileController(this, direction, speed, range); }
             else if (entityType.Equals("powerup")) { controller = new PowerupController(this); }
             else if (entityType.Equals("enemy")) { controller = new EnemyController(this); }
         }
         else
         {
             if (gameObject.CompareTag(GameDefaults.Player())) { controller = new PlayerController(this, speed); }
-            else if (gameObject.CompareTag(GameDefaults.Projectile())) { controller = new ProjectileController(this, direction, speed); }
+            else if (gameObject.CompareTag(GameDefaults.Projectile())) { controller = new ProjectileController(this, direction, speed, range); }
             else if (gameObject.CompareTag(GameDefaults.Powerup())) { controller = new PowerupController(this); }
             else if (gameObject.CompareTag(GameDefaults.Enemy())) { controller = new EnemyController(this);}
         }
@@ -287,6 +288,9 @@ public class EntityScript : MonoBehaviour
 
     public void DispenseObject(GameObject dispensable, Vector2 location, Vector2 direction, float speed = 0.2f, string[] input=null, string type="projectile")
     {
+        string s = "";
+        foreach (FloatStat f in stats.Values) { s += " " + f.getName() + " " + f.getCompoundValue(); }
+        Debug.Log(s);
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
         y.Init(type, location, direction, speed, gameObject);
@@ -298,9 +302,9 @@ public class EntityScript : MonoBehaviour
         {
             float dmg = stats["ranged"].getCompoundValue();
             y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
+            y.rawInput.Add("STAT range "+stats["projectileRange"].getCompoundValue().ToString());
         }
         y.Input();
-        Debug.Log(speed);
         y.Init(type,location,direction,speed,gameObject);
     }
     Vector2 GetLocation()
