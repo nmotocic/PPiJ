@@ -200,7 +200,8 @@ MonoBehaviour:
   initFromStart: 0
   rawInput: []
   parent: {fileID: 0}
-  projectileOptions: []
+  projectileOptions:
+  - {fileID: 4547538877460868112, guid: bf8bbec0a55625c4982d7ba45e62f54d, type: 3}
   drop: {fileID: 0}
   speed: 5
   entityType: player

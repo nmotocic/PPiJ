@@ -52,7 +52,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
-  drop: {fileID: 0}
+  drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: enemy
 --- !u!195 &6800536775554594642
@@ -145,11 +145,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6800536775554594653}
     m_Modifications:
-    - target: {fileID: 4042398610007553218, guid: 993194b8ed3372648b8fa86c3a0e4af3,
-        type: 3}
-      propertyPath: m_Name
-      value: SpiderSprite
-      objectReference: {fileID: 0}
     - target: {fileID: 1105195850964201608, guid: 993194b8ed3372648b8fa86c3a0e4af3,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -214,6 +209,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4042398610007553218, guid: 993194b8ed3372648b8fa86c3a0e4af3,
+        type: 3}
+      propertyPath: m_Name
+      value: SpiderSprite
       objectReference: {fileID: 0}
     - target: {fileID: 2665726241571951069, guid: 993194b8ed3372648b8fa86c3a0e4af3,
         type: 3}

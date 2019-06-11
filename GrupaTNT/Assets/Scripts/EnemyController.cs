@@ -25,9 +25,9 @@ public class EnemyController : EntityControllerInterface
         parentScript = ps;
         parent = ps.gameObject;
         myAi = parent.GetComponent<AiScriptBase>();
-        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage);
+        myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage, ref rangeDamage);
         stun = poiseMax;
-        parentScript.stats["ranged"] = new FloatStat("ranged", (float) meleeDamage);
+        parentScript.stats["ranged"] = new FloatStat("ranged", (float)rangeDamage);
         parentScript.stats["health"] = new FloatStat("health", (float)health);
         parentScript.stats["armor"] = new FloatStat("armor", (float)armor);
         parentScript.stats["damage"] = new FloatStat("damage", (float)meleeDamage);
