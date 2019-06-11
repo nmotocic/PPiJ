@@ -27,7 +27,8 @@ public class EnemyController : EntityControllerInterface
         myAi = parent.GetComponent<AiScriptBase>();
         myAi.getStats(ref health, ref armor, ref poiseMax, ref meleeDamage, ref rangeDamage);
         stun = poiseMax;
-        parentScript.stats["ranged"] = new FloatStat("ranged", (float) rangeDamage);
+        parentScript.stats.Add("projectileRange", new FloatStat("projectileRange", 10f));
+        parentScript.stats["ranged"] = new FloatStat("ranged", (float)rangeDamage);
         parentScript.stats["health"] = new FloatStat("health", (float)health);
         parentScript.stats["armor"] = new FloatStat("armor", (float)armor);
         parentScript.stats["damage"] = new FloatStat("damage", (float)meleeDamage);
@@ -78,13 +79,14 @@ public class EnemyController : EntityControllerInterface
     {
         myAi.setState(-2);
         parent.GetComponent<Collider2D>().enabled = false;
+        parent.GetComponent<Rigidbody2D>().velocity = new Vector3(0,0,0);
         myAi.setDanger(false);
         if (!dropped) { lootDrop(); dropped = true; }
     }
     public void lootDrop()
     {
         Vector2 position = parentScript.gameObject.transform.position;
-        string[] rawInput = { "EFFECT gold boop 1 -1 1", "EFFECT xp boop 1 -1 1" };
+        string[] rawInput = { "EFFECT gold boop 1 -1 1", "EFFECT experience boop 1 -1 1" };
         parentScript.DispenseObject(parentScript.drop, position, new Vector3(), 0f, rawInput, "powerup");
     }
 }

@@ -592,6 +592,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 0}
   speed: 5
   entityType: powerup
 --- !u!61 &910608147

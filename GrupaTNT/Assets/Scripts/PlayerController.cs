@@ -15,7 +15,7 @@ public class PlayerController : EntityControllerInterface
         parentScript.stats.Add("health", new FloatStat("health", health));
         parentScript.stats.Add("ranged", new FloatStat("ranged", 1));
         parentScript.stats.Add("damage", new FloatStat("ranged", 1));
-        parentScript.stats.Add("gold", new FloatStat("gold", 0));
+        parentScript.stats.Add("gold", new FloatStat("gold", 0.01f));
         parentScript.stats.Add("experience", new FloatStat("experience", 0));
         parentScript.stats.Add("armor", new FloatStat("armor", 5));
         parentScript.stats.Add("speed", new FloatStat("speed", speed));
@@ -43,7 +43,7 @@ public class PlayerController : EntityControllerInterface
     public void damage(int dmg)
     {
         health -= 0;
-        Debug.Log("Hp:"+health);
+        //Debug.Log("Hp:"+health);
         if (health==0) { death(); }
     }
 

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8932913874426895905}
   - component: {fileID: 8932913874426895910}
   m_Layer: 0
-  m_Name: Imp
+  m_Name: Imp_1
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -48,9 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef3bafa762ccb7b23931720ad0590f60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  input: []
+  initFromStart: 0
+  rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: enemy
 --- !u!195 &8932913874426895907
@@ -117,6 +119,7 @@ MonoBehaviour:
   targetObjectTag: Player
   projectileObject: {fileID: 4547538877460868112, guid: bf8bbec0a55625c4982d7ba45e62f54d,
     type: 3}
+  projectileDamage: 1
   health: 6
   poise: 0
   armor: 0

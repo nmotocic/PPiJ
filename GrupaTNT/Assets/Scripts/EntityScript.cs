@@ -16,7 +16,7 @@ public class FSQI
         string name = stat.getName();
         try
         {
-            ES.applyPowerup(ES.stats[name], name, value, time);
+            ES.applyPowerup(ES.stats[name], name, value, time, mode);
         }
         catch (System.Exception e)
         {
@@ -75,7 +75,7 @@ public class EntityScript : MonoBehaviour
         foreach (string line in rawInput)
         {
             string[] split = line.Split(' ');
-            Debug.Log(line + split.Length.ToString());
+            Debug.Log(gameObject + line + split.Length.ToString());
             if (split.Length == 0) { continue; }
             if (split[0].Equals("STAT"))
             {
@@ -151,9 +151,9 @@ public class EntityScript : MonoBehaviour
         }*/
         controller.Update();
         //DEBUG REMOVE AFTER TESTIIIING
-        if (stats.ContainsKey("health")&&CompareTag(GameDefaults.Player()))
+        if (stats.ContainsKey("gold")&&CompareTag(GameDefaults.Player()))
         {
-            Debug.Log("Hp:" + stats["health"].getCompoundValue());
+            Debug.Log("Gold:" + stats["gold"].getCompoundValue());
         }
         Vector2 movement = controller.getMovement();
         rb2d.velocity = movement;
@@ -191,7 +191,7 @@ public class EntityScript : MonoBehaviour
 
             foreach (string effect in impactEffects.Keys)
             {
-                Debug.Log(effect);
+                //Debug.Log(effect);
                 if (effect.Equals("damage"))
                 {
                     if (!otherES.stats.ContainsKey("health"))
@@ -224,12 +224,12 @@ public class EntityScript : MonoBehaviour
                 else
                 {
                     FSQI effectData = impactEffects[effect];
-                    if (!otherES.stats.ContainsKey(effectData.stat.getName())) continue;
+                    Debug.Log(otherES.stats.ContainsKey(effect).ToString()+effect);
+                    if (!otherES.stats.ContainsKey(effect)) continue;
                     effectData.ApplyTo(otherES);
                 }
             }
         }
-        Debug.Log(gameObject.tag + other.tag);
         if (gameObject.CompareTag(GameDefaults.Powerup())&& other.CompareTag(GameDefaults.Player()))
         {
             Destroy(gameObject);
@@ -289,13 +289,16 @@ public class EntityScript : MonoBehaviour
     {
         GameObject x = Instantiate(dispensable);
         EntityScript y = x.AddComponent<EntityScript>();
-        y.Init("projectile", location, direction, speed, gameObject);
-        float dmg = stats["ranged"].getCompoundValue();
+        y.Init(type, location, direction, speed, gameObject);
         if (input != null)
         {
             y.rawInput.AddRange(input);
         }
-        y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
+        if (type == "projectile")
+        {
+            float dmg = stats["ranged"].getCompoundValue();
+            y.rawInput.Add("EFFECT damage irrelevant " + dmg.ToString() + " 0 1");
+        }
         y.Input();
         Debug.Log(speed);
         y.Init(type,location,direction,speed,gameObject);
@@ -313,11 +316,15 @@ public class EntityScript : MonoBehaviour
         FSQI powerup, template, existing;
         powerup = new FSQI(stat,powName,value,time);
         template = new FSQI(stat, powName);
+        Debug.Log(stat.getName()+mode);
         if (directAccess.ContainsKey(template)) {
             existing = directAccess[template];
             queue[time_period(existing.time)].Remove(existing);
             directAccess.Remove(template);
         } else { queue[timePeriod] = new List<FSQI>(); }
+        if (mode == 1) {
+            stat.ChangeWithFactor(powName, value);return;
+        }
         stat.setFactor(powName, value);
 
         if (duration > 0) {

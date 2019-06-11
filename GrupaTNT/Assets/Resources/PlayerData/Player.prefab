@@ -111,7 +111,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8167517387051914300}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 4.96, y: -4.96, z: 0}
   m_LocalScale: {x: 0.32, y: 0.32, z: 1}
   m_Children:
   - {fileID: 7912172688522324103}
@@ -201,7 +201,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions:
-  - {fileID: 0}
+  - {fileID: 4547538877460868112, guid: bf8bbec0a55625c4982d7ba45e62f54d, type: 3}
   drop: {fileID: 0}
   speed: 5
   entityType: player
