@@ -102,7 +102,7 @@ public class LocationController : MonoBehaviour
         if (roomGrid[position.y, position.x] == null)
             return;
 
-        if (!alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
+        if (alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
         {
             var BossGameObject = roomGrid[position.y, position.x].boss[0];
             BossGameObject.GetComponent<NavMeshAgent>().enabled = true;
