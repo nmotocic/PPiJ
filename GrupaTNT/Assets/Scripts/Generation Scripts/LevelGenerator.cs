@@ -502,7 +502,7 @@ public class LevelGenerator : MonoBehaviour
 
         if (((float) n / branchMaxLength) >= (0.8))
         {
-            pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(3, numExitsMin), 4));
+            pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(2, numExitsMin), 4));
         } else if (((float) n / branchMaxLength) >= 0.3)
         {
             pickedExits = Math.Max(numExitsMin, Random.Range(Math.Max(1, numExitsMin), 3));
