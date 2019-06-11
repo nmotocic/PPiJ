@@ -124,7 +124,8 @@ public class SpawnController : MonoBehaviour
 
         foreach (var realPosition in flagWorldPositions)
         {
-            string pickedFile = powerupNames[Random.Range(0, powerupNames.Count - 1)];
+            string pickedFile = powerupNames[Random.Range(0, 
+                Math.Min(_levelManager.DifficultyLevel, powerupNames.Count - 1))];
 
             GameObject loadedPowerup = Resources.Load<GameObject>(room_prefix +
                                                                 pickedFile.Substring(0,
@@ -196,7 +197,8 @@ public class SpawnController : MonoBehaviour
                     s.Substring(0, s.LastIndexOf(".prefab")).
                         EndsWith(_levelManager.DifficultyLevel.ToString())));
             
-            string pickedFile = difficultyBoss[Random.Range(0, difficultyBoss.Count - 1)];
+            string pickedFile = difficultyBoss[Random.Range(0, 
+                Math.Min(_levelManager.DifficultyLevel, difficultyBoss.Count - 1))];
 
             GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
                                                                pickedFile.Substring(0,
