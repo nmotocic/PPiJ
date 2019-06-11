@@ -58,7 +58,8 @@ public class FloatStat
         }
         factors.Remove(name);
     }
-    public void ChangeWithFactor(string name, float compoundValueDiff) {
+    public void ChangeWithFactor(string name, float compoundValueDiff)
+    {
         float v = getFactor(name);
         if (v == 0) {
             if (nullifiers == 1) {
