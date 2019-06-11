@@ -599,7 +599,7 @@ public class LevelGenerator : MonoBehaviour
                 modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
 
             bool makeBossRoom = false;
-            if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
+            if ((roomsToGen < branchMaxLength/4 || n < branchMaxLength/3) && (madeBossRoom == false))
             {
                 //Is it not a hallway?
                 if (!pickedRoom.name.EndsWith("_2"))
