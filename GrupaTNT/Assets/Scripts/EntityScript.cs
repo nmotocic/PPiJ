@@ -257,6 +257,14 @@ public class EntityScript : MonoBehaviour
                     {
                         otherEntity.enabled = true;
                     }
+                    
+                    // Wake up the boss script if it is attacked
+                    var otherBoss = other.GetComponent<MinoBossAI>();
+                    if (otherBoss != null && !otherBoss.enabled)
+                    {
+                        otherBoss.enabled = true;
+                    }
+
                 }
             }
             //Enemy coll
