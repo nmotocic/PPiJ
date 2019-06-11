@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 26017975052970693}
   - component: {fileID: 26017975052970691}
   - component: {fileID: 26017975052970690}
+  - component: {fileID: 5649410963076836288}
   m_Layer: 0
   m_Name: gold
   m_TagString: Powerup
@@ -28,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 26017975052970694}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5, y: 1, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -70,7 +71,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: db58fd8c867991c47ac4dd9caf73b3e0, type: 3}
+  m_Sprite: {fileID: 21300000, guid: c4c8b5665c8b56d41887e1c1ebd10c9e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -128,3 +129,18 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.64, y: 0.64}
   m_EdgeRadius: 0
+--- !u!114 &5649410963076836288
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 26017975052970694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 840f05bf95ab7e6499f953cbbf9c9ba7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  randomStartAngle: 0
+  turnSpeed: 10
+  rotVector: {x: 0, y: 1, z: 0}

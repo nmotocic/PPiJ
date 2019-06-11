@@ -52,6 +52,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: enemy
 --- !u!195 &6325184700375950009
@@ -147,11 +148,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 6325184700375949991}
     m_Modifications:
-    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
-        type: 3}
-      propertyPath: m_Name
-      value: ImpSprite
-      objectReference: {fileID: 0}
     - target: {fileID: 5613109189211214858, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -216,6 +212,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
+        type: 3}
+      propertyPath: m_Name
+      value: ImpSprite
       objectReference: {fileID: 0}
     - target: {fileID: 4812096706188906537, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}

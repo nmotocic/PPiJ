@@ -204,7 +204,7 @@ public class MinoBossAI : AiScriptBase
                             agent.speed = dashSpeed * 1.5f;
                             agent.angularSpeed = dashAngular * 4f;
                             agent.acceleration = dashAccel * 4f;
-                            agent.destination = target;
+                            setDestination(target, agent);
                             buff = false;
                             if( myBuff!=null ) myBuff.GetComponent<AI_Effect>().deActivate();
                             alarm.setMax(dashDuration/2);
@@ -215,7 +215,7 @@ public class MinoBossAI : AiScriptBase
                             agent.speed = dashSpeed;
                             agent.angularSpeed = dashAngular;
                             agent.acceleration = dashAccel;
-                            agent.destination = target;
+                            setDestination(target, agent);
                             alarm.setMax(dashDuration);
                             alarm.reset();
                         }
@@ -427,6 +427,14 @@ public class MinoBossAI : AiScriptBase
         agent.speed = agentSpeed;
         agent.angularSpeed = agentAngleSpeed;
         agent.acceleration = agentAccel;
+        if (set == -2)
+        {
+            agent.enabled = false;
+        }
+        else
+        {
+            agent.enabled = true;
+        }
     }
 
     public override void setAlarm(float duration)
@@ -458,6 +466,7 @@ public class MinoBossAI : AiScriptBase
 
     public void setDestination(Vector2 pos, NavMeshAgent agent)
     {
+        if (!agent.enabled) return;
         if (agent.isOnNavMesh) agent.SetDestination(pos);
         else
         {

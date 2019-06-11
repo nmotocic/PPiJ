@@ -78,6 +78,7 @@ public class EnemyController : EntityControllerInterface
     {
         myAi.setState(-2);
         parent.GetComponent<Collider2D>().enabled = false;
+        parent.GetComponent<Rigidbody2D>().velocity = new Vector3(0,0,0);
         myAi.setDanger(false);
         if (!dropped) { lootDrop(); dropped = true; }
     }

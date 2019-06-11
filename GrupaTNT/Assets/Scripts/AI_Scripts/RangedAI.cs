@@ -161,6 +161,13 @@ public class RangedAI : AiScriptBase
     public override void setState(int set)
     {
         state = set;
+        if (set == -2)
+        {
+            agent.enabled = false;
+        }
+        else {
+            agent.enabled = true;
+        }
     }
 
     public override void setAlarm(float duration)
@@ -193,6 +200,7 @@ public class RangedAI : AiScriptBase
 
     public void setDestination(Vector2 pos, NavMeshAgent agent)
     {
+        if (!agent.enabled) return;
         if (agent.isOnNavMesh) agent.SetDestination(pos);
         else
         {

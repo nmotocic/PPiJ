@@ -52,6 +52,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
+  drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: enemy
 --- !u!195 &3491260392113825629
@@ -173,11 +174,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3491260392113825571}
     m_Modifications:
-    - target: {fileID: 8018951749921423686, guid: 20383d7939f23f74da0012efd9ab00eb,
-        type: 3}
-      propertyPath: m_Name
-      value: Minotaur Sprite
-      objectReference: {fileID: 0}
     - target: {fileID: 8868315801110828275, guid: 20383d7939f23f74da0012efd9ab00eb,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -237,6 +233,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.x
       value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8018951749921423686, guid: 20383d7939f23f74da0012efd9ab00eb,
+        type: 3}
+      propertyPath: m_Name
+      value: Minotaur Sprite
       objectReference: {fileID: 0}
     - target: {fileID: 4507766735122444560, guid: 20383d7939f23f74da0012efd9ab00eb,
         type: 3}
