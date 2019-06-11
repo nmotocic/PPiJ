@@ -83,7 +83,7 @@ public class LocationController : MonoBehaviour
     // Enemies and boss are split because of difference in the original implementation, can be combined now
     void TurnOnMovementScriptsForEnemies(Vector2Int position)
     {
-        if (roomGrid[position.y, position.x] == null)
+        if (roomGrid[position.y, position.x] == null || alreadySpawned[position.y, position.x])
             return;
 
         if (!alreadySpawned[position.y, position.x] && !roomGrid[position.y, position.x].bossRoom)
@@ -99,14 +99,15 @@ public class LocationController : MonoBehaviour
     
     void TurnOnMovementScriptsForBoss(Vector2Int position)
     {
-        if (roomGrid[position.y, position.x] == null)
+        if (roomGrid[position.y, position.x] == null || alreadySpawned[position.y, position.x])
             return;
 
-        if (!alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
+        if (alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
         {
             var BossGameObject = roomGrid[position.y, position.x].boss[0];
             BossGameObject.GetComponent<NavMeshAgent>().enabled = true;
             BossGameObject.GetComponent<EntityScript>().enabled = true;
+            BossGameObject.GetComponent<MinoBossAI>().enabled = true;
             alreadySpawned[position.y, position.x] = true;
         }
     }

@@ -411,7 +411,7 @@ PrefabInstance:
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}
       propertyPath: roomGenNumber
-      value: 10
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}

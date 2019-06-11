@@ -124,8 +124,7 @@ public class SpawnController : MonoBehaviour
 
         foreach (var realPosition in flagWorldPositions)
         {
-            string pickedFile = powerupNames[Random.Range(0, 
-                Math.Min(_levelManager.DifficultyLevel, powerupNames.Count - 1))];
+            string pickedFile = powerupNames[Random.Range(0, powerupNames.Count)];
 
             GameObject loadedPowerup = Resources.Load<GameObject>(room_prefix +
                                                                 pickedFile.Substring(0,
@@ -148,20 +147,40 @@ public class SpawnController : MonoBehaviour
             var enemyWorldPositions = FindRoomEnemies(position);
 
             if (enemyWorldPositions == null) return;
+            
+            //find all needed difficulty enemies
+            var difficultyEnemies = enemyNames.FindAll(
+                new Predicate<string>(s => 
+                    s.Substring(0, s.LastIndexOf(".prefab")).
+                        EndsWith(_levelManager.DifficultyLevel.ToString())));
+            
+            
+            if (difficultyEnemies.Count == 0)
+            {
+                int maxDifficulty = 0;
+
+                foreach (var enemy in difficultyEnemies)
+                {
+                    var removedAppendex = enemy.Substring(0, enemy.LastIndexOf(".prefab"));
+                    int difficultyNumber = (int) char.GetNumericValue(removedAppendex, removedAppendex.Length - 1);
+
+                    if (maxDifficulty < difficultyNumber)
+                        maxDifficulty = difficultyNumber;
+                }
+                
+                difficultyEnemies = enemyNames.FindAll(
+                    new Predicate<string>(s => 
+                        s.Substring(0, s.LastIndexOf(".prefab")).
+                            EndsWith(maxDifficulty.ToString())));
+            }
 
             string room_prefix = "EnemyData/";
 
             foreach (var realPosition in enemyWorldPositions)
             {
-                //find all needed difficulty enemies
-                var difficultyEnemies = enemyNames.FindAll(
-                    new Predicate<string>(s => 
-                        s.Substring(0, s.LastIndexOf(".prefab")).
-                            EndsWith(_levelManager.DifficultyLevel.ToString())));
                 
-                Debug.LogWarning("different difficulties: " + difficultyEnemies.Count.ToString());
                 
-                string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count - 1)];
+                string pickedFile = difficultyEnemies[Random.Range(0, difficultyEnemies.Count)];
                 
                 GameObject loadedEnemy = Resources.Load<GameObject>(room_prefix +
                                                                     pickedFile.Substring(0,
@@ -197,8 +216,26 @@ public class SpawnController : MonoBehaviour
                     s.Substring(0, s.LastIndexOf(".prefab")).
                         EndsWith(_levelManager.DifficultyLevel.ToString())));
             
-            string pickedFile = difficultyBoss[Random.Range(0, 
-                Math.Min(_levelManager.DifficultyLevel, difficultyBoss.Count - 1))];
+            if (difficultyBoss.Count == 0)
+            {
+                int maxDifficulty = 0;
+
+                foreach (var boss in difficultyBoss)
+                {
+                    var removedAppendex = boss.Substring(0, boss.LastIndexOf(".prefab"));
+                    int difficultyNumber = (int) char.GetNumericValue(removedAppendex, removedAppendex.Length - 1);
+
+                    if (maxDifficulty < difficultyNumber)
+                        maxDifficulty = difficultyNumber;
+                }
+                
+                difficultyBoss = bossNames.FindAll(
+                    new Predicate<string>(s => 
+                        s.Substring(0, s.LastIndexOf(".prefab")).
+                            EndsWith(maxDifficulty.ToString())));
+            }
+            
+            string pickedFile = difficultyBoss[Random.Range(0, difficultyBoss.Count)];
 
             GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
                                                                pickedFile.Substring(0,
