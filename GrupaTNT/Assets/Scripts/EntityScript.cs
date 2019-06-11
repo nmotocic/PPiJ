@@ -250,6 +250,13 @@ public class EntityScript : MonoBehaviour
                 {
                     controller.OnTriggerEnter2D(collision);
                     GameObject.Destroy(gameObject);
+                    
+                    // Wake up the enemy entity script if it is attacked
+                    var otherEntity = other.GetComponent<EntityScript>();
+                    if (otherEntity != null && !otherEntity.enabled)
+                    {
+                        otherEntity.enabled = true;
+                    }
                 }
             }
             //Enemy coll
