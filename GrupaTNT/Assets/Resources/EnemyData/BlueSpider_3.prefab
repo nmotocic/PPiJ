@@ -151,7 +151,7 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions: []
-  drop: {fileID: 0}
+  drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: enemy
 --- !u!195 &5458288992193177761

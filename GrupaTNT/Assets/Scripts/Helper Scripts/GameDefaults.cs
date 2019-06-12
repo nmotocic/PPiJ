@@ -44,4 +44,9 @@ public abstract class GameDefaults
     {
         return -1;
     }
+
+    //Default timing
+    public static int corpseTimeout() {
+        return 10;
+    }
 }

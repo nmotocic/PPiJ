@@ -102,6 +102,13 @@ public class ChaserAI : AiScriptBase
             else if (state == GameDefaults.deatState()) {
                 //Drop stuff, get removed
                 danger = false;
+                if (alarm.getMax() != GameDefaults.corpseTimeout())
+                {
+                    alarm.setMax(GameDefaults.corpseTimeout());
+                }
+                if (alarm.isActive()) {
+                    Destroy(gameObject);
+                }
             }
 
             //--------------------------Attacking
@@ -154,10 +161,16 @@ public class ChaserAI : AiScriptBase
 
     public override void setState(int set)
     {
+        if (state != 2 && set == 2)//Despawn
+        {
+            alarm.reset();
+            alarm.setMax(GameDefaults.corpseTimeout());
+        }
         state = set;
         if (set == -2)
         {
             agent.enabled = false;
+
         }
         else
         {

@@ -36,7 +36,7 @@ public class PlayerController : EntityControllerInterface
             Vector2 position = parentScript.gameObject.transform.position;
             string[] rawInput= {"EFFECT damage boop 1 -1 1"};
             parentScript.DispenseObject(parentScript.projectileOptions[0], position, (target-position).normalized,20f,rawInput);
-            spriteAnimator.attack = true;
+            if(spriteAnimator!=null)spriteAnimator.attack = true;
         }
     }
     public Vector2 getMovement() { return direction*parentScript.stats["speed"].getCompoundValue(); }

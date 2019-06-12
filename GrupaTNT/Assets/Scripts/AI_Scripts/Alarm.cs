@@ -48,4 +48,8 @@ public class Alarm
         timerMax = max;
     }
 
+    public double getMax() {
+        return timerMax;
+    }
+
 }
