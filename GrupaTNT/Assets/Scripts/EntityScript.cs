@@ -170,7 +170,7 @@ public class EntityScript : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (gameObject.CompareTag(GameDefaults.Projectile()) && (other.CompareTag(GameDefaults.Projectile())))
+        if (gameObject.CompareTag(GameDefaults.Projectile()) && (other.CompareTag(GameDefaults.Projectile())|| other.CompareTag(GameDefaults.Powerup())))
         {
             return;
         }
