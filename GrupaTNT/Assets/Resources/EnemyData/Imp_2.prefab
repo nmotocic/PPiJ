@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 4029366516712185722}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.65, y: 0.65, z: 1}
   m_Children:
   - {fileID: 8795224884263701924}
   m_Father: {fileID: 0}
@@ -148,11 +148,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 4029366516712185696}
     m_Modifications:
-    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
-        type: 3}
-      propertyPath: m_Name
-      value: ImpSprite
-      objectReference: {fileID: 0}
     - target: {fileID: 5613109189211214858, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -217,6 +212,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalScale.y
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2693554616688586973, guid: 2ae38f0fbdda665418fc264e9c8db396,
+        type: 3}
+      propertyPath: m_Name
+      value: ImpSprite
       objectReference: {fileID: 0}
     - target: {fileID: 4812096706188906537, guid: 2ae38f0fbdda665418fc264e9c8db396,
         type: 3}

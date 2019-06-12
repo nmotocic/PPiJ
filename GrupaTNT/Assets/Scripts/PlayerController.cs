@@ -5,12 +5,14 @@ using UnityEngine;
 public class PlayerController : EntityControllerInterface
 {
     EntityScript parentScript;
+    PlayerSpriteRenderer spriteAnimator;
     Vector2 direction;
     float speed = 2f;
     public float health = 100f;
     // Start is called before the first frame update
     public PlayerController(EntityScript ps,float speed=0f) {
         parentScript = ps;
+        spriteAnimator = parentScript.gameObject.GetComponent<PlayerSpriteRenderer>();
         if (speed == 0f) { speed = this.speed; }
         parentScript.stats.Add("health", new FloatStat("health", health));
         parentScript.stats.Add("ranged", new FloatStat("ranged", 1));
@@ -34,6 +36,7 @@ public class PlayerController : EntityControllerInterface
             Vector2 position = parentScript.gameObject.transform.position;
             string[] rawInput= {"EFFECT damage boop 1 -1 1"};
             parentScript.DispenseObject(parentScript.projectileOptions[0], position, (target-position).normalized,20f,rawInput);
+            spriteAnimator.attack = true;
         }
     }
     public Vector2 getMovement() { return direction*parentScript.stats["speed"].getCompoundValue(); }
@@ -44,7 +47,10 @@ public class PlayerController : EntityControllerInterface
     {
         health -= 0;
         //Debug.Log("Hp:"+health);
-        if (health==0) { death(); }
+        if (health==0) {
+            death();
+            spriteAnimator.dead = true;
+        }
     }
 
     public void OnTriggerEnter2D(Collider2D col)
