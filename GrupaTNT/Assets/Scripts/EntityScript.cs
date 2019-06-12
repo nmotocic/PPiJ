@@ -202,6 +202,9 @@ public class EntityScript : MonoBehaviour
                 //Debug.Log(effect);
                 if (effect.Equals("damage"))
                 {
+                    if (gameObject.CompareTag(GameDefaults.Enemy())) {
+                        if (!gameObject.GetComponent<AiScriptBase>().isDangerous()) continue;
+                    }
                     if (!otherES.stats.ContainsKey("health"))
                     {
                         continue;
@@ -243,6 +246,7 @@ public class EntityScript : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        //Stari kod
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
@@ -254,7 +258,7 @@ public class EntityScript : MonoBehaviour
                     Destroy(gameObject);
                     return;
                 }
-                if (parent!=null&&!parent.CompareTag(other.gameObject.tag))
+                if (parent!=null &&! parent.CompareTag(other.gameObject.tag))
                 {
                     controller.OnTriggerEnter2D(collision);
                     GameObject.Destroy(gameObject);
@@ -292,6 +296,7 @@ public class EntityScript : MonoBehaviour
                 //Player
                 else if (other.gameObject.CompareTag(GameDefaults.Player()))
                 {
+                    if(controller !=null  && collision != null)
                     controller.OnTriggerEnter2D(collision);
                 }
             }
@@ -303,6 +308,7 @@ public class EntityScript : MonoBehaviour
                 }
             }
         }
+        
     }
     private void OnTriggerEnter2D(Collider2D collision) {
         OnTriggerStay2D(collision);

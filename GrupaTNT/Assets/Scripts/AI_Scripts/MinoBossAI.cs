@@ -470,7 +470,20 @@ public class MinoBossAI : AiScriptBase
         if (agent.isOnNavMesh) agent.SetDestination(pos);
         else
         {
-            //Do stuff
+            snapToMesh();
         }
+    }
+
+    public bool snapToMesh()
+    {
+
+        NavMeshHit hitCoord;
+        if (NavMesh.SamplePosition(rbody2d.position, out hitCoord, 5, NavMesh.AllAreas))
+        {
+            Debug.Log("Snapping to mesh...");
+            transform.position = hitCoord.position;
+        }
+        Debug.LogWarning("Failed snapping to mesh.");
+        return false;
     }
 }
