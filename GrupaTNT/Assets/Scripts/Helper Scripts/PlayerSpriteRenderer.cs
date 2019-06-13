@@ -20,6 +20,8 @@ public class PlayerSpriteRenderer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        anim.SetFloat("Velocity", Mathf.Abs(rBody.velocity.magnitude));
+        anim.SetBool("Dead", dead);
         var mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         var my_pos = rBody.position;
         var flip = -Mathf.Sign(my_pos.x - mouse.x);
@@ -33,7 +35,5 @@ public class PlayerSpriteRenderer : MonoBehaviour
         {
             attack = false;
         }
-        anim.SetFloat("Velocity", Mathf.Abs(rBody.velocity.magnitude));
-        anim.SetBool("Dead", dead);
     }
 }

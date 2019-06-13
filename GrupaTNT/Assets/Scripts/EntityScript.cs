@@ -142,7 +142,11 @@ public class EntityScript : MonoBehaviour
     // Update is called once per frame
     public void Update()
     {
-
+        if (gameObject.CompareTag(GameDefaults.Player())) {
+            if (controller == null) {
+                getController("player", new Vector2(0,0), 0);
+            }
+        }
         if (controller == null) { return; }
         /*if (Input.GetMouseButtonDown(0) && gameObject.CompareTag(GameDefaults.Enemy()))
         {
@@ -204,6 +208,9 @@ public class EntityScript : MonoBehaviour
                 {
                     if (gameObject.CompareTag(GameDefaults.Enemy())) {
                         if (!gameObject.GetComponent<AiScriptBase>().isDangerous()) continue;
+                        else {
+                            gameObject.GetComponent<AiScriptBase>().setDanger(false);
+                        }
                     }
                     if (!otherES.stats.ContainsKey("health"))
                     {
@@ -304,7 +311,8 @@ public class EntityScript : MonoBehaviour
             {
                 if (other.gameObject.CompareTag(GameDefaults.LevelExit()))
                 {
-                    controller.OnTriggerEnter2D(collision);
+                    if (controller != null && collision != null)
+                        controller.OnTriggerEnter2D(collision);
                 }
             }
         }

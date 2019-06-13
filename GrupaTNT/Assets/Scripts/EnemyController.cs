@@ -32,6 +32,10 @@ public class EnemyController : EntityControllerInterface
         parentScript.stats["health"] = new FloatStat("health", (float)health);
         parentScript.stats["armor"] = new FloatStat("armor", (float)armor);
         parentScript.stats["damage"] = new FloatStat("damage", (float)meleeDamage);
+        if (meleeDamage != 0) {
+            parentScript.rawInput.Add("EFFECT damage irrelevant " + meleeDamage.ToString() + " 0 1");
+            parentScript.Input();
+        }
 
     }
 
@@ -57,13 +61,14 @@ public class EnemyController : EntityControllerInterface
         //Code
     }
     public void OnTriggerEnter2D(Collider2D col) {
-        
+        /*
         if (myAi.isDangerous())
         {
             Debug.Log("Udario nesto:" + col.gameObject);
             var es = col.gameObject.GetComponent<EntityScript>();
             myAi.setDanger(false);
         }
+        */
     }
 
     public void damage(int dmg) {

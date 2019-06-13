@@ -417,6 +417,16 @@ public class MinoBossAI : AiScriptBase
         {
             gameObject.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
         }
+        if ((gameObject.GetComponent<EntityScript>()) != null)
+        {
+            if (!gameObject.GetComponent<EntityScript>().enabled)
+            {
+                return;
+            }
+            else if(agent!=null){
+                if (!agent.enabled) agent.enabled = true;
+            }
+        }
         anim.SetInteger("State", state);
         anim.SetInteger("AttackType", attackType);
     }
