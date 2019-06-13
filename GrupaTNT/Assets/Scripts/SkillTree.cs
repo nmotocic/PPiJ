@@ -44,6 +44,8 @@ public class SkillTree : MonoBehaviour
     public Button speed3;
     public Button speed4;
 
+    public Button healthPoiton;
+
     //needs to be in player script
     public static int totalSkillPoints = 6;
     public static int totalSpentSkillPoints = 0;
@@ -135,6 +137,12 @@ public class SkillTree : MonoBehaviour
         }
         if (totalSkillPoints >= 7 && spdLvl3Pur) {
             speed4.interactable = true;
+        }
+
+        //Support
+
+        if (coins < 50) {
+            healthPoiton.interactable = false;
         }
 
     }
@@ -275,4 +283,6 @@ public class SkillTree : MonoBehaviour
         Debug.Log(movementSpeed);
 
     }
+
+    
 }
