@@ -8,12 +8,11 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : Singleton<LevelManager>
 {
-    private int _difficultyLevel = -1;
+    public int difficultyIterator = -1;
 
     public int DifficultyLevel
     {
-        get => _difficultyLevel / 2;
-        set => _difficultyLevel = value;
+        get => difficultyIterator / 2;
     }
 
     public bool levelProcessing = false;
@@ -42,8 +41,8 @@ public class LevelManager : Singleton<LevelManager>
         if (levelProcessing == false)
         {
             StartCoroutine(GoToNextLevel());
-            _difficultyLevel++;
-            Debug.Log("diff level :" + _difficultyLevel);
+            difficultyIterator++;
+            Debug.Log("diff level :" + DifficultyLevel);
                 
             nextScene = nextScene == loadingScene ? generationScene : loadingScene;
             levelProcessing = true;

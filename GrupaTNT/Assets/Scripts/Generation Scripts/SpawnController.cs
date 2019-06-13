@@ -159,7 +159,7 @@ public class SpawnController : MonoBehaviour
             {
                 int maxDifficulty = 0;
 
-                foreach (var enemy in difficultyEnemies)
+                foreach (var enemy in enemyNames)
                 {
                     var removedAppendex = enemy.Substring(0, enemy.LastIndexOf(".prefab"));
                     int difficultyNumber = (int) char.GetNumericValue(removedAppendex, removedAppendex.Length - 1);
@@ -220,7 +220,7 @@ public class SpawnController : MonoBehaviour
             {
                 int maxDifficulty = 0;
 
-                foreach (var boss in difficultyBoss)
+                foreach (var boss in bossNames)
                 {
                     var removedAppendex = boss.Substring(0, boss.LastIndexOf(".prefab"));
                     int difficultyNumber = (int) char.GetNumericValue(removedAppendex, removedAppendex.Length - 1);
