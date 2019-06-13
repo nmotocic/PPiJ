@@ -41,7 +41,7 @@ public class PlayerController : EntityControllerInterface
                 death();
             }
         }
-        //Debug.Log("Hp:"+parentScript.stats["health"].getCompoundValue()+"Delay:"+attackDelay.getTimer()+"/"+attackDelay.getMax());
+        Debug.Log("Hp:"+parentScript.stats["health"].getCompoundValue()+"Delay:"+attackDelay.getTimer()+"/"+attackDelay.getMax());
         float X = Input.GetAxis("Horizontal");
         float Y = Input.GetAxis("Vertical");
         direction = new Vector2(X, Y);
