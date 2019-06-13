@@ -11,7 +11,8 @@ public class LevelLoader : MonoBehaviour
 
     public void LoadLevel(int sceneID) {
         StartCoroutine(LoadAsynchronously(sceneID));
-        LevelManager.Instance.DifficultyLevel++;
+        LevelManager.Instance.difficultyIterator = LevelManager.Instance.difficultyIterator + 1;
+        Debug.Log("Difficulty increased to: " + LevelManager.Instance.DifficultyLevel);
     }
 
     IEnumerator LoadAsynchronously(int sceneID) {
