@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerSpriteRenderer : MonoBehaviour
 {
+    public GameObject bubbleObject;
+    private GameObject bubble;
     private Animator anim;
     private Rigidbody2D rBody;
     private EntityScript es;
@@ -20,6 +22,26 @@ public class PlayerSpriteRenderer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (es.stats.ContainsKey("armor"))
+        { //Crtaj bubble
+            if (bubble == null)
+            { //Napravi novi bubble
+                bubble = Instantiate(bubbleObject, transform);
+                bubble.GetComponent<StickToObject>().setStick(gameObject);
+            }
+            if (es.stats["armor"].getCompoundValue() >= 100)
+            {
+                bubble.GetComponentInChildren<SpriteRenderer>().enabled = true;
+            }
+            else {
+                bubble.GetComponentInChildren<SpriteRenderer>().enabled = false;
+            }
+        }
+        else {
+            if (bubble != null) {
+                bubble.GetComponentInChildren<SpriteRenderer>().enabled = false;
+            }
+        }
         anim.SetFloat("Velocity", Mathf.Abs(rBody.velocity.magnitude));
         anim.SetBool("Dead", dead);
         var mouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);

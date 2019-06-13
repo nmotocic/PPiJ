@@ -146,6 +146,10 @@ public class EntityScript : MonoBehaviour
     public void Update()
     {
         if (gameObject.CompareTag(GameDefaults.Player())) {
+            if (listAllPowerups().Count > 0) {
+                checkPowerups();
+                Debug.LogWarning("Pups:" + listAllPowerups().ToString());
+            }
             if (controller == null) {
                 getController("player", new Vector2(0,0), 0);
             }
@@ -224,13 +228,19 @@ public class EntityScript : MonoBehaviour
                     if (otherES.stats.ContainsKey("armor"))
                     {
                         FloatStat FSA = otherES.stats["armor"];
+                        if (FSA.getCompoundValue() >= 100)
+                        {
+                            x = 0;
+                        }
+                        else
                         x = Mathf.Max(x - FSA.getCompoundValue(), 1f);
                     }
                     FloatStat FSH = otherES.stats["health"];
                     otherES.controller.damage((int) x);
                     FSH.ChangeWithFactor("baseValue", 0 - x);
+                    FSH = new FloatStat ("health",Mathf.RoundToInt(FSH.getCompoundValue()));
                 }
-                else if (effect.Equals("health"))
+                else if (effect.Equals("healthBoost"))
                 {
                     if (!otherES.stats.ContainsKey("health"))
                     {
@@ -378,6 +388,7 @@ public class EntityScript : MonoBehaviour
                 currentTimePeriod++;
             }
         }
+        if(queue.ContainsKey(currentTimePeriod))
         foreach (FSQI element in queue[currentTimePeriod])
         {
             if (element.time <= time)

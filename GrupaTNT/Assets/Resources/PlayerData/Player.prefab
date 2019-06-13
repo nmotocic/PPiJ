@@ -134,10 +134,11 @@ MonoBehaviour:
   rawInput: []
   parent: {fileID: 0}
   projectileOptions:
-  - {fileID: 4547538877460868112, guid: bf8bbec0a55625c4982d7ba45e62f54d, type: 3}
-  drop: {fileID: 0}
+  - {fileID: 9194570030596714139, guid: 5bdb4c5547069af43bdaf86e2f41ba00, type: 3}
+  drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: player
+  valsInit: 0
 --- !u!50 &8167517387051914303
 Rigidbody2D:
   serializedVersion: 4
@@ -187,6 +188,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 260b71bdaf0d779498f19342453a0076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bubbleObject: {fileID: 6287532692987519958, guid: b8f002fa52e7588489f7768d821572bd,
+    type: 3}
 --- !u!1001 &8644546119371410290
 PrefabInstance:
   m_ObjectHideFlags: 0
