@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+
 public class FSQI
 {
     public FloatStat stat;
@@ -270,18 +272,12 @@ public class EntityScript : MonoBehaviour
                     controller.OnTriggerEnter2D(collision);
                     GameObject.Destroy(gameObject);
                     
-                    // Wake up the enemy entity script if it is attacked
-                    var otherEntity = other.GetComponent<EntityScript>();
-                    if (otherEntity != null && !otherEntity.enabled)
+                    // Wake up any script that is attached to the enemy + navmesh
+                    var otherChaser = other.GetComponent<AiScriptBase>();
+                    if (otherChaser != null && !otherChaser.enabled)
                     {
-                        otherEntity.enabled = true;
-                    }
-                    
-                    // Wake up the boss script if it is attacked
-                    var otherBoss = other.GetComponent<MinoBossAI>();
-                    if (otherBoss != null && !otherBoss.enabled)
-                    {
-                        otherBoss.enabled = true;
+                        otherChaser.enabled = true;
+                        other.GetComponent<NavMeshAgent>().enabled = true;
                     }
 
                 }
