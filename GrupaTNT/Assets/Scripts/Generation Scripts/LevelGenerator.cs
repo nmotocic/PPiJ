@@ -138,11 +138,28 @@ public class LevelGenerator : MonoBehaviour
         gameObject.GetComponent<SpawnController>().Initialize();
         gameObject.GetComponent<SpawnController>().SpawnForAllRooms();
 
+        if (!gameObject.GetComponent<SpawnController>().bossSpawned)
+        {
+            var spawnController = gameObject.GetComponent<SpawnController>();
+
+            foreach (var room in spawnController.roomGrid)
+            {
+                if (room != null)
+                {
+                    spawnController.ForceSpawnBoss(room.GridPosition);
+                    Debug.LogWarning("Force spawned");
+                    break;
+                }
+            }
+        }
+
         gameObject.GetComponent<LocationController>()
             .Initialize(startingGridPostion, RoomGrid, playerGameObject, gameObject.GetComponent<SpawnController>());
+        
+        gameObject.GetComponent<KillQuestController>().Init();
 
         RemoveFlagRendering();
-
+        
         Debug.Assert(madeBossRoom);
     }
 
@@ -599,7 +616,7 @@ public class LevelGenerator : MonoBehaviour
                 modifier.z*deltaTilesMid.z + previousRoom.RealPosition.z), Space.World);
 
             bool makeBossRoom = false;
-            if ((roomsToGen < branchMaxLength/4 || n < branchMaxLength/3) && (madeBossRoom == false))
+            if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
             {
                 //Is it not a hallway?
                 if (!pickedRoom.name.EndsWith("_2"))
@@ -844,10 +861,8 @@ public class LevelGenerator : MonoBehaviour
             ConnectedRoomDictionary = new Dictionary<string, Room>(4);
             HasDoor = new Dictionary<string, bool>(4);
             _controller = GameObject.FindWithTag("Manager").GetComponent<FlagController>();
-            if (!bossRoom)
-                enemies = new List<GameObject>();
-            else
-                boss = new List<GameObject>();
+            enemies = new List<GameObject>();
+            boss = new List<GameObject>();
 
             //Ugly manual setting for each type of entrance
             ConnectedRoomDictionary[_controller.DoorUp.name] = null;

@@ -10,7 +10,7 @@ public class SpawnController : MonoBehaviour
 {
     private int gridHeightWidth;
 
-    private LevelGenerator.Room[,] roomGrid;
+    public LevelGenerator.Room[,] roomGrid;
 
     private List<string> enemyNames;
     private List<string> powerupNames;
@@ -19,6 +19,12 @@ public class SpawnController : MonoBehaviour
 
     private FlagController _controller;
     private LevelManager _levelManager;
+
+    public Dictionary<string, int> enemyTypes;
+    public string bossType;
+
+    public bool bossSpawned;
+    public bool spawnedExit;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +41,9 @@ public class SpawnController : MonoBehaviour
         FileInfo[] filenamesPlayer = directoryInfoPlayer.GetFiles();
 
         playerName = filenamesPlayer[0].Name;
+        enemyTypes = new Dictionary<string, int>();
+        bossSpawned = false;
+        spawnedExit = false;
     }
 
     private List<string> GetPrefabsNames(string folderName)
@@ -88,6 +97,26 @@ public class SpawnController : MonoBehaviour
             var spawnedPlayer = Instantiate(loadedPlayer);
 
             return spawnedPlayer;
+    }
+    
+    public GameObject SpawnExitInRoomCenter(Vector2Int location)
+    {
+        string room_prefix = "LevelExitData/";
+        
+        string pickedFile = "LevelExit.prefab";
+
+        GameObject exit = Resources.Load<GameObject>(room_prefix +
+                                                             pickedFile.Substring(0,
+                                                                 pickedFile.LastIndexOf(".")));
+
+        exit.transform.position = new Vector3(roomGrid[location.y, location.x].roomGameObject.transform
+            .Find("Floor").GetComponent<Tilemap>().localBounds.center.x, roomGrid[location.y, location.x].roomGameObject.transform
+            .Find("Floor").GetComponent<Tilemap>().localBounds.center.y, 0);
+
+        var spawnedPlayer = Instantiate(exit);
+        spawnedExit = true;
+
+        return spawnedPlayer;
     }
 
     public void SpawnForAllRooms()
@@ -191,6 +220,13 @@ public class SpawnController : MonoBehaviour
                 createdEnemy.transform.Translate(realPosition);
 
                 roomGrid[position.y, position.x].enemies.Add(createdEnemy);
+
+                if (!enemyTypes.ContainsKey(createdEnemy.name))
+                {
+                    enemyTypes[createdEnemy.name] = 0;
+                }
+                
+                enemyTypes[createdEnemy.name]++;
             }
         }
     }
@@ -246,7 +282,64 @@ public class SpawnController : MonoBehaviour
             createdBoss.transform.Translate(center);
 
             roomGrid[position.y, position.x].boss.Add(createdBoss);
+            bossSpawned = true;
+            bossType = createdBoss.name;
         }
+    }
+    
+    public void ForceSpawnBoss(Vector2Int position)
+    {
+        if (roomGrid[position.y, position.x] == null) return;
+        
+
+            var RoomGameObject = roomGrid[position.y, position.x].roomGameObject;
+            var center = RoomGameObject.transform.Find("Floor")
+                .GetComponent<Tilemap>().localBounds.center;
+            
+            Debug.LogWarning("Spawned boss in room:" + position.y.ToString() + " " + position.x.ToString() 
+                      + " " + roomGrid[position.y, position.x].roomGameObject.name);
+            
+            string room_prefix = "BossData/";
+
+            //find all needed difficulty enemies
+            var difficultyBoss = bossNames.FindAll(
+                new Predicate<string>(s => 
+                    s.Substring(0, s.LastIndexOf(".prefab")).
+                        EndsWith(_levelManager.DifficultyLevel.ToString())));
+            
+            if (difficultyBoss.Count == 0)
+            {
+                int maxDifficulty = 0;
+
+                foreach (var boss in bossNames)
+                {
+                    var removedAppendex = boss.Substring(0, boss.LastIndexOf(".prefab"));
+                    int difficultyNumber = (int) char.GetNumericValue(removedAppendex, removedAppendex.Length - 1);
+
+                    if (maxDifficulty < difficultyNumber)
+                        maxDifficulty = difficultyNumber;
+                }
+                
+                difficultyBoss = bossNames.FindAll(
+                    new Predicate<string>(s => 
+                        s.Substring(0, s.LastIndexOf(".prefab")).
+                            EndsWith(maxDifficulty.ToString())));
+            }
+            
+            string pickedFile = difficultyBoss[Random.Range(0, difficultyBoss.Count)];
+
+            GameObject loadedBoss = Resources.Load<GameObject>(room_prefix +
+                                                               pickedFile.Substring(0,
+                                                                   pickedFile.LastIndexOf(".")));
+            GameObject createdBoss = Instantiate(loadedBoss);
+
+            createdBoss.transform.Translate(roomGrid[position.y, position.x].roomGameObject.transform.position);
+            createdBoss.transform.Translate(center);
+
+            roomGrid[position.y, position.x].boss.Add(createdBoss);
+            bossSpawned = true;
+            bossType = createdBoss.name;
+        
     }
 
     private List<Vector3> FindRoomFlags(Vector2Int position, string flagName)

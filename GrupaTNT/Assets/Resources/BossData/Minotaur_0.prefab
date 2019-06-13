@@ -55,6 +55,7 @@ MonoBehaviour:
   drop: {fileID: 26017975052970694, guid: c818800646e3d0d4c818cdfef42f9e6c, type: 3}
   speed: 5
   entityType: enemy
+  valsInit: 0
 --- !u!195 &6634064865654905987
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -161,7 +162,7 @@ MonoBehaviour:
   autoTriggerAtackDist: 1
   attackDelay: 2
   permaBuff: 0
-  health: 120
+  health: 50
   poise: 80
   armor: 2
   stunMod: 1
