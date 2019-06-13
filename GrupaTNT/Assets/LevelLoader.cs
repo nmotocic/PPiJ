@@ -10,8 +10,9 @@ public class LevelLoader : MonoBehaviour
     public Text progressText;
 
     public void LoadLevel(int sceneID) {
+
         StartCoroutine(LoadAsynchronously(sceneID));
-        LevelManager.Instance.DifficultyLevel++;
+       
     }
 
     IEnumerator LoadAsynchronously(int sceneID) {
@@ -19,7 +20,6 @@ public class LevelLoader : MonoBehaviour
         AsyncOperation operation = SceneManager.LoadSceneAsync(sceneID);
 
         loadingScreen.SetActive(true);
-        //operation.allowSceneActivation = false;
 
         while (!operation.isDone) {
 
@@ -29,9 +29,7 @@ public class LevelLoader : MonoBehaviour
             slider.value = progress;
             progressText.text = progress * 100f + "%";
             //wait a frame
-            yield return operation;
+            yield return null;
         }
-        
-        operation.allowSceneActivation = true;
     }
 }
