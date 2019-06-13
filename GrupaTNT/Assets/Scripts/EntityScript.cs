@@ -49,6 +49,7 @@ public class EntityScript : MonoBehaviour
     Rigidbody2D rb2d;
     public float speed = 20f;
     public string entityType = null;
+    public bool valsInit = false;
 
     public void Awake()
     {
