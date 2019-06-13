@@ -417,6 +417,16 @@ public class MinoBossAI : AiScriptBase
         {
             gameObject.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
         }
+        if ((gameObject.GetComponent<EntityScript>()) != null)
+        {
+            if (!gameObject.GetComponent<EntityScript>().enabled)
+            {
+                return;
+            }
+            else if(agent!=null){
+                if (!agent.enabled) agent.enabled = true;
+            }
+        }
         anim.SetInteger("State", state);
         anim.SetInteger("AttackType", attackType);
     }
@@ -470,7 +480,20 @@ public class MinoBossAI : AiScriptBase
         if (agent.isOnNavMesh) agent.SetDestination(pos);
         else
         {
-            //Do stuff
+            snapToMesh();
         }
+    }
+
+    public bool snapToMesh()
+    {
+
+        NavMeshHit hitCoord;
+        if (NavMesh.SamplePosition(rbody2d.position, out hitCoord, 5, NavMesh.AllAreas))
+        {
+            Debug.Log("Snapping to mesh...");
+            transform.position = hitCoord.position;
+        }
+        Debug.LogWarning("Failed snapping to mesh.");
+        return false;
     }
 }

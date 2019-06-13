@@ -142,7 +142,11 @@ public class EntityScript : MonoBehaviour
     // Update is called once per frame
     public void Update()
     {
-
+        if (gameObject.CompareTag(GameDefaults.Player())) {
+            if (controller == null) {
+                getController("player", new Vector2(0,0), 0);
+            }
+        }
         if (controller == null) { return; }
         /*if (Input.GetMouseButtonDown(0) && gameObject.CompareTag(GameDefaults.Enemy()))
         {
@@ -170,7 +174,15 @@ public class EntityScript : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (gameObject.CompareTag(GameDefaults.Projectile()) && (other.CompareTag(GameDefaults.Projectile())))
+        if (gameObject.CompareTag(GameDefaults.Projectile()) && other.CompareTag(GameDefaults.Projectile()))
+        {
+            return;
+        }
+        if (gameObject.CompareTag(GameDefaults.Powerup()) && !other.CompareTag(GameDefaults.Player()))
+        {
+            return;
+        }
+        if (other.CompareTag(GameDefaults.Powerup()))
         {
             return;
         }
@@ -194,6 +206,12 @@ public class EntityScript : MonoBehaviour
                 //Debug.Log(effect);
                 if (effect.Equals("damage"))
                 {
+                    if (gameObject.CompareTag(GameDefaults.Enemy())) {
+                        if (!gameObject.GetComponent<AiScriptBase>().isDangerous()) continue;
+                        else {
+                            gameObject.GetComponent<AiScriptBase>().setDanger(false);
+                        }
+                    }
                     if (!otherES.stats.ContainsKey("health"))
                     {
                         continue;
@@ -235,6 +253,7 @@ public class EntityScript : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+        //Stari kod
         if (true) //Unity ima ugrađene tagove i layere, zasto si stvarao svoje?
         {
             //Projectile collisions
@@ -246,7 +265,7 @@ public class EntityScript : MonoBehaviour
                     Destroy(gameObject);
                     return;
                 }
-                if (parent!=null&&!parent.CompareTag(other.gameObject.tag))
+                if (parent!=null &&! parent.CompareTag(other.gameObject.tag))
                 {
                     controller.OnTriggerEnter2D(collision);
                     GameObject.Destroy(gameObject);
@@ -284,6 +303,7 @@ public class EntityScript : MonoBehaviour
                 //Player
                 else if (other.gameObject.CompareTag(GameDefaults.Player()))
                 {
+                    if(controller !=null  && collision != null)
                     controller.OnTriggerEnter2D(collision);
                 }
             }
@@ -291,10 +311,12 @@ public class EntityScript : MonoBehaviour
             {
                 if (other.gameObject.CompareTag(GameDefaults.LevelExit()))
                 {
-                    controller.OnTriggerEnter2D(collision);
+                    if (controller != null && collision != null)
+                        controller.OnTriggerEnter2D(collision);
                 }
             }
         }
+        
     }
     private void OnTriggerEnter2D(Collider2D collision) {
         OnTriggerStay2D(collision);

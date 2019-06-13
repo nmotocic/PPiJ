@@ -109,41 +109,50 @@ public class RangedAI : AiScriptBase
             {
                 //Drop stuff, get removed
                 danger = false;
+                if (alarm.getMax() != GameDefaults.corpseTimeout()) {
+                    alarm.setMax(GameDefaults.corpseTimeout());
+                }
+                if (alarm.isActive())
+                {
+                    GameObject.Destroy(gameObject);
+                }
             }
 
             //--------------------------Attacking
-            if (Vector2.Distance(my_pos, target) <= attackTriggerRange && state == 0)
-            { //Prep attack
-                setDestination(my_pos, agent);
-                state = 1;
-                targetDir = -(my_pos - target);
-                targetDir.Normalize();
-                startPos = my_pos;
-                //Alarm
-                alarm.setMax(attackWindup);
-                alarm.reset();
+            if (state != GameDefaults.deatState())
+            {
+                if (Vector2.Distance(my_pos, target) <= attackTriggerRange && state == 0)
+                { //Prep attack
+                    setDestination(my_pos, agent);
+                    state = 1;
+                    targetDir = -(my_pos - target);
+                    targetDir.Normalize();
+                    startPos = my_pos;
+                    //Alarm
+                    alarm.setMax(attackWindup);
+                    alarm.reset();
+                }
+                else if (state == 1 && alarm.isActive())  //Wait for alarm
+                { //Attack - shoot
+                    eScript.DispenseObject(projectileObject, my_pos, targetDir, attackSpeed);
+                    //Alarm
+                    state = 2;
+                    alarm.setMax(attackDuration);
+                    alarm.reset();
+                }
+                else if ((state == 2 & alarm.isActive()))
+                { //Attack over - stop
+                    rbody2d.velocity = new Vector2(0, 0);
+                    state = 3;
+                    alarm.setMax(attackCooldown);
+                    alarm.reset();
+                }
+                else if ((state == 3 & alarm.isActive()))
+                { //Attack over - stop
+                    state = 0;
+                }
+                //--------------------------Attacking
             }
-            else if (state == 1 && alarm.isActive())  //Wait for alarm
-            { //Attack - shoot
-                eScript.DispenseObject(projectileObject,my_pos, targetDir, attackSpeed);
-                //Alarm
-                state = 2;
-                alarm.setMax(attackDuration);
-                alarm.reset();
-            }
-            else if ((state == 2 & alarm.isActive()))
-            { //Attack over - stop
-                rbody2d.velocity = new Vector2(0, 0);
-                state = 3;
-                alarm.setMax(attackCooldown);
-                alarm.reset();
-            }
-            else if ((state == 3 & alarm.isActive()))
-            { //Attack over - stop
-                state = 0;
-            }
-            //--------------------------Attacking
-
         }
     }
 
@@ -160,6 +169,11 @@ public class RangedAI : AiScriptBase
 
     public override void setState(int set)
     {
+        if (state != 2 && set == 2)//Despawn
+        {
+            alarm.reset();
+            alarm.setMax(GameDefaults.corpseTimeout());
+        }
         state = set;
         if (set == -2)
         {
@@ -204,7 +218,19 @@ public class RangedAI : AiScriptBase
         if (agent.isOnNavMesh) agent.SetDestination(pos);
         else
         {
-            //Do stuff
+            snapToMesh();
         }
+    }
+
+    public bool snapToMesh()
+    {
+        NavMeshHit hitCoord;
+        if (NavMesh.SamplePosition(rbody2d.position, out hitCoord, 5, NavMesh.AllAreas))
+        {
+            Debug.Log("Snapping to mesh...");
+            transform.position = hitCoord.position;
+        }
+        Debug.LogWarning("Failed snapping to mesh.");
+        return false;
     }
 }

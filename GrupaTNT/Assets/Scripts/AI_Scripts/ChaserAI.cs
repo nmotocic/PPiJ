@@ -32,7 +32,7 @@ public class ChaserAI : AiScriptBase
     public int contactDamage = 1;
     private bool danger = false;
 
-    private Vector2 targetDir,startPos;
+    private Vector2 targetDir, startPos;
     private Alarm alarm = new Alarm(0);
     private Rigidbody2D rbody2d;
     private Animator anim;
@@ -49,7 +49,7 @@ public class ChaserAI : AiScriptBase
         //Startup animation
         anim = gameObject.GetComponentInChildren<Animator>();
         //Startup controller
-        gameObject.GetComponent<EntityScript>().getController(null,new Vector2(0,0));
+        gameObject.GetComponent<EntityScript>().getController(null, new Vector2(0, 0));
     }
 
 
@@ -71,16 +71,17 @@ public class ChaserAI : AiScriptBase
             target = targetObject.transform.position;
         }
         //Update animation
-        updateAnimation(Mathf.Sign(my_pos.x-target.x));
+        updateAnimation(Mathf.Sign(my_pos.x - target.x));
         target.z = 0;
 
 
-        if (state==0 && AiDefaults.getLineSight(my_pos, target))
+        if (state == 0 && AiDefaults.getLineSight(my_pos, target))
         {   //Target obstructed
-            setDestination(target,agent);
+            setDestination(target, agent);
             rbody2d.velocity = new Vector2(0, 0);
         }
-        else { //State machine
+        else
+        { //State machine
             //Pick state
             if (state != 0) // Stop moving if winding up an attack
             {
@@ -94,14 +95,24 @@ public class ChaserAI : AiScriptBase
             }
 
             //Hurt
-            if (state == GameDefaults.hitState()) {
+            if (state == GameDefaults.hitState())
+            {
                 if (alarm.isActive()) state = 0;
                 danger = false;
             }
             //Death
-            else if (state == GameDefaults.deatState()) {
+            else if (state == GameDefaults.deatState())
+            {
                 //Drop stuff, get removed
                 danger = false;
+                if (alarm.getMax() != GameDefaults.corpseTimeout())
+                {
+                    alarm.setMax(GameDefaults.corpseTimeout());
+                }
+                if (alarm.isActive())
+                {
+                    Destroy(gameObject);
+                }
             }
 
             //--------------------------Attacking
@@ -109,7 +120,7 @@ public class ChaserAI : AiScriptBase
             { //Prep attack
                 setDestination(my_pos, agent);
                 state = 1;
-                targetDir = target-my_pos;
+                targetDir = target - my_pos;
                 targetDir.Normalize();
                 targetDir.Scale(new Vector2(attackSpeed, attackSpeed));
                 startPos = my_pos;
@@ -144,9 +155,11 @@ public class ChaserAI : AiScriptBase
 
     }
 
-    public override void updateAnimation(float flip){
+    public override void updateAnimation(float flip)
+    {
         var scale = gameObject.transform.localScale;
-        if (flip != Mathf.Sign(scale.x) && state==0) {
+        if (flip != Mathf.Sign(scale.x) && state == 0)
+        {
             gameObject.transform.localScale = new Vector3(-scale.x, scale.y, scale.z);
         }
         anim.SetInteger("State", state);
@@ -154,10 +167,16 @@ public class ChaserAI : AiScriptBase
 
     public override void setState(int set)
     {
+        if (state != 2 && set == 2)//Despawn
+        {
+            alarm.reset();
+            alarm.setMax(GameDefaults.corpseTimeout());
+        }
         state = set;
         if (set == -2)
         {
             agent.enabled = false;
+
         }
         else
         {
@@ -167,13 +186,14 @@ public class ChaserAI : AiScriptBase
 
     public override void setAlarm(float duration)
     {
-        if (state == GameDefaults.hitState()) {
+        if (state == GameDefaults.hitState())
+        {
             duration *= stunMod;
         }
         alarm.setMax(Mathf.Abs(duration));
     }
 
-    public override void getStats(ref int health,ref int armor,ref int poise,ref int meleeDamage, ref int rangeDamage)
+    public override void getStats(ref int health, ref int armor, ref int poise, ref int meleeDamage, ref int rangeDamage)
     {
         health = this.health;
         armor = this.armor;
@@ -192,11 +212,25 @@ public class ChaserAI : AiScriptBase
         danger = level;
     }
 
-    public void setDestination(Vector2 pos,NavMeshAgent agent) {
+    public void setDestination(Vector2 pos, NavMeshAgent agent)
+    {
         if (!agent.enabled) return;
         if (agent.isOnNavMesh) agent.SetDestination(pos);
-        else {
-            //Do stuff
+        else
+        {
+            snapToMesh();
         }
+    }
+
+    public bool snapToMesh()
+    {
+        NavMeshHit hitCoord;
+        if (NavMesh.SamplePosition(rbody2d.position, out hitCoord, 5, NavMesh.AllAreas))
+        {
+            Debug.Log("Snapping to mesh...");
+            transform.position = hitCoord.position;
+        }
+        Debug.LogWarning("Failed snapping to mesh.");
+        return false;
     }
 }

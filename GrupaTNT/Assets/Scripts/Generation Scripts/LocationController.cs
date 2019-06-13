@@ -90,6 +90,7 @@ public class LocationController : MonoBehaviour
         {
             foreach (var enemyGameObject in roomGrid[position.y, position.x].enemies)
             {
+                if (enemyGameObject == null) continue;
                 enemyGameObject.GetComponent<NavMeshAgent>().enabled = true;
                 enemyGameObject.GetComponent<EntityScript>().enabled = true;
             }
