@@ -12,6 +12,8 @@ public class LocationController : MonoBehaviour
     private Vector2Int locationOnRoomGrid;
     private LevelGenerator.Room[,] roomGrid;
     private Dictionary<LevelGenerator.Room, Bounds> boundsDict;
+    
+    // Maybe rename to alreadyAwoken, old name leftover
     private bool[,] alreadySpawned;
 
     private GameObject playerObject;
@@ -92,7 +94,7 @@ public class LocationController : MonoBehaviour
             {
                 if (enemyGameObject == null) continue;
                 enemyGameObject.GetComponent<NavMeshAgent>().enabled = true;
-                enemyGameObject.GetComponent<EntityScript>().enabled = true;
+                enemyGameObject.GetComponent<AiScriptBase>().enabled = true;
             }
             alreadySpawned[position.y, position.x] = true;
         }
@@ -103,14 +105,16 @@ public class LocationController : MonoBehaviour
         if (roomGrid[position.y, position.x] == null || alreadySpawned[position.y, position.x])
             return;
 
-        if (alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
+        // Not used anymore, we dont want the boss waking up when we enter the room
+        /*
+        if (!alreadySpawned[position.y, position.x] && roomGrid[position.y, position.x].bossRoom)
         {
             var BossGameObject = roomGrid[position.y, position.x].boss[0];
-            BossGameObject.GetComponent<NavMeshAgent>().enabled = true;
+            //BossGameObject.GetComponent<NavMeshAgent>().enabled = true;
             BossGameObject.GetComponent<EntityScript>().enabled = true;
             BossGameObject.GetComponent<MinoBossAI>().enabled = true;
             alreadySpawned[position.y, position.x] = true;
-        }
+        }*/
     }
 
     void CheckSpawn(Vector2Int position)
