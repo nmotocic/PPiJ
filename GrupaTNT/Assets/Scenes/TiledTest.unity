@@ -337,17 +337,17 @@ PrefabInstance:
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}
       propertyPath: roomGenNumber
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}
       propertyPath: branchMaxLength
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}
       propertyPath: gridWidthHeight
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3475256683035657305, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}
