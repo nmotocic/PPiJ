@@ -9,7 +9,7 @@ using UnityEngine.Tilemaps;
 
 public class LocationController : MonoBehaviour
 {
-    private Vector2Int locationOnRoomGrid;
+    public Vector2Int locationOnRoomGrid;
     private LevelGenerator.Room[,] roomGrid;
     private Dictionary<LevelGenerator.Room, Bounds> boundsDict;
     

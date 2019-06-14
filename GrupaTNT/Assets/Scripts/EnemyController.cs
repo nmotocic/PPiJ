@@ -20,6 +20,9 @@ public class EnemyController : EntityControllerInterface
     public int stun { get; set; }
     private bool start = true;
     private bool dropped = false;
+    
+    private KillQuestController _killQuestController;
+    private bool dead;
 
     public EnemyController(EntityScript ps) {
         parentScript = ps;
@@ -36,7 +39,9 @@ public class EnemyController : EntityControllerInterface
             parentScript.rawInput.Add("EFFECT damage irrelevant " + meleeDamage.ToString() + " 0 1");
             parentScript.Input();
         }
-
+    
+        _killQuestController = GameObject.FindWithTag("Manager").GetComponent<KillQuestController>();
+        dead = false;
     }
 
     // Update is called once per frame
@@ -80,11 +85,18 @@ public class EnemyController : EntityControllerInterface
             stun = poiseMax;
         }
     }
-    public void death()//Death script
+    public void death()//Death scriptd
     {
         myAi.setState(-2);
         parent.GetComponent<Collider2D>().enabled = false;
         parent.GetComponent<Rigidbody2D>().velocity = new Vector3(0,0,0);
+
+        if (!dead)
+        { 
+            _killQuestController.EnemyDeath(parentScript.name);
+            dead = true;
+        }
+        
         myAi.setDanger(false);
         if (!dropped) { lootDrop(); dropped = true; }
     }
