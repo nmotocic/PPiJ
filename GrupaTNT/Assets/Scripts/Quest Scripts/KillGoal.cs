@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class KillGoal : Goal
+﻿public class KillGoal : Goal
 {
     private string enemy;
 

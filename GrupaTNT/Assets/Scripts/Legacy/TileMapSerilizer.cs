@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 using Vector2 = UnityEngine.Vector2;
-using Vector3 = UnityEngine.Vector3;
 
 //TODO: - We need a way to mark places where doors/exits to be. So we know where to place rooms. Some kind of flag system is needed.
 

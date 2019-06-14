@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
@@ -44,7 +44,6 @@ public class LevelGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Time.timeScale = 1;
         _controller = GetComponent<FlagController>();
         _spawnController = GetComponent<SpawnController>();
         
@@ -410,8 +409,7 @@ public class LevelGenerator : MonoBehaviour
         var components = _tempMainRoomInstantiation.GetComponents<Component>();
         foreach (var component in components)
         {
-            UnityEditorInternal.ComponentUtility.CopyComponent(component);
-            UnityEditorInternal.ComponentUtility.PasteComponentAsNew(gridObject);
+            CopyComponent(component, gridObject);
         }
         
         Destroy(_tempMainRoomInstantiation);
@@ -429,6 +427,26 @@ public class LevelGenerator : MonoBehaviour
         //roomHolder.transform.Find("Flags").gameObject.GetComponent<TilemapCollider2D>().isTrigger = true;
         
         return room;
+    }
+    
+    T CopyComponent<T>(T original, GameObject destination) where T : Component
+    {
+        System.Type type = original.GetType();
+        var dst = destination.GetComponent(type) as T;
+        if (!dst) dst = destination.AddComponent(type) as T;
+        var fields = type.GetFields();
+        foreach (var field in fields)
+        {
+            if (field.IsStatic) continue;
+            field.SetValue(dst, field.GetValue(original));
+        }
+        var props = type.GetProperties();
+        foreach (var prop in props)
+        {
+            if (!prop.CanWrite || !prop.CanWrite || prop.Name == "name") continue;
+            prop.SetValue(dst, prop.GetValue(original, null), null);
+        }
+        return dst as T;
     }
 
     List<GameObject> LoadGameObjectRooms()

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using SuperTiled2Unity;
+﻿using SuperTiled2Unity;
 using UnityEngine;
 
 public class SuperTIleTest : MonoBehaviour

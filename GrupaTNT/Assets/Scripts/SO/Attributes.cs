@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(menuName = "EnterTheDungeon/Player/Create Attribute")]
 public class Attributes : ScriptableObject
