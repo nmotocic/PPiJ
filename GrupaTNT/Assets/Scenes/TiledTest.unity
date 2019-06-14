@@ -112,7 +112,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1001 &1933338837
+--- !u!1001 &761345210
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -181,11 +181,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f964e71971d74211eb3bebdf171b408d, type: 3}
---- !u!1 &1933338838 stripped
+--- !u!1 &1311830896 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1840078520223882040, guid: f964e71971d74211eb3bebdf171b408d,
     type: 3}
-  m_PrefabInstance: {fileID: 1933338837}
+  m_PrefabInstance: {fileID: 761345210}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &630490690305658392
 PrefabInstance:
@@ -333,11 +333,11 @@ PrefabInstance:
         type: 3}
       propertyPath: mainRoom
       value: 
-      objectReference: {fileID: 1933338838}
+      objectReference: {fileID: 1311830896}
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}
       propertyPath: roomGenNumber
-      value: 2
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3475256683035657307, guid: 2fd0836b051f2451c885e2ea30def721,
         type: 3}

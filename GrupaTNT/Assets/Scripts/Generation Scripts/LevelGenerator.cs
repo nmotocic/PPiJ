@@ -309,7 +309,7 @@ public class LevelGenerator : MonoBehaviour
                 if (madeBossRoom == false)
                 {
                     //Is it a hallway?
-                    if (!pickedRoom.name.EndsWith("_2"))
+                    if (!pickedRoom.name.EndsWith("_2") && !pickedRoom.name.EndsWith("_5") && !pickedRoom.name.EndsWith("_8"))
                     {
                         bossRoom = true;
                         Debug.Log("Made boss room");
@@ -619,7 +619,7 @@ public class LevelGenerator : MonoBehaviour
             if ((roomsToGen < branchMaxLength/2 || n < branchMaxLength/2) && (madeBossRoom == false))
             {
                 //Is it not a hallway?
-                if (!pickedRoom.name.EndsWith("_2"))
+                if (!pickedRoom.name.EndsWith("_2") && !pickedRoom.name.EndsWith("_5") && !pickedRoom.name.EndsWith("_8"))
                 {
                     makeBossRoom = true;
                     Debug.Log("MADE BOSS");
