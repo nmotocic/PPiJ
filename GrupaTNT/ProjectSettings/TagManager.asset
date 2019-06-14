@@ -12,6 +12,7 @@ TagManager:
   - Powerup
   - LevelExit
   - Manager
+  - Canvas
   layers:
   - Default
   - TransparentFX

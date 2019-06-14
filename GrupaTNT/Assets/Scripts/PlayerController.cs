@@ -100,6 +100,7 @@ public class PlayerController : EntityControllerInterface
     }
     public void death() {
         Debug.LogWarning("Oof");
+        GameObject.FindWithTag("Canvas").GetComponent<Canvas>().enabled = true;
         spriteAnimator.dead = true;
     }
 }
