@@ -159,6 +159,8 @@ public class LevelGenerator : MonoBehaviour
 
         RemoveFlagRendering();
         
+        
+        _roomGameObjects.ForEach(room => Destroy(room));
         Debug.Assert(madeBossRoom);
     }
 
